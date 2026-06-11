@@ -1,11 +1,15 @@
 import * as fs from "fs-extra";
 import { BookMetadata, projectAon } from "../model/projectAon";
+import { downloadFile, downloadDirectory } from "./downloadFile";
 
 /** Tool to download book data from the Project Aon SVN */
 export class BookData {
 
-    /** URL for the PAON trunk (current version) */
-    private static readonly SVN_TRUNK_URL = "https://www.projectaon.org/data/trunk";
+    /** Base URL for XML text files (has all books including 29) */
+    private static readonly XML_BASE_URL = "https://svn.projectaon.org/books/trunk";
+
+    /** Base URL for image assets (covers, illustrations) */
+    private static readonly IMG_BASE_URL = "https://www.projectaon.org/data/trunk";
 
     /**
      * The target directory root
@@ -55,55 +59,47 @@ export class BookData {
     }
 
     /**
-     * Get the SVN source path for the book XML, as it is configured on projectAon.ts
-     * @param root Optional. The SVN root to use. If null, the current published version will be used
-     * @returns The currently used book XML URL at the PAON web site
+     * Get the HTTP source URL for the book XML
      */
-    private getXmlSvnSourcePath(): string {
-        return "project-aon/en/xml/" + this.getBookXmlName();
+    private getXmlUrl(): string {
+        return BookData.XML_BASE_URL + "/en/xml/" + this.getBookXmlName();
     }
 
     /**
      * Download the book XML
      */
-    private downloadXml() {
-        // Download the book XML
-        const sourcePath = this.getXmlSvnSourcePath();
-        const targetPath = this.getBookDir() + "/" + this.getBookXmlName();        
-        fs.copyFileSync(sourcePath, targetPath);
+    private async downloadXml() {
+        const url = this.getXmlUrl();
+        const targetPath = this.getBookDir() + "/" + this.getBookXmlName();
+        await downloadFile(url, targetPath);
     }
 
     /**
      * Download an author biography file
      */
-    private downloadAuthorBio(bioFileName: string) {
-        const sourcePath = "project-aon/en/xml/" + bioFileName + ".inc";
+    private async downloadAuthorBio(bioFileName: string) {
+        const url = BookData.XML_BASE_URL + "/en/xml/" + bioFileName + ".inc";
         const targetPath = this.getBookDir() + "/" + bioFileName + ".inc";
-        fs.copyFileSync(sourcePath, targetPath);
+        await downloadFile(url, targetPath);
     }
 
     /**
-     * Get the svn absolute URL for illustrations directory of a given author
+     * Get the HTTP URL for illustrations directory of a given author
      */
-    private getSvnIllustrationsDir(author: string): string {
-        return "project-aon/en/png/lw/" + this.code + "/ill/" +
-            author;
+    private getIllustrationsUrl(author: string): string {
+        return BookData.IMG_BASE_URL + "/en/png/lw/" + this.code + "/ill/" + author;
     }
 
     /**
      * Download illustrations
      */
-    private downloadIllustrations(author: string) {
-
-        const sourceDir = this.getSvnIllustrationsDir(author);
+    private async downloadIllustrations(author: string) {
+        const url = this.getIllustrationsUrl(author);
         const targetDir = this.getBookDir() + "/ill";
-        if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir);
-        }
-        fs.copySync(sourceDir, targetDir);
+        await downloadDirectory(url, targetDir);
 
         if ( this.bookNumber === 9) {
-            this.book9ObjectIllustrations();
+            await this.book9ObjectIllustrations();
         }
     }
 
@@ -112,7 +108,7 @@ export class BookData {
      * On book 9, there is a illustrator change (Brian Williams). He did illustrations for objects that
      * exists on previous books. So, include on this book all existing objects illustrations
      */
-    private book9ObjectIllustrations() {
+    private async book9ObjectIllustrations() {
 
         // Already included on book 9: dagger.png, sword.png, mace.png, bow.png, food.png, potion.png, quiver.png, rope.png
 
@@ -128,52 +124,52 @@ export class BookData {
             "warhammr.png" : "08tjoh/ill/chalk/warhammr.png"
         };
         for (const illName of Object.keys(williamsIllustrations) ) {
-            const sourcePath = "project-aon/en/png/lw/" + williamsIllustrations[illName];
+            const url = BookData.IMG_BASE_URL + "/en/png/lw/" + williamsIllustrations[illName];
             const targetPath = targetDir + "/" + illName;
-            fs.copySync(sourcePath, targetPath);
+            await downloadFile(url, targetPath, true);
         }
     }
 
     /**
      * Download the book cover
      */
-    private downloadCover() {
+    private async downloadCover() {
         if ( this.hasCover ) {
-            const coverPath = "project-aon/en/jpeg/lw/" + this.code +
+            const url = BookData.IMG_BASE_URL + "/en/jpeg/lw/" + this.code +
                 "/skins/ebook/cover.jpg";
             const targetPath = this.getBookDir() + "/cover.jpg";
-            fs.copyFileSync(coverPath, targetPath);
+            await downloadFile(url, targetPath);
         }
     }
 
-    public downloadBookData() {
+    public async downloadBookData() {
         const bookDir = BookData.TARGET_ROOT + "/" + this.bookNumber.toFixed();
 
         console.log("Re-creating directory " + bookDir);
         fs.removeSync( bookDir );
         fs.mkdirSync( bookDir );
 
-        this.downloadCover();
+        await this.downloadCover();
 
         // Download authors biographies
-        this.bookMetadata.biographies.forEach( (authorBio) => {
-            this.downloadAuthorBio(authorBio);
-        });
+        for (const authorBio of this.bookMetadata.biographies) {
+            await this.downloadAuthorBio(authorBio);
+        }
 
-        this.downloadXml();
+        await this.downloadXml();
 
-        this.illAuthors.forEach( (author) => {
-            this.downloadIllustrations(author);
-        });
+        for (const author of this.illAuthors) {
+            await this.downloadIllustrations(author);
+        }
 
-        this.downloadCombatTablesImages();
+        await this.downloadCombatTablesImages();
     }
 
-    private downloadCombatTablesImages() {
-        const sourceSvnDir = this.getSvnIllustrationsDir("blake");
+    private async downloadCombatTablesImages() {
+        const baseUrl = this.getIllustrationsUrl("blake");
         const targetDir = this.getBookDir() + "/ill";
-        
-        fs.copyFileSync(sourceSvnDir + "/crtneg.png", targetDir + "/crtneg.png");        
-        fs.copyFileSync(sourceSvnDir + "/crtpos.png", targetDir + "/crtpos.png");
+
+        await downloadFile(baseUrl + "/crtneg.png", targetDir + "/crtneg.png", true);
+        await downloadFile(baseUrl + "/crtpos.png", targetDir + "/crtpos.png", true);
     }
 }

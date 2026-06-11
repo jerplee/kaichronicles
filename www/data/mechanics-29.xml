@@ -2713,7 +2713,7 @@
 
         <section id="sect342">
             <choiceState section="all" set="disabled" />
-            <book29sect342 />
+            <specialSection sectionId="sect342" />
             <test currentWeapon="kaistar">
                 <combat combatSkillModifierIncrement="+2"/>
             </test>

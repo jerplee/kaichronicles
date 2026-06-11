@@ -242,7 +242,7 @@
             <textToChoice text="turn immediately to 335" section="sect335" />
             <choiceState section="all" set="disabled" />
             <combat bow="true" />
-            <book6sect26 />
+            <specialSection sectionId="sect26" />
             <test sectionVisited="sect298">
                 <!-- 2 CS if you play with a jakan -->
                 <combat combatSkillModifier="-2" />
@@ -1528,7 +1528,7 @@
 
         <section id="sect284">
             <numberPicker text="Choose the number of Gold Crowns you want to bet" min="1" max="10" money="true" actionButton="Bet" />
-            <book6sect284 />
+            <specialSection sectionId="sect284" />
         </section>
 
         <section id="sect286">
@@ -1783,7 +1783,7 @@
         </section>
 
         <section id="sect340">
-            <book6sect340 />
+            <specialSection sectionId="sect340" />
         </section>
 
         <section id="sect341">

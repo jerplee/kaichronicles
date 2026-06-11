@@ -1,8 +1,6 @@
 import * as fs from "fs-extra";
-import * as fsn from "fs";
 import { projectAon } from "../model/projectAon";
 import { BookData } from "./bookData";
-import simpleGit, {SimpleGit, SimpleGitProgressEvent} from 'simple-git';
 
 /*
     Download Project Aon book data
@@ -37,24 +35,8 @@ if ( bookNumber ) {
     to = projectAon.supportedBooks.length;
 }
 
-const progress = ({method, stage, progress}: SimpleGitProgressEvent) => {
-    console.log(`git.${method} ${stage} stage ${progress}% complete`);
- }
-
-let gitPromise;
-if(fsn.existsSync("project-aon")) {
-    console.log("Updating Project Aon local repository");
-    const git: SimpleGit = simpleGit('./project-aon', {progress});
-    gitPromise = git.pull();
-} else {
-    const url:string = process.env.npm_config_url || "https://git.projectaon.org/project-aon.git";
-    console.log(`Cloning Project Aon git repository (${url}). Could take time (~500MB to download).`);
-    const git: SimpleGit = simpleGit({progress});
-    gitPromise = git.clone(url);
-}
-
-gitPromise.then(() => {
+(async () => {
     for (let i = from; i <= to; i++) {
-        new BookData(i).downloadBookData();
+        await new BookData(i).downloadBookData();
     }
-}, null);
+})();

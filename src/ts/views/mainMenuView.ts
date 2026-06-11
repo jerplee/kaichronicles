@@ -1,4 +1,4 @@
-import { translations, routing, mainMenuController } from "..";
+import { translations, routing } from "..";
 
 export const mainMenuView = {
 
@@ -19,10 +19,6 @@ export const mainMenuView = {
         $("#menu-load").on("click", (e) => {
             e.preventDefault();
             routing.redirect("loadGame");
-        });
-        $("#menu-color-theme").on("click", (e) => {
-            e.preventDefault();
-            mainMenuController.changeColor();
         });
         $("#menu-faq").on("click", (e) => {
             e.preventDefault();

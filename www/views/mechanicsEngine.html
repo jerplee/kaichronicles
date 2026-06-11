@@ -118,18 +118,41 @@
 
     <!-- Combat template -->
     <div class="mechanics-combatUI" id="mechanics-combat">
-        <!-- Combat tables -->
-        <button class="btn btn-default table-op mechanics-combatTables" 
-            title="Show combat tables">
-            <span class="glyphicon glyphicon-th"></span>
-        </button>
-        <!-- Combat ratio -->
-        <p>
-            <a href="#" class="crlink">
-                <span class="attribute" data-translation="combatRatio">COMBAT RATIO</span>: 
-                <span class="mechanics-combatRatio">CR</span>
-            </a>
-        </p>
+        <!-- Fighter status panel -->
+        <div class="mechanics-combat-status row">
+            <div class="col-xs-5 combat-fighter player">
+                <div class="fighter-name mechanics-playerName">Lone Wolf</div>
+                <div class="fighter-stat">
+                    <span class="attribute" data-translation="enduranceUpper">ENDURANCE</span>:
+                    <span class="mechanics-player-current-endurance">20</span>
+                    / <span class="mechanics-player-max-endurance">25</span>
+                </div>
+                <div class="fighter-stat">
+                    <span class="attribute" data-translation="combatSkillUpper">COMBAT SKILL</span>:
+                    <span class="mechanics-player-cs">15</span>
+                </div>
+            </div>
+            <div class="col-xs-2 combat-divider">
+                <div class="cr-box">
+                    <div class="cr-label" data-translation="combatRatio">Combat Ratio</div>
+                    <a href="#" class="crlink">
+                        <div class="cr-value mechanics-combatRatio">0</div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-xs-5 combat-fighter enemy">
+                <div class="fighter-name mechanics-enemyName">Enemy</div>
+                <div class="fighter-stat">
+                    <span class="attribute" data-translation="enduranceUpper">ENDURANCE</span>:
+                    <span class="mechanics-enemy-current-endurance">20</span>
+                    / <span class="mechanics-enemy-max-endurance">20</span>
+                </div>
+                <div class="fighter-stat">
+                    <span class="attribute" data-translation="combatSkillUpper">COMBAT SKILL</span>:
+                    <span class="mechanics-enemy-cs">15</span>
+                </div>
+            </div>
+        </div>
         <!-- Psi-surge / Kai-surge -->
         <div class="checkbox psisurgecheck">
             <label>
@@ -175,19 +198,21 @@
                         <span class="hidden-xs" data-translation="randomTable">Random table</span>
                         <span class="visible-xs-inline" data-translation="randomTableSmall">R.</span>
                     </td>
-                    <td class="mechanics-playerName">Lone Wolf</td>
-                    <td><span class="mechanics-enemyName">Enemy</span></td>
+                    <td>LW Loss</td>
+                    <td>Enemy Loss</td>
                 </tr>
             </thead>
             <tbody>
             </tbody>
         </table>
         <!-- Combat buttons -->
-        <a href="#" class="btn btn-primary btn-block mechanics-playTurn" data-translation="playTurn">
-            Play turn
+        <a href="#" class="btn btn-primary btn-lg btn-block mechanics-playTurn" data-translation="playTurn">
+            <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Play Turn
         </a>
         <a href="#" class="btn btn-warning btn-block mechanics-elude" 
             style="display: none" data-translation="eludeCombat">Elude combat</a>
+        <a href="#" class="btn btn-info btn-block mechanics-audit" 
+            style="display: none" data-translation="combatAudit">Combat Audit</a>
     </div>
 
     <!-- Player death -->

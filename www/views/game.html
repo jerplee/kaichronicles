@@ -7,19 +7,19 @@
 </div>
 
 <!-- Navigation buttons (previous / next) -->
-<div id="game-navSectionButtons" style="display: none; text-align: center">
-    <hr />
-    <a href="#" id="game-prevSection" class="btn btn-default" style="margin-right:10px; width:25%">
+<div id="game-navSectionButtons" style="display: none;">
+    <a href="#" id="game-prevSection" class="btn btn-default btn-nav">
         <span class="glyphicon glyphicon-arrow-left"></span>
+        <span data-translation="previousSection">Previous Section</span>
     </a>
-    <a href="#" id="game-nextSection" class="btn btn-default" style="margin-left:10px; width:25%">
+    <a href="#" id="game-nextSection" class="btn btn-default btn-nav">
+        <span data-translation="nextSection">Next Section</span>
         <span class="glyphicon glyphicon-arrow-right"></span>
     </a>
 </div>
 
-<!-- Book copyright -->
-<div style="text-align: center; font-size: small; font-style: italic">
-    <hr />
+<!-- Book copyright footer -->
+<div id="game-copyrights-wrapper">
     <span id="game-copyrights"></span>
 </div>
 
@@ -58,7 +58,7 @@
 </div>
 
 <!-- Modal to see Combat ratio details (see combatMechanics.ts)-->
-<div class="modal fade" id="game-ratiodetails" tabindex="-1" role="dialog" 
+<div class="modal fade" id="game-ratiodetails" tabindex="-1" role="dialog"
     aria-labelledby="game-ratiotitle">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -92,5 +92,51 @@
             </div>
         </div>
 
+    </div>
+</div>
+
+<!-- Modal to see Combat audit (see combatMechanics.ts)-->
+<div class="modal fade" id="game-combataudit" tabindex="-1" role="dialog"
+    aria-labelledby="game-combataudittitle">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="game-combataudittitle" data-translation="combatAudit">
+                    Combat Audit
+                </h4>
+            </div>
+
+            <div class="modal-body" id="game-combatauditbody">
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal"
+                data-translation="close">
+                    Close
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal to zoom illustrations -->
+<div class="modal fade" id="game-illustration-zoom" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" data-translation="illustration">Illustration</h4>
+            </div>
+            <div class="modal-body text-center">
+                <img id="game-illustration-img" src="" style="max-width:100%; cursor: zoom-out;" />
+            </div>
+        </div>
     </div>
 </div>

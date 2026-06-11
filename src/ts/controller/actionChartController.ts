@@ -309,6 +309,19 @@ export const actionChartController = {
         }
 
         if (o.usage && applyEffect) {
+            // Check Alether limit: one per combat
+            if (o.usage.cls === Item.COMBATSKILL) {
+                const isAlether = o.id.startsWith("alether") || o.id.startsWith("potionofstrength");
+                if (isAlether) {
+                    const sectionState = state.sectionStates.getSectionState();
+                    if (sectionState.aletherUsed) {
+                        toastr.error(translations.text("aletherAlreadyUsed"));
+                        return;
+                    }
+                    sectionState.aletherUsed = true;
+                }
+            }
+
             // Do the usage action:
             if (o.usage.cls === Item.ENDURANCE) {
                 actionChartController.increaseEndurance(o.usage.increment);

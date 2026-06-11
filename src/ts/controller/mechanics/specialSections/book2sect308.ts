@@ -1,4 +1,4 @@
-import { mechanicsEngine, gameView, template, state, translations, actionChartController, randomTable, CurrencyName } from "../../..";
+import { mechanicsEngine, gameView, template, state, translations, actionChartController, randomTable, CurrencyName, SpecialSectionRegistry } from "../../..";
 
 interface GameResult {
     dice1: number,
@@ -80,3 +80,5 @@ export const book2sect308 = {
         return result;
     },
 };
+
+SpecialSectionRegistry.register("sect308", book2sect308);

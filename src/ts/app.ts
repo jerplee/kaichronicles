@@ -66,6 +66,17 @@ export class App {
             toastr.clear();
         };
 
+        // Online / offline indicator
+        window.addEventListener("online", () => {
+            $("#template-offline").hide();
+        });
+        window.addEventListener("offline", () => {
+            $("#template-offline").show();
+        });
+        if (!navigator.onLine) {
+            $("#template-offline").show();
+        }
+
         // First, load the views
         void views.setup()
             .then( () => {

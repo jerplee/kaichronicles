@@ -67,12 +67,6 @@ div.illustration img.originalsize {
     font-style: italic;
 }
 
-/* Choices */
-.choice {
-    margin-left: 15px;
-    text-align: left;
-}
-
 /* Disabled raw links */
 .disabled {
     opacity: 0.65;
@@ -84,6 +78,21 @@ div.illustration img.originalsize {
     font-weight: bold;
 }
 
+/* Random number table links — subtle inline pill */
+.action.random {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: #e8f4fd;
+    border-bottom: 1px dashed #337ab7;
+    transition: background 0.15s;
+    cursor: pointer;
+}
+.action.random:hover {
+    background: #d0e8f7;
+    text-decoration: none;
+}
+
 /* Disabled action links */
 .action.disabled {
     color: gray;
@@ -93,6 +102,8 @@ div.illustration img.originalsize {
     color: black;
     font-weight: bold;
     opacity: 1;
+    background: transparent;
+    border-bottom: none;
 }
 
 /* List tables */
@@ -195,18 +206,279 @@ div.signpost {
     text-align: center;
 }
 
-/* Large buttons */
+/* Combat UI card container */
+.mechanics-combatUI {
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    margin-bottom: 0;
+}
+
+/* Fighter status panel */
+.mechanics-combat-status {
+    margin: 0 0 10px 0;
+    padding: 8px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.combat-fighter {
+    text-align: center;
+}
+.fighter-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 4px;
+}
+.fighter-stat {
+    font-size: 0.95em;
+    color: #555;
+}
+.fighter-stat .attribute {
+    font-size: 0.85em;
+    text-transform: uppercase;
+}
+
+/* Vertical divider with boxed combat ratio */
+.combat-divider {
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 70px;
+    padding: 4px 2px;
+}
+.cr-box {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px 10px;
+    text-align: center;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+    min-width: 70px;
+}
+.cr-box .cr-label {
+    font-size: 0.68em;
+    text-transform: uppercase;
+    color: #666;
+    letter-spacing: 0.3px;
+    margin-bottom: 3px;
+    line-height: 1.1;
+}
+.cr-box .cr-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    line-height: 1.1;
+}
+.cr-box .crlink:hover {
+    text-decoration: none;
+}
+.cr-box .crlink:hover .cr-value {
+    color: #337ab7;
+}
+
+/* Color-coded endurance */
+.endurance-high { color: #5cb85c !important; }
+.endurance-medium { color: #f0ad4e !important; }
+.endurance-low { color: #d9534f !important; }
+.endurance-critical { color: #c9302c !important; font-weight: bold !important; }
+
+body.dark .mechanics-combatUI {
+    background: #2a2a2a;
+    border-color: #444;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+body.dark .mechanics-combat-status {
+    background-color: #333;
+    border-color: #444;
+}
+body.dark .fighter-stat {
+    color: #aaa;
+}
+body.dark .combat-divider {
+    border-left-color: #444;
+    border-right-color: #444;
+}
+body.dark .cr-box {
+    background: #2d2d2d;
+    border-color: #444;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.2);
+}
+body.dark .cr-box .cr-label {
+    color: #999;
+}
+body.dark .cr-box .cr-value {
+    color: #ddd;
+}
+body.dark .cr-box .crlink:hover .cr-value {
+    color: #5bc0de;
+}
+
+/* Hide original combat well text — the new fighter panel replaces it */
+.combat.well {
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    margin-bottom: 16px;
+}
+.combat.well > *:not(.mechanics-combatUI) {
+    display: none !important;
+}
+
+/* Collapsed finished combat */
+.mechanics-combatUI.combat-finished {
+    opacity: 0.6;
+}
+.mechanics-combatUI.combat-finished .mechanics-combat-status {
+    margin-bottom: 0;
+}
+.mechanics-combatUI.combat-finished .fighter-name::after {
+    content: " ✓";
+    color: #5cb85c;
+    font-size: 0.9em;
+}
+body.dark .mechanics-combatUI.combat-finished .fighter-name::after {
+    color: #5cb85c;
+}
+.mechanics-combatUI.combat-finished .crlink,
+.mechanics-combatUI.combat-finished .checkbox,
+.mechanics-combatUI.combat-finished table,
+.mechanics-combatUI.combat-finished .mechanics-playTurn,
+.mechanics-combatUI.combat-finished .mechanics-elude {
+    display: none !important;
+}
+
+/* Combat buttons */
+.mechanics-playTurn {
+    margin-top: 10px;
+    margin-bottom: 8px;
+    font-size: 1.15em;
+    padding: 12px;
+}
+.mechanics-playTurn .glyphicon {
+    margin-right: 6px;
+}
+.mechanics-elude {
+    margin-bottom: 8px;
+}
+.mechanics-audit {
+    margin-bottom: 8px;
+}
+
+/* ============================================================
+   Main Menu
+   ============================================================ */
+
+#main-menu {
+    padding: 20px;
+}
+
+.menu-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.menu-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.menu-header h1 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 2em;
+    color: inherit;
+}
+.menu-meta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+.menu-version {
+    color: #888;
+    font-size: 0.85em;
+}
+.menu-header p {
+    color: #666;
+    font-size: 0.95em;
+    margin: 0;
+}
+
+.menu-warnings {
+    background: #fafafa;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 0.85em;
+    color: #666;
+}
+.menu-warnings p {
+    margin-bottom: 0.6em;
+}
+.menu-warnings p:last-child {
+    margin-bottom: 0;
+}
+
+.menu-actions {
+    margin-bottom: 0;
+}
+
+/* Large buttons — card style */
 .large-button {
-    /*display: block;*/
+    display: flex;
+    align-items: center;
     width: 100%;
     text-align: left;
     white-space: normal;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-left: 3px solid #337ab7;
+    background: #fafafa;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: background 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    outline: none;
 }
-.large-button img { 
-    max-width: 25%;
-    margin: 5px 0;
-    margin-right: 10px;
+.large-button:hover {
+    background: #f0f0f0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+.large-button:active {
+    background: #e0e0e0;
+}
+.large-button img {
+    max-width: 32px;
+    max-height: 32px;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+.large-button span {
+    font-weight: bold;
+    font-size: 1.05em;
+}
+
+.menu-footer {
+    text-align: center;
+    font-size: 0.9em;
+    color: #777;
+}
+.menu-footer p {
+    margin-bottom: 4px;
 }
 
 /* Multiline text on buttons */
@@ -217,6 +489,85 @@ div.signpost {
 /* The statistics on header is like a link */
 #template-statistics {
     cursor: pointer;
+}
+
+/* Navbar theme toggle */
+.navbar-theme-toggle {
+    float: right;
+    padding: 14px 10px;
+    margin-right: 8px;
+    color: #9d9d9d;
+    font-size: 18px;
+    line-height: 20px;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.navbar-theme-toggle:hover {
+    color: #fff;
+    text-decoration: none;
+}
+.navbar-theme-toggle:focus {
+    outline: none;
+    text-decoration: none;
+}
+
+/* Action chart interactive elements need cursor: pointer for iOS Safari */
+.equipment-op,
+.table-op,
+#achart-dropmeal,
+#achart-restore20Ep,
+#achart-fightUnarmed-container label {
+    cursor: pointer;
+}
+
+/* Action chart stat display */
+#achart-combatSkills,
+#achart-endurance {
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
+    background: #f8f8f8;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    color: #333;
+    padding: 8px;
+}
+body.dark #achart-combatSkills,
+body.dark #achart-endurance {
+    background: #2d2d2d;
+    border-color: #444;
+    color: #ddd;
+}
+
+/* Action chart section spacing */
+#action-chart-view h3 {
+    margin-top: 24px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #eee;
+    font-size: 1.2em;
+}
+body.dark #action-chart-view h3 {
+    border-bottom-color: #444;
+}
+
+/* Action chart inventory table improvements */
+#achart-weapons td,
+#achart-backpack td,
+#achart-special td,
+#achart-disciplines td {
+    vertical-align: middle !important;
+    padding: 8px 12px !important;
+}
+
+/* Inventory item image */
+.inventoryImgContainer {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+.inventoryImg {
+    max-height: 32px;
+    max-width: 32px;
 }
 
 #template-kaiName {
@@ -302,8 +653,17 @@ body.dark {
 }
 
 
+body.dark .action.random {
+    background: #1a3a4a;
+    border-bottom-color: #5bc0de;
+}
+body.dark .action.random:hover {
+    background: #2a4a5a;
+}
 body.dark .action.random.picked {
     color: #ddd;
+    background: transparent;
+    border-bottom: none;
 }
 
 body.dark .well,
@@ -350,4 +710,440 @@ body.dark #template-containertable {
 /** Downloaded book on Work With Books */
 body.dark #wwbooks-list tr.success > td {
     background-color: #006400;
+}
+
+/* Dark mode: html background to avoid white flash */
+body.dark,
+html:has(body.dark) {
+    background: #222;
+}
+
+/* Dark mode: navbar */
+body.dark .navbar-inverse {
+    background-color: #111;
+    border-color: #333;
+}
+
+/* Dark mode: links */
+body.dark a {
+    color: #6cb4f5;
+}
+body.dark a:hover,
+body.dark a:focus {
+    color: #9eceff;
+}
+
+/* Dark mode: combat boxes */
+body.dark .combat.well {
+    background-color: #2d2d2d;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+/* Dark mode: primary buttons */
+body.dark .btn-primary {
+    background-color: #286090;
+    border-color: #204d74;
+}
+body.dark .btn-primary:hover {
+    background-color: #1d4b73;
+    border-color: #173a5a;
+}
+
+/* Dark mode: panels */
+body.dark .panel {
+    background-color: #2d2d2d;
+    border-color: #444;
+}
+body.dark .panel-default > .panel-heading {
+    background-color: #3a3a3a;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+/* Dark mode: alerts */
+body.dark .alert-warning {
+    background-color: #4d3b1a;
+    border-color: #66522b;
+    color: #f0d9a0;
+}
+body.dark .alert-success {
+    background-color: #1a4d1a;
+    border-color: #2b662b;
+    color: #a0f0a0;
+}
+body.dark .alert-info {
+    background-color: #1a3a4d;
+    border-color: #2b4d66;
+    color: #a0d9f0;
+}
+body.dark .alert-danger {
+    background-color: #4d1a1a;
+    border-color: #662b2b;
+    color: #f0a0a0;
+}
+
+/* Dark mode: toasts */
+body.dark #toast-container > .toast {
+    background-color: #333;
+    color: #e0e0e0;
+}
+
+/* Dark mode: dropdown menus */
+body.dark .dropdown-menu {
+    background-color: #333;
+    border-color: #555;
+}
+body.dark .dropdown-menu > li > a {
+    color: #ccc;
+}
+body.dark .dropdown-menu > li > a:hover {
+    background-color: #444;
+    color: #fff;
+}
+
+/* Dark mode: pagination / pager */
+body.dark .pagination > li > a,
+body.dark .pagination > li > span {
+    background-color: #333;
+    border-color: #555;
+    color: #ccc;
+}
+body.dark .pagination > li > a:hover {
+    background-color: #444;
+    border-color: #666;
+    color: #fff;
+}
+
+/* Dark mode: labels */
+body.dark .label-default {
+    background-color: #555;
+}
+body.dark .label-success {
+    background-color: #3d7a3d;
+}
+body.dark .label-warning {
+    background-color: #8a6d3b;
+}
+body.dark .label-danger {
+    background-color: #a94442;
+}
+body.dark .label-info {
+    background-color: #31708f;
+}
+
+/* Dark mode: hr */
+body.dark hr {
+    border-color: #444;
+}
+
+/* Dark mode: blockquote */
+body.dark blockquote {
+    border-color: #444;
+    color: #bbb;
+}
+
+/* Dark mode: disabled choices */
+body.dark a.disabled {
+    color: #777;
+}
+
+/* Toast image alignment */
+#toast-container > .toast {
+    display: flex;
+    align-items: center;
+}
+#toast-container > .toast > .toast-message {
+    flex: 1;
+    padding-left: 5px;
+}
+
+/* ============================================================
+   Phase 6: Reading Experience & Choice UI Polish
+   ============================================================ */
+
+/* --- Reading Section Card --- */
+#game-section {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 20px 20px 70px 20px;
+    line-height: 1.7;
+}
+
+/* --- Section Number --- */
+.section-number {
+    text-align: center;
+    font-size: 1em;
+    font-weight: normal;
+    color: #888;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+/* --- Narrative Readability --- */
+#game-section p {
+    font-size: 1.05em;
+    margin-bottom: 1.2em;
+}
+
+/* --- Choice Cards (full-clickable) --- */
+.choice {
+    margin: 4px 0;
+    border: 1px solid #ddd;
+    border-left: 3px solid #337ab7;
+    background: #fafafa;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s, border-color 0.2s;
+    overflow: hidden;
+}
+.choice:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+/* The link fills the entire card */
+.choice-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+    outline: none;
+    transition: background 0.2s;
+}
+.choice-link:hover {
+    background: #f0f0f0;
+    text-decoration: none;
+}
+.choice-link:active {
+    background: #e0e0e0;
+}
+
+.choice-text {
+    flex: 1;
+}
+
+/* Disabled choice */
+.choice.disabled {
+    border-left-color: #bbb;
+    opacity: 0.6;
+    background: #f0f0f0;
+    box-shadow: none;
+}
+.choice.disabled .choice-link {
+    pointer-events: none;
+    color: #777;
+}
+.choice.disabled .choice-link:hover,
+.choice.disabled .choice-link:active {
+    background: transparent;
+}
+
+.choice-section-num {
+    font-size: 0.8em;
+    color: #888;
+    background: #e8e8e8;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+/* --- Subtle divider between text and choices --- */
+.choice:first-of-type {
+    margin-top: 32px;
+    position: relative;
+}
+.choice:first-of-type::before {
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: 10%;
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #ccc, transparent);
+}
+
+/* --- Navigation Buttons --- */
+#game-navSectionButtons {
+    text-align: center;
+    margin: 30px 0;
+}
+#game-navSectionButtons .btn-nav {
+    min-width: 160px;
+    margin: 0 8px;
+}
+
+/* --- Available Objects Table (card style) --- */
+#mechanics-availableObjects {
+    margin: 16px 0;
+}
+#mechanics-availableObjects > p:first-child {
+    margin-bottom: 8px;
+    color: #666;
+    font-size: 0.95em;
+}
+#mechanics-availableObjectsList {
+    border: none;
+    background: transparent;
+    margin-bottom: 0;
+}
+#mechanics-availableObjectsList tbody tr {
+    display: block;
+    margin: 4px 0;
+    border: 1px solid #ddd;
+    border-left: 3px solid #5cb85c;
+    background: #f5f5f5;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+#mechanics-availableObjectsList tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    background: transparent;
+    padding: 6px 12px;
+}
+
+/* --- Object Pick Styling --- */
+.equipment-op,
+a.equipment-op {
+    display: inline-block;
+    padding: 4px 10px;
+    margin: 2px 0;
+    border-left: 2px solid #5cb85c;
+    background: #f5f5f5;
+    border-radius: 0 3px 3px 0;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+.equipment-op:hover {
+    background: #e8e8e8;
+    text-decoration: none;
+}
+.equipment-op.disabled {
+    border-left-color: #999;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* --- Book copyright footer (fixed bottom, full-width) --- */
+#game-copyrights-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.85em;
+    font-style: italic;
+    color: #777;
+    padding: 12px 15px;
+    border-top: 1px solid #ddd;
+    background: #f8f8f8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 10;
+}
+
+/* --- Dark Mode for all new styles --- */
+body.dark #game-section {
+    background: #2a2a2a;
+    border-color: #444;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+body.dark .section-number {
+    color: #999;
+}
+body.dark .choice {
+    background: #2a2a2a;
+    border-color: #444;
+    border-left-color: #5bc0de;
+}
+body.dark .choice:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+body.dark .choice-link:hover {
+    background: #333;
+}
+body.dark .choice-link:active {
+    background: #2a2a2a;
+}
+body.dark .choice.disabled {
+    border-left-color: #555;
+    background: #2a2a2a;
+    opacity: 0.5;
+}
+body.dark .choice.disabled .choice-link:hover,
+body.dark .choice.disabled .choice-link:active {
+    background: transparent;
+}
+body.dark .choice:first-of-type::before {
+    background: linear-gradient(to right, transparent, #444, transparent);
+}
+body.dark .choice-section-num {
+    color: #999;
+    background: #3a3a3a;
+}
+body.dark #mechanics-availableObjectsList tbody tr {
+    background: #2a2a2a;
+    border-color: #444;
+    border-left-color: #5cb85c;
+}
+body.dark #mechanics-availableObjectsList tbody td {
+    background: transparent;
+}
+body.dark #game-copyrights-wrapper {
+    background: #2a2a2a;
+    border-top-color: #444;
+    color: #999;
+}
+body.dark .menu-card {
+    background: #2a2a2a;
+    border-color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+body.dark .menu-header p {
+    color: #999;
+}
+body.dark .menu-version {
+    color: #777;
+}
+body.dark .menu-warnings {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #999;
+}
+body.dark .large-button {
+    background: #2a2a2a;
+    border-color: #444;
+    border-left-color: #5bc0de;
+    color: #ccc;
+}
+body.dark .large-button:hover {
+    background: #333;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+body.dark .large-button:active {
+    background: #2a2a2a;
+}
+body.dark .menu-footer {
+    color: #999;
+}
+body.dark .equipment-op {
+    background: #2a2a2a;
+    border-left-color: #5cb85c;
+    color: #ccc;
+}
+body.dark .equipment-op:hover {
+    background: #333;
+}
+body.dark .equipment-op.disabled {
+    border-left-color: #555;
 }

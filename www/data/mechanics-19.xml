@@ -1939,7 +1939,7 @@
         </section>
 
         <section id="sect304">
-            <book19sect304 />
+            <specialSection sectionId="sect304" />
             <choiceState section="all" set="disabled" />
             <combat />
             <afterCombatTurn turn="1">

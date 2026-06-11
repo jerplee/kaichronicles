@@ -1,9 +1,8 @@
 import { views, translations, Section, SectionState, gameView, state, CombatMechanics, randomMechanics, Combat, Item, routing, gameController,
     App, ExpressionEvaluator, numberPickerMechanics, disciplinePickerMechanics, kaiWeaponPickerMechanics, SkillsSetup, KaiNameSetup, SetupDisciplines, EquipmentSectionMechanics, actionChartController,
     CurrencyName, LoreCircle, BookSeriesId, MealMechanics, ActionChartItem, InventoryState, actionChartView, template, Book,
-    GrandMasterUpgrade, kaimonasteryController, book2sect238, book2sect308, book3sect88, book6sect26, book6sect284,
-    book6sect340, book9sect91, book19sect304, book28sect71, book28sect192, book29sect342, ObjectsTable, ObjectsTableType, setupController, KaiDiscipline, MgnDiscipline,
-    GndDiscipline, projectAon, DebugMode, 
+    GrandMasterUpgrade, kaimonasteryController, SpecialSectionRegistry, ObjectsTable, ObjectsTableType, setupController, KaiDiscipline, MgnDiscipline,
+    GndDiscipline, NewOrderDiscipline, projectAon, DebugMode,
     SectionRenderer} from "../..";
 import DOMPurify from 'dompurify';
 
@@ -481,6 +480,7 @@ export const mechanicsEngine = {
 
         // Do not execute the rule twice:
         if (sectionState.ruleHasBeenExecuted(rule)) {
+            console.log("Pick rule already executed for this section");
             return;
         }
 
@@ -494,10 +494,14 @@ export const mechanicsEngine = {
             }
 
             // Pick the object
-            if (!actionChartController.pick(objectId, false)) {
+            const picked = actionChartController.pick(objectId, false);
+            if (!picked) {
                 // The object has not been picked (ex. full backpack)
                 // Add the object to the section
                 sectionState.addObjectToSection(objectId);
+                console.log("Pick rule: object '" + objectId + "' could not be picked (inventory full?), added to section");
+            } else {
+                console.log("Pick rule: object '" + objectId + "' picked successfully");
             }
 
             // Mark the rule as executed
@@ -509,14 +513,16 @@ export const mechanicsEngine = {
         const cls = $rule.attr("class");
 
         // Check the amount
-        const count = cls !== Item.MONEY ? 
+        const count = cls !== Item.MONEY ?
             ExpressionEvaluator.evalInteger($rule.attr("count")) :
             ExpressionEvaluator.evalFloat($rule.attr("count"));
 
         // Add to the action chart
         if (cls === Item.MEAL ) {
+            console.log("Pick rule: adding " + count + " meal(s)");
             actionChartController.increaseMeals(count);
         } else if (cls === Item.ARROW) {
+            console.log("Pick rule: adding " + count + " arrow(s)");
             actionChartController.increaseArrows(count);
         } else if (cls === Item.MONEY) {
             const excessToKaiMonastry = mechanicsEngine.getBooleanProperty($rule, "excessToKaiMonastry", false);
@@ -524,6 +530,8 @@ export const mechanicsEngine = {
             if (currency && !(Object.values(CurrencyName) as string[]).includes(currency)) {
                 mechanicsEngine.debugWarning("Unknown currency: " + currency);
             }
+            const currencyName = currency || CurrencyName.CROWN;
+            console.log("Pick rule: adding " + count + " " + currencyName);
             actionChartController.increaseMoney(count, false, excessToKaiMonastry, currency);
         } else {
             mechanicsEngine.debugWarning("Pick rule with no objectId / class");
@@ -1833,48 +1841,13 @@ export const mechanicsEngine = {
     /**************** SPECIAL SECTIONS **************************/
     /************************************************************/
 
-    book2Sect238(rule: Element) {
-        book2sect238.run(rule);
-    },
-
-    book2sect308() {
-        book2sect308.run();
-    },
-
-    book3sect88() {
-        book3sect88.run();
-    },
-
-    book6sect26() {
-        book6sect26.run();
-    },
-
-    book6sect284() {
-        book6sect284.run();
-    },
-
-    book6sect340() {
-        book6sect340.run();
-    },
-
-    book9sect91() {
-        book9sect91.run();
-    },
-
-    book19sect304() {
-        book19sect304.run();
-    },
-
-    book28sect71() {
-        book28sect71.run();
-    },
-
-    book28sect192() {
-        book28sect192.run();
-    },
-
-    book29sect342() {
-        book29sect342.run();
+    specialSection(rule: Element) {
+        const sectionId = $(rule).attr("sectionId");
+        if (!sectionId) {
+            mechanicsEngine.debugWarning("specialSection rule missing sectionId attribute");
+            return;
+        }
+        SpecialSectionRegistry.run(sectionId, rule);
     },
 
     /************************************************************/
@@ -2006,8 +1979,10 @@ export const mechanicsEngine = {
         // Select the choose that contains the link to the section, and enable / disable it
         const $choose = $(txtSelector);
         if (disabled) {
+            $choose.addClass("disabled");
             $choose.find(".choice-link").addClass("disabled");
         } else {
+            $choose.removeClass("disabled");
             $choose.find(".choice-link").removeClass("disabled");
         }
     },
@@ -2081,7 +2056,8 @@ export const mechanicsEngine = {
     healingDiscipline() {
         if (!state.actionChart.hasKaiDiscipline(KaiDiscipline.Healing) &&
             !state.actionChart.hasMgnDiscipline(MgnDiscipline.Curing) &&
-            !state.actionChart.hasGndDiscipline(GndDiscipline.Deliverance)) {
+            !state.actionChart.hasGndDiscipline(GndDiscipline.Deliverance) &&
+            !state.actionChart.hasNewOrderDiscipline(NewOrderDiscipline.Deliverance)) {
             // Only if having healing discipline or loyalty bonus
             return;
         }

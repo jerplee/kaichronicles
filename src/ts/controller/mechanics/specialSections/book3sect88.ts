@@ -1,4 +1,4 @@
-import { state, CombatTurn, Combat, COMBATTABLE_DEATH, randomTable } from "../../..";
+import { state, CombatTurn, Combat, COMBATTABLE_DEATH, randomTable, SpecialSectionRegistry } from "../../..";
 
 /**
  * Javek venom test
@@ -34,3 +34,5 @@ export const book3sect88 = {
         }
     },
 };
+
+SpecialSectionRegistry.register("sect88", book3sect88);

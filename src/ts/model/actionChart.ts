@@ -603,8 +603,11 @@ export class ActionChart {
         this.checkCurrentWeapon();
 
         if (aChartItem.id === Item.QUIVER || aChartItem.id === Item.LARGE_QUIVER) {
-            // Decrease arrows count
-            this.arrows -= dropCount;
+            // Decrease arrows count. dropCount === 1 is the default for generic drops;
+            // for quivers, let sanitizeArrowCount handle limiting arrows to remaining capacity.
+            if (dropCount !== 1) {
+                this.arrows -= dropCount;
+            }
             this.sanitizeArrowCount();
         }
 

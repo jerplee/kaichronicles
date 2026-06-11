@@ -74,6 +74,9 @@ export class SectionState {
     /** An object was sold on the section? */
     public soldObject = false;
 
+    /** An Alether-type combat modifier has been used on this section? */
+    public aletherUsed = false;
+
     /**
      * Number picker states for this section.
      * See numberPicker.ts and numberPickerMechanics.ts

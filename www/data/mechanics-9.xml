@@ -488,7 +488,7 @@
         </section>
 
         <section id="sect91">
-            <book9sect91 />
+            <specialSection sectionId="sect91" />
 
             <choiceState section="all" set="disabled" />
             <randomTable>

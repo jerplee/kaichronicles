@@ -76,8 +76,12 @@ export class State {
      */
     public setupDefaultColorTheme() {
         try {
-            this.color = Color[localStorage.getItem("color")];
-            if (!this.color) {
+            const savedColor = localStorage.getItem("color");
+            if (savedColor) {
+                this.color = Color[savedColor];
+            } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                this.color = Color.Dark;
+            } else {
                 this.color = Color.Light;
             }
         } catch (e) {

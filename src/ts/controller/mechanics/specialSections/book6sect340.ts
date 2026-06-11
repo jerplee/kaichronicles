@@ -1,4 +1,4 @@
-import { mechanicsEngine, gameView, ExpressionEvaluator, state, randomMechanics } from "../../..";
+import { mechanicsEngine, gameView, ExpressionEvaluator, state, randomMechanics, SpecialSectionRegistry } from "../../..";
 
 /** Bow tournament */
 export const book6sect340 = {
@@ -59,3 +59,5 @@ export const book6sect340 = {
         }
     },
 };
+
+SpecialSectionRegistry.register("sect340", book6sect340);

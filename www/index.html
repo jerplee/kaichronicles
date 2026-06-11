@@ -47,6 +47,9 @@
           <a class="navbar-brand hidden-xs hidden-sm" href="#mainMenu" id="template-title">
             Kai Chronicles
           </a>
+          <a href="#" class="navbar-theme-toggle" id="template-themeToggle" title="Toggle dark mode">
+            <span class="glyphicon glyphicon-adjust"></span>
+          </a>
           <p class="navbar-text" id="template-statistics">
               <span id="template-kaiName"></span>
               <span data-translation="CS">C.S.</span>: 
@@ -64,6 +67,7 @@
                 </a>
             </li>
             <li><a href="#map" id="template-map" data-translation="map">Map</a></li>
+            <li><a href="#combatTables" id="template-combatTablesLink" data-translation="combatTables">Combat Tables</a></li>
             <li><a href="#settings" data-translation="settings">Settings</a></li>
             <li>
               <a href="#mainMenu" id="template-mainMenu" data-translation="mainMenu">
@@ -75,6 +79,10 @@
 
       </div>
     </nav>
+
+    <div id="template-offline" class="alert alert-warning text-center" style="display:none; margin-bottom:0; border-radius:0;">
+        <span class="glyphicon glyphicon-signal"></span> <span data-translation="offline">You are offline</span>
+    </div>
 
     <div class="container" id="template-container">
 

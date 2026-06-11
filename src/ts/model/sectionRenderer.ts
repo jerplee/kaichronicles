@@ -408,9 +408,30 @@ export class SectionRenderer {
      * @returns The HTML
      */
     private choice($choice: JQuery<HTMLElement>, level: number): string {
+        let html = this.renderNodeChildren( $choice , level );
+        // Normalize whitespace to keep choices as continuous sentences
+        const tags: string[] = [];
+        const protectedHtml = html.replace(/<[^>]+>/g, (match) => {
+            tags.push(match);
+            return "\x00" + (tags.length - 1) + "\x00";
+        });
+        const normalizedText = protectedHtml.replace(/\s+/g, " ").trim();
+        html = normalizedText.replace(/\x00(\d+)\x00/g, (_, i) => tags[parseInt(i, 10)]);
 
-        return '<p class="choice"><span class="glyphicon glyphicon-chevron-right"></span> ' +
-            this.renderNodeChildren( $choice , level ) + "</p>";
+        // Extract section id from the first link_text anchor
+        const sectionMatch = html.match(/data-section="([^"]+)"/);
+        const section = sectionMatch ? sectionMatch[1] : "";
+        const sectionNum = section.replace(/^sect/i, "");
+
+        // Strip individual anchor wrappers from link_text elements, keeping inner content
+        html = html.replace(/<a[^>]*class="[^"]*choice-link[^"]*"[^>]*>(.*?)<\/a>/g, "$1");
+
+        // Wrap entire choice content in a single clickable card
+        return '<div class="choice">' +
+            '<a href="#" class="choice-link" data-section="' + section + '">' +
+            '<span class="choice-text">' + html + "</span>" +
+            '<span class="choice-section-num">' + sectionNum + "</span>" +
+            "</a></div>";
     }
 
     /**

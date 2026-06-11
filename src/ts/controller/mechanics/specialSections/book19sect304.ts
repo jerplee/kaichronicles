@@ -1,4 +1,4 @@
-import { state, Combat } from "../../..";
+import { state, Combat, SpecialSectionRegistry } from "../../..";
 
 /**
  * Generate Wolf's Bane combat
@@ -21,3 +21,5 @@ export const book19sect304 = {
         state.sectionStates.getSectionState().combats.push(new Combat("Wolf's Bane", combatSkill, endurance));
     }
 };
+
+SpecialSectionRegistry.register("sect304", book19sect304);

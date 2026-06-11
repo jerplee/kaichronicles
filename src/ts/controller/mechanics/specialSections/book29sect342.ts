@@ -1,4 +1,4 @@
-import { state, mechanicsEngine, CombatTurn, Combat } from "../../..";
+import { state, mechanicsEngine, CombatTurn, Combat, SpecialSectionRegistry } from "../../..";
 
 /** Bow tournament final */
 export const book29sect342 = {
@@ -23,3 +23,5 @@ export const book29sect342 = {
         });
     },
 };
+
+SpecialSectionRegistry.register("sect342", book29sect342);

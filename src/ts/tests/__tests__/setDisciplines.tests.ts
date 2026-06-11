@@ -42,7 +42,7 @@ async function testSelectWeaponskill() {
         await (await getDisciplineCheck(KaiDiscipline.Weaponskill)).click();
 
         // The random number selection is asynchronous, so wait a bit
-        await new Promise((r) => setTimeout(r, 10));
+        await new Promise((r) => setTimeout(r, 500));
 
         const actionChart = await driver.getActionChart();
         expect( actionChart.getWeaponSkill() ).toStrictEqual( [ "sword" ] );
@@ -89,7 +89,7 @@ async function testSelectDisciplines() {
 
         if (disciplineId === KaiDiscipline.Weaponskill) {
             // The random number selection is asynchronous, so wait a bit
-            await new Promise((r) => setTimeout(r, 10));
+            await new Promise((r) => setTimeout(r, 500));
         }
 
         let actionChart = await driver.getActionChart();

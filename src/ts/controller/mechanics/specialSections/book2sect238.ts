@@ -1,4 +1,4 @@
-import { mechanicsEngine, gameView, state, template, randomTable, actionChartController, translations, CurrencyName } from "../../..";
+import { mechanicsEngine, gameView, state, template, randomTable, actionChartController, translations, CurrencyName, SpecialSectionRegistry } from "../../..";
 
 interface GameState {
     moneyToBet: number,
@@ -104,3 +104,5 @@ export const book2sect238 = {
         }, null);
     },
 };
+
+SpecialSectionRegistry.register("sect238", book2sect238);

@@ -224,7 +224,7 @@ export class CombatTurn {
      * @param {typeof COMBATTABLE_DEATH | number} loss It can be a number with the loss, or COMBATTABLE_DEATH
      */
     public static translateLoss(loss: typeof COMBATTABLE_DEATH | number): string {
-        return loss === COMBATTABLE_DEATH ? translations.text( "deathLetter" ) : loss.toString();
+        return loss === COMBATTABLE_DEATH ? translations.text( "deathLetter" ) : loss.toString() + " EP";
     }
 
     /**

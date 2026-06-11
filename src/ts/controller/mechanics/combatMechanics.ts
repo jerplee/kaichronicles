@@ -1,4 +1,4 @@
-import { state, mechanicsEngine, Combat, template, SpecialObjectsUse, CombatTurn, GndDiscipline, translations, BookSeriesId, NewOrderDiscipline, BookSeries } from "../..";
+import { state, mechanicsEngine, Combat, template, SpecialObjectsUse, CombatTurn, GndDiscipline, translations, BookSeriesId, NewOrderDiscipline, BookSeries, COMBATTABLE_DEATH } from "../..";
 import striptags from 'striptags';
 
 /**
@@ -26,6 +26,9 @@ export class CombatMechanics {
 
     /** Selector for XXX Power Strike checkbox */
     public static readonly POWER_STRIKE_CHECK_SELECTOR = ".powerstrikecheck input";
+
+    /** Selector for audit buttons */
+    public static readonly AUDIT_BTN_SELECTOR = ".mechanics-audit";
 
     /**
      * Render section combats
@@ -56,23 +59,13 @@ export class CombatMechanics {
 
             // Add combats UI
             const $combatOriginal = $(`.combat:eq(${index})`);
+            $combatOriginal.empty();
 
             $combatOriginal.append( $combatUI )
             .find(CombatMechanics.PLAY_TURN_BTN_SELECTOR).on("click", function(e) {
                 // Play turn button click
                 e.preventDefault();
                 CombatMechanics.runCombatTurn( $(this).parents(".mechanics-combatUI").first(), false );
-            });
-
-            // Move the show combat tables as the first child (needed because it's a float)
-            const $btnCombatTables = $combatUI.find(".mechanics-combatTables");
-            $btnCombatTables.remove();
-            $combatOriginal.prepend( $btnCombatTables );
-
-            // Bind the show combat tables button click
-            $btnCombatTables.on("click", (e) => {
-                e.preventDefault();
-                template.showCombatTables();
             });
 
             // Elude combat button click
@@ -88,15 +81,24 @@ export class CombatMechanics {
                 CombatMechanics.showCombatRatioDetails( $(this).parents(".mechanics-combatUI").first() );
             });
 
+            // Bind audit button click
+            $combatOriginal.find(CombatMechanics.AUDIT_BTN_SELECTOR).on("click", function(e) {
+                e.preventDefault();
+                CombatMechanics.showCombatAudit( $(this).parents(".mechanics-combatUI").first() );
+            });
+
             // Set player name if not Lone Wolf
             if (state.book.getBookSeries().id === BookSeriesId.NewOrder) {
                 $combatUI.find(".mechanics-playerName").html( state.actionChart.kaiName );
             }
 
-            // Set enemy name on table
+            // Set enemy name on table and status panel
             $combatUI.find(".mechanics-enemyName").html( combat.enemy );
             // Set combat ratio:
             CombatMechanics.updateCombatRatio( $combatUI, combat );
+
+            // Initialize fighter status panel
+            CombatMechanics.updateFighterStatusPanel($combatUI, combat, true);
 
             // Add already played turns
             if ( combat.turns.length > 0 ) {
@@ -116,9 +118,15 @@ export class CombatMechanics {
             if ( sectionState.combatEluded || combat.isFinished() || combat.disabled ) {
                 // Hide button to run more turns
                 CombatMechanics.hideCombatButtons( $combatUI );
+                // Show audit button for completed combats
+                $combatUI.find(CombatMechanics.AUDIT_BTN_SELECTOR).show();
+                // Mark as finished for styling
+                $combatUI.addClass("combat-finished");
             } else {
                 // Check if the combat can be eluded
                 CombatMechanics.showHideEludeButton( combat , $combatUI );
+                // Hide audit button while combat is active
+                $combatUI.find(CombatMechanics.AUDIT_BTN_SELECTOR).hide();
             }
 
             // Setup XXX-Surge checkbox
@@ -153,6 +161,48 @@ export class CombatMechanics {
     private static updateEnemyEndurance( $combatUI: JQuery<HTMLElement> , combat: Combat , doNotAnimate: boolean ) {
         template.animateValueChange( $combatUI.parent().find( ".enemy-current-endurance" ) ,
             combat.endurance , doNotAnimate , combat.endurance > 0 ? null : "red" );
+    }
+
+    /**
+     * Update the side-by-side fighter status panel inside the combat UI
+     */
+    private static updateFighterStatusPanel($combatUI: JQuery<HTMLElement>, combat: Combat, doNotAnimate: boolean) {
+        // Player stats
+        const $playerCurrent = $combatUI.find(".mechanics-player-current-endurance");
+        const $playerMax = $combatUI.find(".mechanics-player-max-endurance");
+        const $playerCS = $combatUI.find(".mechanics-player-cs");
+        template.animateValueChange($playerCurrent, state.actionChart.currentEndurance, doNotAnimate, null);
+        $playerMax.text(state.actionChart.getMaxEndurance().toString());
+        $playerCS.text(combat.getCurrentCombatSkill().toString());
+        CombatMechanics.applyEnduranceColor($playerCurrent, state.actionChart.currentEndurance, state.actionChart.getMaxEndurance());
+
+        // Enemy stats
+        const $enemyCurrent = $combatUI.find(".mechanics-enemy-current-endurance");
+        const $enemyMax = $combatUI.find(".mechanics-enemy-max-endurance");
+        const $enemyCS = $combatUI.find(".mechanics-enemy-cs");
+        template.animateValueChange($enemyCurrent, combat.endurance, doNotAnimate, null);
+        $enemyMax.text(combat.originalEndurance.toString());
+        $enemyCS.text(combat.getCurrentEnemyCombatSkill().toString());
+        CombatMechanics.applyEnduranceColor($enemyCurrent, combat.endurance, combat.originalEndurance);
+    }
+
+    /**
+     * Apply color-coded endurance class based on current vs max
+     */
+    private static applyEnduranceColor($element: JQuery<HTMLElement>, current: number, max: number) {
+        $element.removeClass("endurance-high endurance-medium endurance-low endurance-critical");
+        const ratio = max > 0 ? current / max : 0;
+        if (current <= 0) {
+            $element.addClass("endurance-critical");
+        } else if (ratio >= 0.5) {
+            $element.addClass("endurance-high");
+        } else if (ratio >= 0.25) {
+            $element.addClass("endurance-medium");
+        } else if (ratio >= 0.1) {
+            $element.addClass("endurance-low");
+        } else {
+            $element.addClass("endurance-critical");
+        }
     }
 
     private static updateCombatRatio( $combatUI: JQuery<HTMLElement> , combat: Combat ) {
@@ -260,11 +310,20 @@ export class CombatMechanics {
             // Update enemy current endurance
             CombatMechanics.updateEnemyEndurance( $combatUI , combat , false );
 
+            // Update side-by-side fighter status panel
+            CombatMechanics.updateFighterStatusPanel($combatUI, combat, false);
+
             if ( sectionState.combatEluded || combat.isFinished() ) {
                 // Combat finished
 
                 // Hide button to run more turns
                 CombatMechanics.hideCombatButtons( $combatUI );
+
+                // Show audit button for completed combats
+                $combatUI.find(CombatMechanics.AUDIT_BTN_SELECTOR).show();
+
+                // Mark as finished for styling
+                $combatUI.addClass("combat-finished");
 
                 // Test player death
                 mechanicsEngine.testDeath();
@@ -292,6 +351,9 @@ export class CombatMechanics {
                     // Fire post-combat karmo effects
                     SpecialObjectsUse.postKarmoUse();
                 }
+
+                // Scroll to the next active combat, if any
+                CombatMechanics.scrollToNextActiveCombat();
             } else {
                 // Combat continues
 
@@ -337,12 +399,59 @@ export class CombatMechanics {
     }
 
     /**
+     * Scroll to the next active (unfinished) combat on the page
+     */
+    private static scrollToNextActiveCombat() {
+        const sectionState = state.sectionStates.getSectionState();
+        for (let i = 0; i < sectionState.combats.length; i++) {
+            const c = sectionState.combats[i];
+            if (!c.isFinished() && !sectionState.combatEluded && !c.disabled) {
+                const $activeUI = $(`.mechanics-combatUI[data-combatIdx="${i}"]`).first();
+                if ($activeUI.length > 0) {
+                    const offset = $activeUI.offset();
+                    if (offset) {
+                        $("html, body").animate({ scrollTop: offset.top - 80 }, 400);
+                    }
+                }
+                return;
+            }
+        }
+    }
+
+    /**
      * Render a combat turn
      * @param $combatTableBody Table where to append the turn
      * @param turn The turn to render
      */
     private static renderCombatTurn( $combatTableBody: JQuery<HTMLElement> , turn: CombatTurn ) {
-        $combatTableBody.append(`<tr><td class="hidden-xs">${striptags(turn.turnNumber.toFixed())}</td><td>${striptags(turn.randomValue.toFixed())}</td><td>${striptags(turn.getPlayerLossText())}</td><td>${striptags(turn.getEnemyLossText())}</td></tr>`);
+        const playerTooltip = CombatMechanics.buildLossTooltip(turn.loneWolfBase, turn.enemyMultiplier, turn.loneWolfExtra, turn.loneWolfPrevented, turn.loneWolf);
+        const enemyTooltip = CombatMechanics.buildLossTooltip(turn.enemyBase, turn.damageMultiplier, turn.enemyExtra, 0, turn.enemy);
+        $combatTableBody.append(`<tr>` +
+            `<td class="hidden-xs">${striptags(turn.turnNumber.toFixed())}</td>` +
+            `<td title="Random number rolled on the Random Number Table">${striptags(turn.randomValue.toFixed())}</td>` +
+            `<td title="${playerTooltip}">${striptags(turn.getPlayerLossText())}</td>` +
+            `<td title="${enemyTooltip}">${striptags(turn.getEnemyLossText())}</td>` +
+            `</tr>`);
+    }
+
+    /**
+     * Build a tooltip explaining a combat loss calculation
+     */
+    private static buildLossTooltip(base: typeof COMBATTABLE_DEATH | number, multiplier: number, extra: typeof COMBATTABLE_DEATH | number, prevented: number, finalLoss: typeof COMBATTABLE_DEATH | number): string {
+        let tooltip = "Base table loss: " + (base === COMBATTABLE_DEATH ? "Death" : base + " EP");
+        if (multiplier !== 1) {
+            tooltip += " x " + multiplier + " multiplier";
+        }
+        if (extra !== 0) {
+            tooltip += " + " + (-extra) + " extra";
+        }
+        if (prevented > 0) {
+            tooltip += " - " + prevented + " prevented";
+        }
+        if (multiplier !== 1 || extra !== 0 || prevented > 0) {
+            tooltip += " = Final: " + (finalLoss === COMBATTABLE_DEATH ? "Death" : finalLoss + " EP");
+        }
+        return tooltip;
     }
 
     /**
@@ -707,6 +816,141 @@ export class CombatMechanics {
 
         // Show dialog
         $("#game-ratiodetails").modal();
+    }
+
+    /**
+     * Show dialog with combat audit details
+     * @param $combatUI The combat UI
+     */
+    private static showCombatAudit( $combatUI: JQuery<HTMLElement> ) {
+        // Get the combat info:
+        const combatIndex = Number( $combatUI.attr( "data-combatIdx" ) );
+        const sectionState = state.sectionStates.getSectionState();
+        const combat = sectionState.combats[ combatIndex ];
+
+        const sectionStateEluded = sectionState.combatEluded;
+        const playerDead = state.actionChart.currentEndurance <= 0;
+        const enemyDead = combat.endurance <= 0;
+
+        // Determine outcome
+        let outcome: string;
+        let outcomeClass: string;
+        if (sectionStateEluded) {
+            outcome = translations.text("combatEluded");
+            outcomeClass = "text-warning";
+        } else if (playerDead) {
+            outcome = translations.text("combatLost");
+            outcomeClass = "text-danger";
+        } else if (enemyDead || combat.isFinished()) {
+            outcome = translations.text("combatWon");
+            outcomeClass = "text-success";
+        } else {
+            outcome = translations.text("combatInProgress");
+            outcomeClass = "text-muted";
+        }
+
+        // Build audit HTML
+        let html = `<div class="panel panel-default"><div class="panel-heading"><b>${translations.text("combatOutcome")}</b>: <span class="${outcomeClass}">${outcome}</span></div></div>`;
+
+        // Initial state table
+        html += `<h5>${translations.text("combatInitialState")}</h5>`;
+        html += `<table class="table table-bordered table-condensed">`;
+        html += `<thead><tr><th></th><th>${translations.text("combatSkillUpper")}</th><th>${translations.text("enduranceUpper")}</th></tr></thead>`;
+        html += `<tbody>`;
+        const playerName = state.book.getBookSeries().id === BookSeriesId.NewOrder ? state.actionChart.kaiName : translations.text("loneWolf");
+        html += `<tr><td><b>${playerName}</b></td><td>${state.actionChart.combatSkill}</td><td>${combat.originalPlayerEndurance}</td></tr>`;
+        html += `<tr><td><b>${combat.enemy}</b></td><td>${combat.combatSkill}</td><td>${combat.originalEndurance}</td></tr>`;
+        html += `</tbody></table>`;
+
+        // Combat ratio breakdown
+        const finalCSPlayer = combat.getCurrentCombatSkill();
+        const finalCSEnemy = combat.getCurrentEnemyCombatSkill();
+        html += `<p><b>${translations.text("combatRatio")}</b>: ${finalCSPlayer} - ${finalCSEnemy} = ${finalCSPlayer - finalCSEnemy}</p>`;
+
+        const bonuses = combat.getCSBonuses();
+        if (bonuses.length > 0) {
+            html += `<h5>${translations.text("combatModifiers")}</h5><ul>`;
+            for (const bonus of bonuses) {
+                const target = bonus.enemy ? combat.enemy : playerName;
+                const sign = bonus.increment >= 0 ? "+" : "";
+                html += `<li>${target}: ${sign}${bonus.increment} (${bonus.concept})</li>`;
+            }
+            html += `</ul>`;
+        }
+
+        // Special abilities used
+        const abilities: string[] = [];
+        const surgeDisciplineId = combat.getSurgeDiscipline();
+        if (combat.psiSurge && surgeDisciplineId) {
+            const csBonus = combat.getFinalSurgeBonus(surgeDisciplineId);
+            const epLoss = Combat.surgeTurnLoss(surgeDisciplineId, combat);
+            abilities.push(translations.text(
+                surgeDisciplineId === GndDiscipline.KaiSurge ? "mechanics-combat-kaisurge" : "mechanics-combat-psisurge",
+                [csBonus, epLoss]
+            ));
+        }
+        if (combat.kaiBlast) { abilities.push(translations.text("mechanics-combat-kaiblast", ["", combat.kaiBlastRolls.toFixed()])); }
+        if (combat.kaiRayUse === 2) { abilities.push(translations.text("mechanics-combat-kairay", ["15"])); }
+        if (combat.powerStrike) { abilities.push(translations.text("mechanics-combat-powerstrike")); }
+        if (abilities.length > 0) {
+            html += `<h5>${translations.text("combatAbilitiesUsed")}</h5><ul>`;
+            for (const ability of abilities) {
+                html += `<li>${ability}</li>`;
+            }
+            html += `</ul>`;
+        }
+
+        // Turn-by-turn breakdown
+        if (combat.turns.length > 0) {
+            html += `<h5>${translations.text("combatTurns")} (${combat.turns.length})</h5>`;
+            html += `<table class="table table-striped table-bordered table-condensed">`;
+            html += `<thead><tr><th>#</th><th>${translations.text("randomTable")}</th><th>${playerName}</th><th>${combat.enemy}</th></tr></thead>`;
+            html += `<tbody>`;
+            for (const turn of combat.turns) {
+                html += `<tr>`;
+                html += `<td>${turn.turnNumber}</td>`;
+                html += `<td>${turn.randomValue}</td>`;
+                html += `<td>${striptags(turn.getPlayerLossText())}</td>`;
+                html += `<td>${striptags(turn.getEnemyLossText())}</td>`;
+                html += `</tr>`;
+            }
+            html += `</tbody></table>`;
+        } else {
+            html += `<p class="text-muted"><em>${translations.text("noTurnsPlayed")}</em></p>`;
+        }
+
+        // Final state
+        html += `<h5>${translations.text("combatFinalState")}</h5>`;
+        html += `<table class="table table-bordered table-condensed">`;
+        html += `<thead><tr><th></th><th>${translations.text("enduranceUpper")}</th></tr></thead>`;
+        html += `<tbody>`;
+        html += `<tr><td><b>${playerName}</b></td><td>${state.actionChart.currentEndurance} / ${state.actionChart.getMaxEndurance()}</td></tr>`;
+        html += `<tr><td><b>${combat.enemy}</b></td><td>${combat.endurance} / ${combat.originalEndurance}</td></tr>`;
+        html += `</tbody></table>`;
+
+        // Why it ended
+        if (combat.turns.length > 0 && combat.isFinished()) {
+            html += `<p><b>${translations.text("combatEndedBecause")}</b>: `;
+            if (enemyDead) {
+                html += translations.text("enemyDefeated");
+            } else if (playerDead) {
+                html += translations.text("playerDefeated");
+            } else if (sectionStateEluded) {
+                html += translations.text("playerEluded");
+            }
+            html += `</p>`;
+        } else if (combat.turns.length === 0 && combat.isFinished()) {
+            html += `<p class="text-warning"><b>${translations.text("combatEndedImmediately")}</b>: `;
+            if (combat.originalEndurance <= 0) {
+                html += translations.text("enemyHadZeroEP");
+            } else {
+                html += translations.text("combatAutoResolved");
+            }
+            html += `</p>`;
+        }
+
+        $("#game-combatauditbody").html(html);
+        $("#game-combataudit").modal();
     }
 
 }

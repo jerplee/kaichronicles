@@ -483,7 +483,7 @@
         </section>
 
         <section id="sect71">
-            <book28sect71 />
+            <specialSection sectionId="sect71" />
             <choiceState section="all" set="disabled" />
             <afterCombats>
                 <choiceState section="all" set="enabled" />
@@ -789,7 +789,7 @@
         </section>
 
         <section id="sect136">
-            <book28sect71 />
+            <specialSection sectionId="sect71" />
             <choiceState section="all" set="disabled" />
             <afterCombats>
                 <choiceState section="all" set="enabled" />
@@ -1074,7 +1074,7 @@
         <section id="sect192">
             <message text="Either buy individual items, buy all three (price of the last item will be adjusted), or drop a Special Item." />
             <onInventoryEvent>
-                <book28sect192 />
+                <specialSection sectionId="sect192" />
             </onInventoryEvent>
         </section>
 
@@ -1431,7 +1431,7 @@
 
         <section id="sect254">
             <choiceState section="all" set="disabled" />
-            <book28sect71 />
+            <specialSection sectionId="sect71" />
             <afterCombats>
                 <choiceState section="all" set="enabled" />
             </afterCombats>

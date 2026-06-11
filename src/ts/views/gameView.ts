@@ -43,8 +43,11 @@ export const gameView = {
     setSectionContent(section: Section) {
         document.title = section.book.getBookTitle() + " - " +
             section.getTitleText();
-        $("#game-section-title").html(section.getTitleHtml());
-        $("#game-section").html(section.getHtml());
+        $("#game-section-title").hide();
+        $("#game-section").html(
+            '<div class="section-number">— ' + section.getTitleText() + ' —</div>' +
+            section.getHtml()
+        );
     },
 
     /**
@@ -66,8 +69,8 @@ export const gameView = {
         });
 
         // Show book copyright
-        $("#game-copyrights").text(state.book.getBookTitle()).append($("<br/>"));
-        $("#game-copyrights").append(state.book.getCopyrightHtml());
+        const copyrightHtml = state.book.getCopyrightHtml().replace(/<br\s*\/?>/gi, "  -  ");
+        $("#game-copyrights").html(" - " + state.book.getBookTitle() + " - " + copyrightHtml);
 
         // Setup debug options
         if (App.debugMode === DebugMode.DEBUG) {
@@ -118,7 +121,7 @@ export const gameView = {
 
         if (where === "beforeChoices") {
             // Try to add the html before the first choice:
-            const $firstChoice = $("p.choice").first();
+            const $firstChoice = $(".choice").first();
             if ($firstChoice.length > 0) {
                 $firstChoice.before(html);
                 return;
@@ -160,6 +163,13 @@ export const gameView = {
         $(".crtable").on("click", (e) => {
             e.preventDefault();
             template.showCombatTables();
+        });
+    },
+
+    bindIllustrationZoom() {
+        $("#game-section").off("click", ".illustration img");
+        $("#game-section").on("click", ".illustration img", function() {
+            template.showIllustrationZoom($(this).attr("src"));
         });
     },
 

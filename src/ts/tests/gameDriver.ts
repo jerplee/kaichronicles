@@ -139,6 +139,44 @@ export class GameDriver {
         return errors;
     }
 
+    public async getLogWarnings(): Promise<string[]> {
+        const warnings: string[] = [];
+        for (const entry of await this.driver.manage().logs().get(Type.BROWSER)) {
+            if (entry.level === Level.WARNING) {
+                warnings.push(entry.message);
+            }
+        }
+        return warnings;
+    }
+
+    public async setCombatSkill(value: number) {
+        await this.driver.executeScript(`kai.state.actionChart.combatSkill = ${value}`);
+    }
+
+    public async setMaxEndurance(value: number) {
+        await this.driver.executeScript(`kai.state.actionChart.endurance = ${value}`);
+    }
+
+    public async getCurrentEndurance(): Promise<number> {
+        return await this.driver.executeScript("return kai.state.actionChart.currentEndurance") as number;
+    }
+
+    public async getMaxEndurance(): Promise<number> {
+        return await this.driver.executeScript("return kai.state.actionChart.getMaxEndurance()") as number;
+    }
+
+    public async getCombatSkill(): Promise<number> {
+        return await this.driver.executeScript("return kai.state.actionChart.combatSkill") as number;
+    }
+
+    public async hasObject(objectId: string): Promise<boolean> {
+        return await this.driver.executeScript(`return kai.state.actionChart.hasObject("${objectId}")`) as boolean;
+    }
+
+    public async getDisabledDisciplines(): Promise<string[]> {
+        return await this.driver.executeScript("return kai.state.actionChart.newOrderDisciplines.disabledDisciplines") as string[];
+    }
+
     public async debugSleep(miliseconds: number = 2500) {
         try {
             await this.driver.wait(until.elementLocated(By.id("notexists")), miliseconds);
@@ -148,6 +186,10 @@ export class GameDriver {
 
     public async setNextRandomValue(value: number) {
         await this.driver.executeScript(`kai.randomTable.nextValueDebug = ${value}`);
+    }
+
+    public async executeScript<T>(script: string): Promise<T> {
+        return await this.driver.executeScript<T>(script);
     }
 
     public async setupBookState(bookNumber: number) {

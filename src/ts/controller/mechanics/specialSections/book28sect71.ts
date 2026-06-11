@@ -1,4 +1,4 @@
-import { state, Combat, InventoryState, actionChartController } from "../../..";
+import { state, Combat, InventoryState, actionChartController, SpecialSectionRegistry } from "../../..";
 
 /**
  * Generate combat against own Kai Weapon
@@ -75,3 +75,5 @@ export const book28sect71 = {
         state.sectionStates.getSectionState().combats.push(new Combat("Tomb Robbers (with Kai Weapon)", enemyCS, enemyEP));
     }
 };
+
+SpecialSectionRegistry.register("sect71", book28sect71);

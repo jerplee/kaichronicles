@@ -1,4 +1,4 @@
-import { numberPickerMechanics, state, randomTable, actionChartController, translations, mechanicsEngine } from "../../..";
+import { numberPickerMechanics, state, randomTable, actionChartController, translations, mechanicsEngine, SpecialSectionRegistry } from "../../..";
 
 /** Bet */
 export const book6sect284 = {
@@ -96,3 +96,5 @@ export const book6sect284 = {
 
     },
 };
+
+SpecialSectionRegistry.register("sect284", book6sect284);

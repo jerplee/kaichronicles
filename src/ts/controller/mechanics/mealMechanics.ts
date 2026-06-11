@@ -47,8 +47,11 @@ export class MealMechanics {
         // Check if hunting disciplines, of any book series, is available
         const huntDisabled = mechanicsEngine.getBooleanProperty($rule, "huntDisabled", false);
 
-        const hasHuntingDiscipline = 
-            state.book.getBookSeries().id === BookSeriesId.NewOrder ? state.actionChart.hasNewOrderDiscipline(NewOrderDiscipline.GrandHuntmastery) :
+        const hasHuntingDiscipline =
+            state.book.getBookSeries().id === BookSeriesId.NewOrder ?
+                (state.actionChart.hasNewOrderDiscipline(NewOrderDiscipline.GrandHuntmastery) ||
+                 state.actionChart.hasKaiDiscipline(KaiDiscipline.Hunting) ||
+                 state.actionChart.hasMgnDiscipline(MgnDiscipline.Huntmastery)) :
             (state.actionChart.hasKaiDiscipline(KaiDiscipline.Hunting) ||
                 state.actionChart.hasMgnDiscipline(MgnDiscipline.Huntmastery) ||
                 state.actionChart.hasGndDiscipline(GndDiscipline.GrandHuntmastery))

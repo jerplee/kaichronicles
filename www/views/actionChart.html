@@ -1,4 +1,5 @@
 
+<div id="action-chart-view">
 <div class="row">
   <div class="col-sm-12">
     <div data-translation="actionChart" class="h1 pull-left">Action chart</div>
@@ -18,7 +19,18 @@
         readonly>
     <p class="bonuses" id="achart-endurance-bonuses"></p>
   </div>
-</div>    
+</div>
+
+<div class="row" id="achart-hunting-row" style="display:none;">
+  <div class="col-sm-12" style="margin-bottom: 10px;">
+    <span id="achart-hunting-available" class="label label-success" style="display:none;">
+      <span class="glyphicon glyphicon-leaf"></span> <span data-translation="huntingAvailable">Hunting available</span>
+    </span>
+    <span id="achart-hunting-unavailable" class="label label-default" style="display:none;">
+      <span class="glyphicon glyphicon-ban-circle"></span> <span data-translation="huntingUnavailable">Hunting unavailable</span>
+    </span>
+  </div>
+</div>
 
 <div class="row">
   <div class="col-sm-6" id="achartBeltPouchDiv">
@@ -116,3 +128,4 @@
 
 <h3 data-translation="annotations">Annotations</h3>
 <textarea title="Annotations" class="form-control" rows="10" id="achart-annotations"></textarea>
+</div>

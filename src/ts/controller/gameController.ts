@@ -87,6 +87,9 @@ export const gameController = {
         // Bind choice links
         gameView.bindChoiceLinks();
 
+        // Bind illustration zoom
+        gameView.bindIllustrationZoom();
+
         // Scroll to top (or to the indicated place)
         if (!yScroll) {
             yScroll = 0;

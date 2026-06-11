@@ -328,6 +328,7 @@ export const actionChartView = {
 
     showInventoryMsg(action: string, object: Item|null, msg: string) {
         const toastType = ( action === "pick" ? "success" : "warning" );
+        const title = ( action === "pick" ? "Item Acquired" : "Item Removed" );
         let html = "";
 
         // Check if the object has an image
@@ -341,6 +342,6 @@ export const actionChartView = {
         html += msg;
         html = "<div>" + html + "</div>";
 
-        toastr[toastType]( html );
+        toastr[toastType]( html, title, { timeOut: 10000, extendedTimeOut: 5000 } );
     }
 };

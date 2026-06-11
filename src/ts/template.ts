@@ -1,4 +1,4 @@
-import { routing, state, Item, translations, randomTable, mechanicsEngine, App, DebugMode, Color, TextSize } from ".";
+import { routing, state, Item, translations, randomTable, mechanicsEngine, App, DebugMode, Color, TextSize, BookSeriesId, KaiDiscipline, MgnDiscipline, GndDiscipline, NewOrderDiscipline, settingsController } from ".";
 
 /**
  * The HTML template API
@@ -57,10 +57,20 @@ export const template = {
         $("#template-statistics").on("click", () => {
             routing.redirect("actionChart");
         });
+        $("#template-combatTablesLink").on("click", (e) => {
+            e.preventDefault();
+            template.showCombatTables();
+        });
         template.updateStatistics(true);
         template.translateMainMenu();
         template.changeColorTheme(state.color);
         template.changeTextSize(state.textSize);
+
+        // Navbar theme toggle
+        $("#template-themeToggle").on("click", (e) => {
+            e.preventDefault();
+            settingsController.changeColorTheme(state.color === Color.Light ? Color.Dark : Color.Light);
+        });
     },
 
     /**
@@ -112,6 +122,56 @@ export const template = {
             } else {
                 $("#template-map").hide();
             }
+
+            // Update hunting indicator
+            template.updateHuntingIndicator();
+        }
+    },
+
+    /**
+     * Update the hunting availability indicator on the action chart
+     */
+    updateHuntingIndicator() {
+        const $row = $("#achart-hunting-row");
+        const $available = $("#achart-hunting-available");
+        const $unavailable = $("#achart-hunting-unavailable");
+
+        if (!state.sectionStates || !state.sectionStates.currentSection || !state.mechanics) {
+            $row.hide();
+            return;
+        }
+
+        // Check if current section has a meal rule
+        const $section = state.mechanics.getSection(state.sectionStates.currentSection);
+        if (!$section || $section.find("meal").length === 0) {
+            $row.hide();
+            return;
+        }
+
+        $row.show();
+
+        // Check if player has hunting discipline
+        const bookSeries = state.book.getBookSeries();
+        let hasHunting = false;
+        if (bookSeries.id === BookSeriesId.NewOrder) {
+            hasHunting = state.actionChart.hasNewOrderDiscipline(NewOrderDiscipline.GrandHuntmastery) ||
+                state.actionChart.hasKaiDiscipline(KaiDiscipline.Hunting) ||
+                state.actionChart.hasMgnDiscipline(MgnDiscipline.Huntmastery);
+        } else {
+            hasHunting = state.actionChart.hasKaiDiscipline(KaiDiscipline.Hunting) ||
+                state.actionChart.hasMgnDiscipline(MgnDiscipline.Huntmastery) ||
+                state.actionChart.hasGndDiscipline(GndDiscipline.GrandHuntmastery);
+        }
+
+        const $mealRule = $section.find("meal").first();
+        const huntDisabled = $mealRule.attr("huntDisabled") === "true";
+
+        if (hasHunting && state.sectionStates.huntEnabled && !huntDisabled) {
+            $available.show();
+            $unavailable.hide();
+        } else {
+            $available.hide();
+            $unavailable.show();
         }
     },
 
@@ -351,5 +411,14 @@ export const template = {
         if (App.debugMode === DebugMode.TEST) {
             $("#section-ready").remove();
         }
+    },
+
+    /**
+     * Show illustration zoom modal
+     * @param src Image source URL
+     */
+    showIllustrationZoom(src: string) {
+        $("#game-illustration-img").attr("src", src);
+        $("#game-illustration-zoom").modal("show");
     }
 };

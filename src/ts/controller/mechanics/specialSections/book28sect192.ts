@@ -1,4 +1,4 @@
-import { state, gameController, Mechanics } from "../../..";
+import { state, gameController, Mechanics, SpecialSectionRegistry } from "../../..";
 
 /**
  * Generate trader with funny deals
@@ -61,3 +61,5 @@ export const book28sect192 = {
         }
     }
 };
+
+SpecialSectionRegistry.register("sect192", book28sect192);

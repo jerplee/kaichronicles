@@ -21,3 +21,14 @@ ctrf-report.json
 www/sw.js
 www/sw.js.LICENSE.txt
 www/sw.js.map
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# AI / Planning artifacts
+AGENTS.md
+.devin/
+.planning/

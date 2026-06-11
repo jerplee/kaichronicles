@@ -30,7 +30,6 @@
         "pdf-lib": "^1.17.1",
         "preprocess": "^3.2.0",
         "selenium-webdriver": "^4.35.0",
-        "simple-git": "^3.7.1",
         "striptags": "^3.2.0",
         "terser-webpack-plugin": "^5.3.10",
         "ts-jest": "^29.4.3",
@@ -48,6 +47,9 @@
         "serve": "webpack serve --config webpack.config.js",
         "lint": "eslint -c .eslintrc.js --ext .ts src",
         "test": "jest",
+        "test:text": "npm run test -- --no-color > tests_log.txt 2>&1",
+        "test:json": "npm run test -- --json --outputFile=tests-results.json",
+        "test:coverage": "npm run test -- --coverage",
         "predist": "webpack --config webpack.config.js",
         "dist": "node scripts/prepareVersion.js"
     }

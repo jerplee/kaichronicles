@@ -19,33 +19,46 @@ The structure:
             "endurance": 26,
             // Current value:
             "currentEndurance": 26,
-            // Owned weapons. Weapons information can be found in objects.xml
+            // Owned weapons. Since v1.12, these are ActionChartItem objects.
+            // In v1.11 and earlier, these were plain strings.
             "weapons": [
-                "sword",
-                "bow"
+                { "id": "sword", "usageCount": 1, "damage": 0 },
+                { "id": "bow", "usageCount": 1, "damage": 0 }
             ],
             // Current selected weapon
             "fightUnarmed": false,
             "selectedWeapon": "sword",
-            // Money
-            "beltPouch": 31,
+            // Money. Since v1.18, multicurrency support.
+            // In v1.17 and earlier, this was a single number (Gold Crowns).
+            "beltPouch": {
+                "crown": 31,
+                "noble": 0,
+                "lune": 0,
+                "kika": 0,
+                "ren": 0,
+                "sheasutorq": 0,
+                "orla": 0,
+                "ain": 0
+            },
             // Number of meals (each one backpack item)
             "meals": 3,
-            // Backpack items. These are object codes. Object information can be found in objects.xml
+            // Backpack items. Since v1.12, these are ActionChartItem objects.
+            // In v1.11 and earlier, these were plain strings.
             "backpackItems": [
-                "rope",
-                "khetuspores",
-                "baylonboughfungi",
-                "silverflask",
-                "silverflask"
+                { "id": "rope", "usageCount": 1 },
+                { "id": "khetuspores", "usageCount": 1 },
+                { "id": "baylonboughfungi", "usageCount": 1 },
+                { "id": "silverflask", "usageCount": 1 },
+                { "id": "silverflask", "usageCount": 1 }
             ],
-            // Special items. These are object codes. Object information can be found in objects.xml
+            // Special items. Since v1.12, these are ActionChartItem objects.
+            // In v1.11 and earlier, these were plain strings.
             "specialItems": [
-                "quiver",
-                "quiver",
-                "map",
-                "crystalexplosive",
-                "goldenamulet"
+                { "id": "quiver", "usageCount": 1 },
+                { "id": "quiver", "usageCount": 1 },
+                { "id": "map", "usageCount": 1 },
+                { "id": "crystalexplosive", "usageCount": 1 },
+                { "id": "goldenamulet", "usageCount": 1 }
             ],
             // Backpack lost?
             "hasBackpack": true,
@@ -71,10 +84,20 @@ The structure:
             "yScrollPosition": 0,
             // Number of arrows in owned quivers
             "arrows": 9,
+            // Number of fireseeds (added in v1.15)
+            "fireseeds": 0,
             // Adgana has ever been used?
             "adganaUsed": false,
             // Curing (+20EP) has been used in current book?
             "restore20EPUsed": false,
+            // New Order Curing EP restored in current book (added in v1.16)
+            "newOrderCuringEPRestored": 0,
+            // Disciplines per series (added in v1.12). Previous versions stored only
+            // 'disciplines' and 'weaponSkill' for the current series.
+            "kaiDisciplines": { "disciplines": [], "weaponSkill": [] },
+            "magnakaiDisciplines": { "disciplines": [], "weaponSkill": [] },
+            "grandMasterDisciplines": { "disciplines": [], "weaponSkill": [] },
+            "newOrderDisciplines": { "disciplines": [], "weaponSkill": [] },
             // Objects stored in Kai monastery
             "kaiMonasterySafekeeping": [
                 {
@@ -127,6 +150,8 @@ The structure:
                         "drop[objectId='map']": true
                     },
                     "healingExecuted": true,
+                    "aletherUsed": false,
+                    "soldObject": false,
                     "numberPickersState": {
                         "actionFired": null
                     }

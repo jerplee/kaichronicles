@@ -9,4 +9,11 @@ module.exports = {
         'default',
         ['jest-ctrf-json-reporter', {}],
       ],
+    collectCoverageFrom: [
+        'src/ts/**/*.ts',
+        '!src/ts/tests/**',
+        '!src/ts/**/*.d.ts',
+    ],
+    coverageReporters: ['text', 'lcov', 'json-summary'],
+    coverageDirectory: 'coverage',
 };

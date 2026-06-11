@@ -1,4 +1,4 @@
-import { state, mechanicsEngine, CombatTurn, Combat, template } from "../../..";
+import { state, mechanicsEngine, CombatTurn, Combat, template, SpecialSectionRegistry } from "../../..";
 
 /** Bow tournament final */
 export const book6sect26 = {
@@ -66,3 +66,5 @@ export const book6sect26 = {
         template.animateValueChange( $("#mechanics-targetpoins") , targetPoints , doNotAnimate , color );
     },
 };
+
+SpecialSectionRegistry.register("sect26", book6sect26);

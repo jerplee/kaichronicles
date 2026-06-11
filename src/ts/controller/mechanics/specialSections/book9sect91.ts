@@ -1,4 +1,4 @@
-import { state, actionChartController, randomTable, mechanicsEngine, translations } from "../../..";
+import { state, actionChartController, randomTable, mechanicsEngine, translations, SpecialSectionRegistry } from "../../..";
 
 /** Book 9, sect91: Drop half of your backpack content */
 export const book9sect91 = {
@@ -55,3 +55,5 @@ export const book9sect91 = {
         mechanicsEngine.showMessage( translations.text( coinState ) );
     },
 };
+
+SpecialSectionRegistry.register("sect91", book9sect91);
