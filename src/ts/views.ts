@@ -72,7 +72,7 @@ export const views = {
             const msg = "Error loading view " + viewPath + ", error: " +
                 ajaxErrorMsg(this, jqXHR, textStatus, errorThrown);
             template.setErrorMessage( msg );
-            alert( msg );
+            template.showAlert( msg );
         });
     },
 

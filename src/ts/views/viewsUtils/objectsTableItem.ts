@@ -400,25 +400,35 @@ export class ObjectsTableItem {
             // If the currency is not in Crowns, we assume the seller only accepts the specific currency
             if (this.objectInfo.currency !== CurrencyName.CROWN) {
                 if ( state.actionChart.beltPouch[this.objectInfo.currency] < this.objectInfo.price ) {
-                    alert( translations.text("noEnoughMoney") );
+                    template.showAlert( translations.text("noEnoughMoney") );
                     return;
                 }
             } else if ( state.actionChart.getBeltPouchUsedAmount() < this.objectInfo.price ) {
-                alert( translations.text("noEnoughMoney") );
+                template.showAlert( translations.text("noEnoughMoney") );
                 return;
             }
 
             if ( this.item.id === Item.ARROW && state.actionChart.arrows >= state.actionChart.getMaxArrowCount() ) {
                 // Don't let spend money on arrows you can't carry
-                alert( translations.text("noQuiversEnough") );
+                template.showAlert( translations.text("noQuiversEnough") );
                 return;
             }
 
-            if ( !confirm( translations.text("confirmBuy", [this.objectInfo.price, translations.text(this.objectInfo.currency)] ) ) ) {
-                return;
-            }
+            template.showConfirm(
+                translations.text("confirmBuy", [this.objectInfo.price, translations.text(this.objectInfo.currency)] ),
+                (confirmed) => {
+                    if (confirmed) {
+                        this.doGet();
+                    }
+                }
+            );
+            return;
         }
 
+        this.doGet();
+    }
+
+    private doGet() {
         let objectPicked: boolean = false;
         if ( this.item.id === Item.MONEY || this.item.id === Item.ARROW ) {
             // Not really an object
@@ -485,10 +495,14 @@ export class ObjectsTableItem {
     private sell() {
         const sellString = translations.text( "confirmSell" , [ this.objectInfo.price, translations.text(this.objectInfo.currency) ] );
 
-        if ( !confirm( sellString ) ) {
-            return;
-        }
+        template.showConfirm(sellString, (confirmed) => {
+            if (confirmed) {
+                this.doSell();
+            }
+        });
+    }
 
+    private doSell() {
         if ( this.item.id === Item.ARROW && this.objectInfo.count > 0 ) {
             // Drop arrows
             actionChartController.increaseArrows( -this.objectInfo.count );
@@ -505,11 +519,17 @@ export class ObjectsTableItem {
 
     /** Use object operation */
     private use() {
+        template.showConfirm(
+            translations.text( "confirmUse" , [this.item?.name] ),
+            (confirmed) => {
+                if (confirmed) {
+                    this.doUse();
+                }
+            }
+        );
+    }
 
-        if ( !confirm( translations.text( "confirmUse" , [this.item?.name] ) ) ) {
-            return;
-        }
-
+    private doUse() {
         // Use the object
         const dropObject = ( this.type === ObjectsTableType.INVENTORY );
         actionChartController.use(this.item.id, dropObject, this.index);
@@ -532,9 +552,14 @@ export class ObjectsTableItem {
     }
 
     private drop() {
-        if ( confirm( translations.text( "confirmDrop" , [this.item.name] ) ) ) {
-            actionChartController.drop( this.item.id , true , true , this.objectInfo.count , this.index );
-        }
+        template.showConfirm(
+            translations.text( "confirmDrop" , [this.item.name] ),
+            (confirmed) => {
+                if (confirmed) {
+                    actionChartController.drop( this.item.id , true , true , this.objectInfo.count , this.index );
+                }
+            }
+        );
     }
 
     private currentWeapon() {

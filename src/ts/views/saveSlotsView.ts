@@ -1,4 +1,4 @@
-import { translations, settingsController } from "..";
+import { translations, settingsController, template } from "..";
 import { SaveSlotRecord } from "../model/saveGameDb";
 
 /**
@@ -75,19 +75,29 @@ export const saveSlotsView = {
             e.preventDefault();
             const id = $(this).closest(".save-slot-card").data("id");
             const name = $(this).closest(".save-slot-card").find(".save-slot-name").text();
-            const newName = window.prompt(translations.text("renameSave"), name);
-            if (newName && newName.trim()) {
-                settingsController.renameSlot(id, newName.trim());
-            }
+            template.showPrompt(
+                translations.text("renameSave") || "Rename save:",
+                name,
+                (newName) => {
+                    if (newName) {
+                        settingsController.renameSlot(id, newName);
+                    }
+                }
+            );
         });
 
         $("#settings-saveSlotsGrid").on("click", ".slot-delete", function(e) {
             e.preventDefault();
             const id = $(this).closest(".save-slot-card").data("id");
             const name = $(this).closest(".save-slot-card").find(".save-slot-name").text();
-            if (window.confirm(translations.text("deleteSaveConfirm", [name]))) {
-                settingsController.deleteSlot(id);
-            }
+            template.showConfirm(
+                translations.text("deleteSaveConfirm") + " " + name || "Delete save? " + name,
+                (confirmed) => {
+                    if (confirmed) {
+                        settingsController.deleteSlot(id);
+                    }
+                }
+            );
         });
     },
 

@@ -1,4 +1,4 @@
-import { Book, Mechanics, BookSectionStates, ActionChart, projectAon, mechanicsEngine, saveGameDb } from ".";
+import { Book, Mechanics, BookSectionStates, ActionChart, projectAon, mechanicsEngine, saveGameDb, MAX_BOOK_NUMBER, StorageKeys } from ".";
 
 // Variabe "state" is declared at bottom of this file
 
@@ -162,12 +162,12 @@ export class State {
         this.removeCachedState();
 
         // Remove current game state
-        localStorage.removeItem("state");
+        localStorage.removeItem(StorageKeys.STATE);
 
         if (deleteBooksHistory) {
             // Remove action charts from previous books
             for (let i = 1; i <= projectAon.getLastSupportedBook(); i++) {
-                localStorage.removeItem("state-book-" + i.toString());
+                localStorage.removeItem(StorageKeys.STATE_BOOK_PREFIX + i.toString());
             }
         }
     }
@@ -277,8 +277,8 @@ export class State {
      */
     private getPreviousBooksState(): string[] {
         const states: string[] = [];
-        for (let i = 1; i <= 30; i++) {
-            const key = "state-book-" + i;
+        for (let i = 1; i <= MAX_BOOK_NUMBER; i++) {
+            const key = StorageKeys.STATE_BOOK_PREFIX + i;
             const value = localStorage.getItem(key);
             if (value) {
                 states[i] = value;
@@ -291,7 +291,7 @@ export class State {
      * Return true if there is a stored persisted state (localStorage or IndexedDB).
      */
     public existsPersistedState() {
-        if (localStorage.getItem("state")) {
+        if (localStorage.getItem(StorageKeys.STATE)) {
             return true;
         }
         return false;
@@ -302,7 +302,7 @@ export class State {
      */
     public restoreState() {
         try {
-            const json = localStorage.getItem("state");
+            const json = localStorage.getItem(StorageKeys.STATE);
             if (json) {
                 const stateKeys = JSON.parse(json);
                 if (stateKeys) {
@@ -333,12 +333,12 @@ export class State {
                 if (slot.previousBooksState) {
                     for (let i = 1; i < slot.previousBooksState.length; i++) {
                         if (slot.previousBooksState[i]) {
-                            localStorage.setItem("state-book-" + i, slot.previousBooksState[i]);
+                            localStorage.setItem(StorageKeys.STATE_BOOK_PREFIX + i, slot.previousBooksState[i]);
                         }
                     }
                 }
                 // Write back to localStorage so subsequent restores work
-                localStorage.setItem("state", JSON.stringify(slot.currentState));
+                localStorage.setItem(StorageKeys.STATE, JSON.stringify(slot.currentState));
                 return true;
             }
             return false;
@@ -392,7 +392,7 @@ export class State {
     public nextBook() {
 
         // Save the action chart state on the current book ending
-        const key = `state-book-${this.book.bookNumber}`;
+        const key = `${StorageKeys.STATE_BOOK_PREFIX}${this.book.bookNumber}`;
         localStorage.setItem(key, JSON.stringify(this.actionChart));
 
         // Move to the next book
@@ -419,7 +419,7 @@ export class State {
      */
     public getPreviousBookActionChart(bookNumber: number): ActionChart {
         try {
-            const key = `state-book-${bookNumber}`;
+            const key = `${StorageKeys.STATE_BOOK_PREFIX}${bookNumber}`;
             const json = localStorage.getItem(key);
             if (!json) {
                 return null;
@@ -443,8 +443,8 @@ export class State {
         };
 
         // Get the action charts at the end of each book
-        for (let i = 1; i <= 30; i++) {
-            const key = `state-book-${i}`;
+        for (let i = 1; i <= MAX_BOOK_NUMBER; i++) {
+            const key = `${StorageKeys.STATE_BOOK_PREFIX}${i}`;
             const previousBookState = localStorage.getItem(key);
             if (previousBookState) {
                 saveGameObject.previousBooksState[i] = previousBookState;
@@ -482,8 +482,6 @@ export class State {
         // replace BOM Character (https://en.wikipedia.org/wiki/Byte_order_mark). Otherwise call to JSON.parse will fail
         json = json.replace(/\ufeff/g, "");
 
-        // alert( json );
-        // console.log( json );
         const saveGameObject: SaveGameObject = <SaveGameObject>JSON.parse(json);
 
         // Check errors
@@ -492,8 +490,8 @@ export class State {
         }
 
         // Restore previous books action chart
-        for (let i = 1; i <= 30; i++) {
-            const key = `state-book-${i}`;
+        for (let i = 1; i <= MAX_BOOK_NUMBER; i++) {
+            const key = `${StorageKeys.STATE_BOOK_PREFIX}${i}`;
             if (saveGameObject.previousBooksState[i]) {
                 localStorage.setItem(key, saveGameObject.previousBooksState[i]);
             } else {

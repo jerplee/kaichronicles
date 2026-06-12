@@ -1,4 +1,4 @@
-import { state, settingsController, translations, setupController, routing, Color, TextSize } from "..";
+import { state, settingsController, translations, setupController, routing, Color, TextSize, template } from "..";
 
 /**
  * Settings view
@@ -35,9 +35,11 @@ export const settingsView = {
         $("#settings-restart-label").text(translations.text("restartBook", [state.book.bookNumber]));
         $("#settings-restart").on("click", (e) => {
             e.preventDefault();
-            if (confirm(translations.text("confirmRestart"))) {
-                setupController.restartBook();
-            }
+            template.showConfirm(translations.text("confirmRestart"), (confirmed) => {
+                if (confirmed) {
+                    setupController.restartBook();
+                }
+            });
         });
 
         // Restart book
@@ -46,10 +48,12 @@ export const settingsView = {
             $("#settings-restart-sect1-label").text(translations.text("restartBookSection1", [state.book.bookNumber]));
             $("#settings-restart-sect1").on("click", (e) => {
                 e.preventDefault();
-                if (confirm(translations.text("confirmRestartSection1"))) {
-                    state.loadSaveGameJson(state.actionChartSect1);
-                    routing.redirect("setup");
-                }
+                template.showConfirm(translations.text("confirmRestartSection1"), (confirmed) => {
+                    if (confirmed) {
+                        state.loadSaveGameJson(state.actionChartSect1);
+                        routing.redirect("setup");
+                    }
+                });
             });
         }
 

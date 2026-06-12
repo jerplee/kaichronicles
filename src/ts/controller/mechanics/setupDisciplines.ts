@@ -223,9 +223,9 @@ export class SetupDisciplines {
             if (App.debugMode !== DebugMode.DEBUG && state.actionChart.getWeaponSkill().length >= nExpectedWeapons) {
                 e.preventDefault();
                 if (nExpectedWeapons === 1) {
-                    alert(translations.text("onlyNWeapon", [nExpectedWeapons]));
+                    template.showAlert(translations.text("onlyNWeapon", [nExpectedWeapons]));
                 } else {
-                    alert(translations.text("onlyNWeapons", [nExpectedWeapons]));
+                    template.showAlert(translations.text("onlyNWeapons", [nExpectedWeapons]));
                 }
                 return;
             }
@@ -276,7 +276,7 @@ export class SetupDisciplines {
         const selected: boolean = $checkBox.prop("checked");
         if (selected && this.getAllDisciplinesSelected() && App.debugMode !== DebugMode.DEBUG) {
             e.preventDefault();
-            alert(translations.text("maxDisciplines", [this.expectedNDisciplines]));
+            template.showAlert(translations.text("maxDisciplines", [this.expectedNDisciplines]));
             return;
         }
 

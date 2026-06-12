@@ -1,4 +1,4 @@
-import { views, state, template, routing, declareCommonHelpers, mechanicsEngine, pwa, saveGameDb } from ".";
+import { views, state, template, routing, declareCommonHelpers, mechanicsEngine, pwa, saveGameDb, StorageKeys } from ".";
 
 /** Execution enviroment type */
 export enum EnvironmentType {
@@ -92,7 +92,7 @@ export class App {
                     // Migrate existing localStorage save to IndexedDB auto-save if needed
                     if (saveGameDb.isAvailable() && state.existsPersistedState()) {
                         try {
-                            const json = localStorage.getItem("state");
+                            const json = localStorage.getItem(StorageKeys.STATE);
                             if (json) {
                                 const parsed = JSON.parse(json);
                                 if (parsed && parsed.actionChart) {

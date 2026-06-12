@@ -1,4 +1,4 @@
-import { ActionChart, translations, ObjectsTable, ObjectsTableType, actionChartController, state, GndDiscipline, MoneyDialog, BookSeriesId, Item, CurrencyName } from "..";
+import { ActionChart, translations, ObjectsTable, ObjectsTableType, actionChartController, state, GndDiscipline, MoneyDialog, BookSeriesId, Item, CurrencyName, template } from "..";
 
 /**
  * The action chart view API
@@ -78,11 +78,16 @@ export const actionChartView = {
         $restoreButton.on("click", (e: JQuery.TriggeredEvent) => {
             e.preventDefault();
             const restoreDiscipline = state.actionChart.get20EPRestoreDiscipline();
-            if ( !confirm( translations.text(restoreDiscipline === GndDiscipline.Deliverance ? "confirm20EPGrdMaster" : "confirm20EP") ) ) {
-                return;
-            }
-            actionChartController.use20EPRestore();
-            actionChartView.updateRestore20EPState();
+            template.showConfirm(
+                translations.text(restoreDiscipline === GndDiscipline.Deliverance ? "confirm20EPGrdMaster" : "confirm20EP"),
+                (confirmed) => {
+                    if (!confirmed) {
+                        return;
+                    }
+                    actionChartController.use20EPRestore();
+                    actionChartView.updateRestore20EPState();
+                }
+            );
         });
     },
 

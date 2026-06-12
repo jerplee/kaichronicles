@@ -1,4 +1,4 @@
-import { mechanicsEngine, state, gameView, translations, actionChartController, randomMechanics, EquipmentSectionMechanics } from "../..";
+import { mechanicsEngine, state, gameView, translations, actionChartController, randomMechanics, EquipmentSectionMechanics, template } from "../..";
 
 /**
  * Tool to select a Kai Weapon
@@ -48,20 +48,21 @@ export const kaiWeaponPickerMechanics = {
                 const selectedKaiWeaponName = $("#mechanics-kaiweaponpicker").find("input[type='radio']:checked").val().toString();
                 const weaponObject = state.mechanics.getObject(selectedKaiWeaponName);
 
-                const confirmed = confirm(translations.text(mechanicsEngine.getRuleText(rule, "confirmText"), [weaponObject.name]));
-                if (confirmed) {
-                    actionChartController.pick(selectedKaiWeaponName);
-                    // Disable the random choice button (hardcoded index for now)
-                    randomMechanics.disableRandomTableByIndex(1);
-                    this.disable();
-                    // Ugly hack: If we are on the 'equipment' section, check if all link has been clicked
-                    if (state.sectionStates.currentSection === "equipmnt") {
-                        EquipmentSectionMechanics.checkExitEquipmentSection();
+                template.showConfirm(
+                    translations.text(mechanicsEngine.getRuleText(rule, "confirmText"), [weaponObject.name]),
+                    (confirmed) => {
+                        if (confirmed) {
+                            actionChartController.pick(selectedKaiWeaponName);
+                            // Disable the random choice button (hardcoded index for now)
+                            randomMechanics.disableRandomTableByIndex(1);
+                            this.disable();
+                            // Ugly hack: If we are on the 'equipment' section, check if all link has been clicked
+                            if (state.sectionStates.currentSection === "equipmnt") {
+                                EquipmentSectionMechanics.checkExitEquipmentSection();
+                            }
+                        }
                     }
-                }
-                else {
-                    return true;
-                }
+                );
             });
             $ui.append($pickKaiWeaponButton);
         }

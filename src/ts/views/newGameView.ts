@@ -1,4 +1,4 @@
-import { projectAon, translations, newGameController, state, pwa, Book, BookSeriesId } from "..";
+import { projectAon, translations, newGameController, state, pwa, Book, BookSeriesId, template } from "..";
 import { BookData } from "../scripts/bookData";
 
 /**
@@ -26,7 +26,7 @@ export const newGameView = {
         $("#newgame-form").on("submit", (e) => {
             e.preventDefault();
             if (!$("#newgame-license").prop("checked")) {
-                alert(translations.text("youMustAgree"));
+                template.showAlert(translations.text("youMustAgree"));
                 return;
             }
             newGameController.startNewGame(parseInt(<string>$("#newgame-book").val()));

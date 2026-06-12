@@ -146,7 +146,7 @@ export const randomMechanics = {
 
             // If there are pending meals, don't follow with this link
             if (MealMechanics.arePendingMeals()) {
-                alert(translations.text("doMealFirst"));
+                template.showAlert(translations.text("doMealFirst"));
                 return;
             }
 

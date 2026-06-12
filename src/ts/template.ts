@@ -1,4 +1,4 @@
-import { routing, state, Item, translations, randomTable, mechanicsEngine, App, DebugMode, Color, TextSize, BookSeriesId, KaiDiscipline, MgnDiscipline, GndDiscipline, NewOrderDiscipline, settingsController } from ".";
+import { routing, state, Item, translations, randomTable, mechanicsEngine, App, DebugMode, Color, TextSize, BookSeriesId, KaiDiscipline, MgnDiscipline, GndDiscipline, NewOrderDiscipline, settingsController, ModalIds } from ".";
 
 /**
  * The HTML template API
@@ -420,5 +420,58 @@ export const template = {
     showIllustrationZoom(src: string) {
         $("#game-illustration-img").attr("src", src);
         $("#game-illustration-zoom").modal("show");
+    },
+
+    /**
+     * Show a Bootstrap confirm modal. Calls onConfirm(true) if OK is clicked.
+     */
+    showConfirm(message: string, onConfirm: (confirmed: boolean) => void) {
+        const $modal = $("#" + ModalIds.CONFIRM_MODAL);
+        $("#" + ModalIds.CONFIRM_MESSAGE).text(message);
+
+        const $ok = $("#" + ModalIds.CONFIRM_OK);
+        $ok.off("click").on("click", () => {
+            $modal.modal("hide");
+            onConfirm(true);
+        });
+
+        $modal.modal("show");
+    },
+
+    /**
+     * Show a Bootstrap alert modal with a single OK button.
+     */
+    showAlert(message: string) {
+        const $modal = $("#" + ModalIds.ALERT_MODAL);
+        $("#" + ModalIds.ALERT_MESSAGE).text(message);
+        $modal.modal("show");
+    },
+
+    /**
+     * Show a Bootstrap prompt modal. Calls onResult(value) if OK is clicked, or onResult(null) if cancelled.
+     */
+    showPrompt(message: string, defaultValue: string, onResult: (value: string | null) => void) {
+        const $modal = $("#" + ModalIds.PROMPT_MODAL);
+        const $input = $("#" + ModalIds.PROMPT_INPUT);
+        $("#" + ModalIds.PROMPT_LABEL).text(message);
+        $input.val(defaultValue);
+
+        const $ok = $("#" + ModalIds.PROMPT_OK);
+        $ok.off("click").on("click", () => {
+            const value = $input.val() as string;
+            $modal.modal("hide");
+            onResult(value && value.trim() ? value.trim() : null);
+        });
+
+        // Allow Enter key to submit
+        $input.off("keydown").on("keydown", (e) => {
+            if (e.which === 13) {
+                e.preventDefault();
+                $ok.trigger("click");
+            }
+        });
+
+        $modal.modal("show");
+        setTimeout(() => { $input.focus(); }, 100);
     }
 };

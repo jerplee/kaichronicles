@@ -108,7 +108,7 @@ export class MealMechanics {
             } else if (option === "buyMeal") {
                 // Buy the meal
                 if (state.actionChart.getBeltPouchUsedAmount() < price) {
-                    alert(translations.text("noEnoughMoney"));
+                    template.showAlert(translations.text("noEnoughMoney"));
                     return;
                 }
                 actionChartController.increaseMoney(-price);

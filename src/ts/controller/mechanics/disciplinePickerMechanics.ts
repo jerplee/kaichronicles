@@ -1,4 +1,4 @@
-import { mechanicsEngine, state, gameView, translations } from "../..";
+import { mechanicsEngine, state, gameView, translations, template } from "../..";
 
 /**
  * Tool to select a discipline from the active disciplines
@@ -48,14 +48,19 @@ export const disciplinePickerMechanics = {
             disciplinePickerMechanics.bindButtonActionEvent($pickDisciplineButton, () => {
                 const selectedDisciplineIndex = Number($("#mechanics-disciplinepicker").find("input[type='radio']:checked").val().toString());
                 const selectedDiscipline = state.actionChart.getDisciplines()[selectedDisciplineIndex];
-                if (!confirm(translations.text(mechanicsEngine.getRuleText(rule, "confirmText"), [bookDisciplines[selectedDiscipline].name]))) {
-                    return;
-                }
-                if (mechanicsEngine.fireDisciplinePickerChoosed()) {
-                    // Store that the picker action has been fired
-                    const sectionState = state.sectionStates.getSectionState();
-                    sectionState.disciplinePickersState.actionFired = true;
-                }
+                template.showConfirm(
+                    translations.text(mechanicsEngine.getRuleText(rule, "confirmText"), [bookDisciplines[selectedDiscipline].name]),
+                    (confirmed) => {
+                        if (!confirmed) {
+                            return;
+                        }
+                        if (mechanicsEngine.fireDisciplinePickerChoosed()) {
+                            // Store that the picker action has been fired
+                            const sectionState = state.sectionStates.getSectionState();
+                            sectionState.disciplinePickersState.actionFired = true;
+                        }
+                    }
+                );
             });
             $ui.append($pickDisciplineButton);
         }

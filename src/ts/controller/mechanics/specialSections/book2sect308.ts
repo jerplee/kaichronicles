@@ -32,7 +32,7 @@ export const book2sect308 = {
 
     click() {
         if ( state.actionChart.getBeltPouchUsedAmount() < 3 ) {
-            alert( translations.text("noEnoughMoney") );
+            template.showAlert( translations.text("noEnoughMoney") );
             return;
         }
 

@@ -107,19 +107,19 @@ export function declareJqueryNumberFunctions() {
             const num: number = this.getNumber();
 
             if ( isNaN(num) ) {
-                alert( translations.text("npWrongValue" , [this.getTitle()] ) );
+                toastr.error( translations.text("npWrongValue" , [this.getTitle()] ) );
                 return false;
             }
 
             const min = this.getMinValue();
             if ( num < min ) {
-                alert( translations.text( "npMinValue" , [ this.getTitle() , min ] ) );
+                toastr.error( translations.text( "npMinValue" , [ this.getTitle() , min ] ) );
                 return false;
             }
 
             const max = this.getMaxValue();
             if ( num > max ) {
-                alert( translations.text( "npMaxValue" , [ this.getTitle() , max ] ) );
+                toastr.error( translations.text( "npMaxValue" , [ this.getTitle() , max ] ) );
                 return false;
             }
 

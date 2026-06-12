@@ -96,6 +96,73 @@
 
     </div><!-- /.container -->
 
+    <!-- Reusable Alert Modal -->
+    <div class="modal fade" id="template-alertModal" tabindex="-1" role="dialog" aria-labelledby="template-alertTitle">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="template-alertTitle" data-translation="alert">Alert</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="template-alertMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="template-alertOk" data-dismiss="modal" data-translation="ok">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reusable Confirm Modal -->
+    <div class="modal fade" id="template-confirmModal" tabindex="-1" role="dialog" aria-labelledby="template-confirmTitle">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="template-confirmTitle" data-translation="confirm">Confirm</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="template-confirmMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" data-translation="cancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="template-confirmOk" data-translation="ok">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reusable Prompt Modal -->
+    <div class="modal fade" id="template-promptModal" tabindex="-1" role="dialog" aria-labelledby="template-promptTitle">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="template-promptTitle" data-translation="prompt">Prompt</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="template-promptForm">
+                        <div class="form-group">
+                            <label for="template-promptInput" id="template-promptLabel"></label>
+                            <input type="text" class="form-control" id="template-promptInput" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" data-translation="cancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="template-promptOk" data-translation="ok">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal to see object details -->
     <div class="modal fade" id="template-objectDetails" tabindex="-1" role="dialog" 
         aria-labelledby="template-objectTitle">

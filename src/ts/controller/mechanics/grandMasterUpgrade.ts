@@ -33,9 +33,18 @@ export class GrandMasterUpgrade {
     }
 
     private static doUpgrade(rule: Element) {
-        if (!confirm( translations.text("gmupgrade-confirm"))) {
-            return;
-        }
+        template.showConfirm(
+            translations.text("gmupgrade-confirm"),
+            (confirmed) => {
+                if (!confirmed) {
+                    return;
+                }
+                this.performUpgrade(rule);
+            }
+        );
+    }
+
+    private static performUpgrade(rule: Element) {
 
         const option = <string> $("#mechanics-gmupgrade input[name=mechanics-gmupgrade-option]:checked").val();
         if (option === "reroll-nobonus") {

@@ -1,4 +1,4 @@
-import { template, translations, views, mainMenuView, state, settingsController, Color, saveGameDb, routing, mechanicsEngine } from "..";
+import { template, translations, views, mainMenuView, state, settingsController, Color, saveGameDb, routing, mechanicsEngine, SLOT_KEYS, SAVEGAME_EXTENSION } from "..";
 
 /**
  * The application menu controller
@@ -26,11 +26,9 @@ export const mainMenuController = {
     refreshSlots() {
         console.log("[DEBUG] refreshSlots called");
         if (saveGameDb.isAvailable()) {
-            Promise.all([
-                saveGameDb.getSlotByKey("slot-1").catch((e) => { console.log("[DEBUG] slot-1 error:", e); return undefined; }),
-                saveGameDb.getSlotByKey("slot-2").catch((e) => { console.log("[DEBUG] slot-2 error:", e); return undefined; }),
-                saveGameDb.getSlotByKey("slot-3").catch((e) => { console.log("[DEBUG] slot-3 error:", e); return undefined; })
-            ]).then((slots) => {
+            Promise.all(
+                SLOT_KEYS.map((key) => saveGameDb.getSlotByKey(key).catch((e) => { console.log("[DEBUG] " + key + " error:", e); return undefined; }))
+            ).then((slots) => {
                 console.log("[DEBUG] refreshSlots loaded:", slots.map((s) => s ? s.name : "empty"));
                 mainMenuView.renderSlots(slots);
             }).catch((e) => {
@@ -91,7 +89,7 @@ export const mainMenuController = {
                         if (!saveObj || !saveObj.currentState) {
                             throw new Error("Invalid save file format");
                         }
-                        const record = state.buildSaveSlotRecordFromObject(saveObj, file.name.replace(/\.json$/i, ""));
+                        const record = state.buildSaveSlotRecordFromObject(saveObj, file.name.replace(new RegExp("\\" + SAVEGAME_EXTENSION + "$", "i"), ""));
                         saveGameDb.saveToSlot("slot-" + i, record).then(() => {
                             this.refreshSlots();
                         }).catch((err) => {

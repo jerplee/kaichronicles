@@ -1,4 +1,4 @@
-import { setupController, translations, views, settingsView, state, template, mechanicsEngine, Color, TextSize, saveGameDb, routing, mainMenuController } from "..";
+import { setupController, translations, views, settingsView, state, template, mechanicsEngine, Color, TextSize, saveGameDb, routing, mainMenuController, SAVEGAME_EXTENSION, MAX_SAVE_NAME_LENGTH } from "..";
 import { saveSlotsView } from "../views/saveSlotsView";
 import { mainMenuView } from "../views/mainMenuView";
 
@@ -60,7 +60,7 @@ export const settingsController = {
      * Return a default save game file name
      */
     defaultSaveGameName() {
-        return settingsController.getDateForFileNames() + "-book-" + state.book.bookNumber.toFixed() + "-savegame.json";
+        return settingsController.getDateForFileNames() + "-book-" + state.book.bookNumber.toFixed() + "-savegame" + SAVEGAME_EXTENSION;
     },
 
     /**
@@ -77,13 +77,13 @@ export const settingsController = {
             if ( !fileName ) {
                 fileName = settingsController.defaultSaveGameName();
             }
-            if ( !fileName.toLowerCase().endsWith(".json") ) {
-                fileName += ".json";
+            if ( !fileName.toLowerCase().endsWith(SAVEGAME_EXTENSION) ) {
+                fileName += SAVEGAME_EXTENSION;
             }
 
             // Check for invalid character names
             if ( !fileName.isValidFileName() ) {
-                alert("The file name contains invalid characters");
+                template.showAlert("The file name contains invalid characters");
                 return false;
             }
 
@@ -91,7 +91,7 @@ export const settingsController = {
             return true;
         } catch (e) {
             mechanicsEngine.debugWarning(e);
-            alert("Your browser version does not support save file with javascript. " +
+            template.showAlert("Your browser version does not support save file with javascript. " +
                 "Try a newer browser version. Error: " + e);
             return false;
         }
@@ -123,11 +123,11 @@ export const settingsController = {
      */
     saveSlot(name: string) {
         if (!name || !name.trim()) {
-            alert(translations.text("invalidSaveName"));
+            template.showAlert(translations.text("invalidSaveName"));
             return;
         }
-        if (name.length > 40) {
-            alert(translations.text("saveNameTooLong"));
+        if (name.length > MAX_SAVE_NAME_LENGTH) {
+            template.showAlert(translations.text("saveNameTooLong"));
             return;
         }
         const record = state["buildAutoSaveRecord"] ? (state as any).buildAutoSaveRecord() : {
@@ -150,7 +150,7 @@ export const settingsController = {
             settingsController.refreshSlots();
         }).catch((e) => {
             mechanicsEngine.debugWarning("Failed to create save slot: " + e);
-            alert(translations.text("saveSlotFailed"));
+            template.showAlert(translations.text("saveSlotFailed"));
         });
     },
 
@@ -178,7 +178,7 @@ export const settingsController = {
             settingsController.refreshSlots();
         }).catch((e) => {
             mechanicsEngine.debugWarning("Failed to overwrite save slot: " + e);
-            alert(translations.text("overwriteSlotFailed"));
+            template.showAlert(translations.text("overwriteSlotFailed"));
         });
     },
 
@@ -187,14 +187,14 @@ export const settingsController = {
      */
     renameSlot(id: number, newName: string) {
         if (!newName || !newName.trim()) {
-            alert(translations.text("invalidSaveName"));
+            template.showAlert(translations.text("invalidSaveName"));
             return;
         }
         saveGameDb.updateSlot(id, { name: newName.trim() }).then(() => {
             settingsController.refreshSlots();
         }).catch((e) => {
             mechanicsEngine.debugWarning("Failed to rename save slot: " + e);
-            alert(translations.text("renameSlotFailed"));
+            template.showAlert(translations.text("renameSlotFailed"));
         });
     },
 
@@ -206,7 +206,7 @@ export const settingsController = {
             settingsController.refreshSlots();
         }).catch((e) => {
             mechanicsEngine.debugWarning("Failed to delete save slot: " + e);
-            alert(translations.text("deleteSlotFailed"));
+            template.showAlert(translations.text("deleteSlotFailed"));
         });
     },
 
@@ -216,7 +216,7 @@ export const settingsController = {
     loadSlot(id: number) {
         saveGameDb.getSlot(id).then((slot) => {
             if (!slot) {
-                alert(translations.text("slotNotFound"));
+                template.showAlert(translations.text("slotNotFound"));
                 return;
             }
             const json = JSON.stringify({
@@ -227,7 +227,7 @@ export const settingsController = {
             routing.redirect("setup");
         }).catch((e) => {
             mechanicsEngine.debugWarning("Failed to load save slot: " + e);
-            alert(translations.text("loadSlotFailed"));
+            template.showAlert(translations.text("loadSlotFailed"));
         });
     },
 
