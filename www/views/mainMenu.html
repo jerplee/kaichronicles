@@ -8,9 +8,6 @@
             <p data-translation="appInfo">
                 Lone Wolf Game Books 1 to 29. Have Fun!
             </p>
-
-            <br>
-        <a href="https://www.projectaon.org">https://www.projectaon.org</a>
         </div>
 
         <div id="menu-webinfo" class="menu-warnings">
@@ -20,19 +17,12 @@
             </p>
         </div>
 
-        <div class="menu-actions">
-            <button class="large-button" type="button" id="menu-continue">
-                <img src="images/game-icons/white-book.png" alt="Continue game" />
-                <span data-translation="continueGame">Continue game</span>
-            </button>
-            <button class="large-button" type="button" id="menu-new">
-                <img src="images/game-icons/enlightenment.png" alt="New game" />
-                <span data-translation="newGame">Start new game</span>
-            </button>
-            <button class="large-button" type="button" id="menu-load">
-                <img src="images/game-icons/load.png" alt="Load game" />
-                <span data-translation="loadGame">Load game</span>
-            </button>
+        <div id="menu-saveSlotsSection">
+            <div id="menu-saveSlotsGrid" class="save-slots-grid menu-slots-grid">
+            </div>
+        </div>
+
+        <div class="menu-actions" id="menu-actions-default">
             <button class="large-button" type="button" id="menu-faq">
                 <img src="images/game-icons/help.png" alt="FAQ" />
                 <span data-translation="faq">FAQ</span>
@@ -44,4 +34,38 @@
         </div>
     </div>
 
+    <div id="menu-footer" class="menu-footer">
+        <span class="menu-footer-inner">Kai Chronicles v1.18 — <a href="https://www.projectaon.org" target="_blank">Project Aon</a> — <a href="https://github.com/jerplee/kaichronicles" target="_blank">GitHub</a></span>
+    </div>
+
+</div>
+
+<!-- Hidden file inputs for slot upload -->
+<input type="file" id="menu-upload-slot1" accept=".json" style="display:none" />
+<input type="file" id="menu-upload-slot2" accept=".json" style="display:none" />
+<input type="file" id="menu-upload-slot3" accept=".json" style="display:none" />
+
+<!-- New Game Name Modal -->
+<div class="modal fade" id="menu-newGameModal" tabindex="-1" role="dialog" aria-labelledby="menu-newGameModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="menu-newGameModalLabel" data-translation="newGame">New Game</h4>
+            </div>
+            <div class="modal-body">
+                <form id="menu-newGameForm">
+                    <div class="form-group">
+                        <label for="menu-newGameName" data-translation="enterKaiName">Enter your Kai name:</label>
+                        <input type="text" class="form-control" id="menu-newGameName" required maxlength="30" />
+                    </div>
+                    <input type="hidden" id="menu-newGameSlot" />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" data-translation="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" id="menu-startNewGame" data-translation="start">Start</button>
+            </div>
+        </div>
+    </div>
 </div>

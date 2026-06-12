@@ -40,7 +40,91 @@ export class ObjectsTableItem {
             return html;
         }
 
-        return this.getItemOperations() + html;
+        if ( this.type === ObjectsTableType.AVAILABLE ) {
+            return this.renderAvailableCard();
+        }
+
+        return this.getItemOperations() + '<div class="item-info">' + html + "</div>";
+    }
+
+    /**
+     * Render an available object as a clickable image card.
+     * Clicking the card adds the item to inventory.
+     * Clicking the magnifying glass opens details.
+     */
+    private renderAvailableCard(): string {
+        const name = this.buildItemName();
+        const imageUrl = this.item.getImageUrl();
+
+        let html = '<div class="available-card" data-op="get" ' + this.buildDataAttrs() + '>';
+
+        if ( imageUrl ) {
+            html += '<img class="available-img" src="' + imageUrl + '" alt="' + name + '" />';
+        }
+
+        html += '<div class="available-name">' + name + '</div>';
+
+        // Magnifying glass for details (needs all data attrs too)
+        html += '<span class="available-zoom" data-op="details" ' + this.buildDataAttrs() + '>' +
+            '<span class="glyphicon glyphicon-zoom-in"></span></span>';
+
+        // Description (small text below name)
+        if ( this.item.description ) {
+            html += '<div class="available-desc">' + this.item.description + '</div>';
+        }
+
+        html += '</div>';
+
+        return html;
+    }
+
+    /**
+     * Build the display name for this item (counts, prices, etc.)
+     */
+    private buildItemName(): string {
+        let name = this.item.name;
+
+        // Number of arrows on the quiver
+        if ( this.objectInfo.id === Item.QUIVER || this.objectInfo.id === Item.LARGE_QUIVER ) {
+            const count = ( this.objectInfo.count ? this.objectInfo.count : 0 );
+            if ( count > 0 || this.type === ObjectsTableType.INVENTORY ) {
+                name += " (" + count.toFixed() + " " + (count === 1 ? translations.text("arrow") : translations.text("arrows")) + ")";
+            }
+        }
+
+        // Arrow amount
+        if ( this.objectInfo.id === Item.ARROW && this.objectInfo.count ) {
+            name = this.objectInfo.count.toFixed() + " " + (this.objectInfo.count === 1 ? translations.text("arrow") : name);
+        }
+
+        // Fireseed amount
+        if ( this.objectInfo.id === Item.FIRESEED ) {
+            name += " (" + this.objectInfo.count.toFixed() + ")";
+        }
+
+        // Money amount
+        if ( this.objectInfo.id === Item.MONEY && this.objectInfo.count ) {
+            name += " (" + this.objectInfo.count.toFixed() + " " + translations.text(this.objectInfo.currency) + ")";
+        }
+
+        // Buy / sell price
+        if ( this.objectInfo.price ) {
+            const currencyText = translations.text(this.objectInfo.currency);
+            name += " (" + this.objectInfo.price.toFixed() + " " + currencyText + ")";
+        }
+
+        // Buy X objects for a given price
+        if ( this.objectInfo.id !== Item.MONEY && this.objectInfo.id !== Item.ARROW
+            && this.objectInfo.id !== Item.QUIVER && this.objectInfo.id !== Item.LARGE_QUIVER
+            && this.objectInfo.price > 0 && this.objectInfo.count > 1 ) {
+            name = this.objectInfo.count.toFixed() + " x " + name;
+        }
+
+        if ( this.objectInfo.dessiStoneBonus ) {
+            name += " (" + translations.text( "dessiStone" ) + ")";
+        }
+
+        return name;
     }
 
     /**
@@ -65,51 +149,10 @@ export class ObjectsTableItem {
         }
 
         let html = "";
-
-        // Name
-        let name = this.item.name;
-
-        // Number of arrows on the quiver
-        if ( this.objectInfo.id === Item.QUIVER || this.objectInfo.id === Item.LARGE_QUIVER ) {
-            // Be sure count is not null
-            const count = ( this.objectInfo.count ? this.objectInfo.count : 0 );
-            // In INVENTORY always show "0 arrows", but not in SELL or AVAILABLE (ugly)
-            if ( count > 0 || this.type === ObjectsTableType.INVENTORY ) {
-                name += " (" + count.toFixed() + " " + (count === 1 ? translations.text("arrow") : translations.text("arrows")) + ")";
-            }
-        }
-
-        // Arrow amount
-        if ( this.objectInfo.id === Item.ARROW && this.objectInfo.count ) {
-            name = this.objectInfo.count.toFixed() + " " + (this.objectInfo.count === 1 ? translations.text("arrow") : name);
-        }
-
-        // Fireseed amount
-        if ( this.objectInfo.id === Item.FIRESEED ) {
-            name += " (" + this.objectInfo.count.toFixed() + ")";
-        }
-        
-        // Money amount
-        if ( this.objectInfo.id === Item.MONEY && this.objectInfo.count ) {
-            name += " (" + this.objectInfo.count.toFixed() + " " + translations.text(this.objectInfo.currency) + ")";
-        }
-
-        // Buy / sell price
-        if ( this.objectInfo.price ) {
-            const currency = this.objectInfo.currency;
-            const currencyText = translations.text(currency);
-            name += " (" + this.objectInfo.price.toFixed() + " " + currencyText + ")";
-        }
-
-        // Buy X objects for a given price
-        if ( this.objectInfo.id !== Item.MONEY && this.objectInfo.id !== Item.ARROW 
-            && this.objectInfo.id !== Item.QUIVER && this.objectInfo.id !== Item.LARGE_QUIVER 
-            && this.objectInfo.price > 0 && this.objectInfo.count > 1 ) {
-            name = this.objectInfo.count.toFixed() + " x " + name;
-        }
+        let name = this.buildItemName();
+        const imageUrl = this.item.getImageUrl();
 
         // Object Image
-        const imageUrl = this.item.getImageUrl();
         if ( imageUrl ) {
             html += '<span class="inventoryImgContainer"><img class="inventoryImg" src=' +
                 imageUrl + " /></span>";
@@ -117,16 +160,11 @@ export class ObjectsTableItem {
 
         // Special
         if ( this.objectInfo.id === Item.MAP ) {
-            // It's the map:
             name = '<a href="#map">' + name + "</a>";
         } else if ( imageUrl || this.item.extraDescription ) {
             // Add a link to view a larger version of the image / view object extra description
             name = '<a href="#" class="equipment-op" data-op="details" data-objectId="' +
             this.item.id + '">' + name + "</a>";
-        }
-
-        if( this.objectInfo.dessiStoneBonus ) {
-            name += " (" + translations.text( "dessiStone" ) + ")";
         }
 
         html += "<span><b>" + name + "</b></span>";
@@ -151,6 +189,40 @@ export class ObjectsTableItem {
     }
 
     /**
+     * Build the shared data-attribute string for operation links.
+     */
+    private buildDataAttrs(): string {
+        let attrs = 'data-objectId="' + this.item.id + '" data-index="' + this.index + '" ';
+
+        if ( this.item.id === Item.QUIVER || this.item.id === Item.LARGE_QUIVER || this.item.id === Item.ARROW || this.item.id === Item.MONEY || this.item.id === Item.FIRESEED ||
+            ( this.objectInfo.price > 0 && this.objectInfo.count > 0 ) ) {
+            attrs += 'data-count="' + this.objectInfo.count.toFixed() + '" ';
+        }
+
+        if ( this.objectInfo.price ) {
+            attrs += 'data-price="' + this.objectInfo.price.toFixed() + '" ';
+        }
+
+        if ( this.objectInfo.currency ) {
+            attrs += 'data-currency="' + this.objectInfo.currency.toString() + '" ';
+        }
+
+        if ( this.objectInfo.unlimited ) {
+            attrs += 'data-unlimited="true" ';
+        }
+
+        if ( this.objectInfo.useOnSection ) {
+            attrs += 'data-useonsection="true" ';
+        }
+
+        if ( this.objectInfo.usageCount ) {
+            attrs += 'data-usagecount="' + this.objectInfo.usageCount + '" ';
+        }
+
+        return attrs;
+    }
+
+    /**
      * Get HTML for a given object operation
      * @param operation The operation for the link
      * @param title The tooltip text for the operation. null to do not display
@@ -159,41 +231,13 @@ export class ObjectsTableItem {
      */
     private getOperationTag(operation: string, title: string = null , opDescription: string ) {
 
-        let link = `<a href="#" data-objectId="${this.item.id}" data-index="${this.index}" class="equipment-op btn btn-default" `;
-
-        if ( this.item.id === Item.QUIVER || this.item.id === Item.LARGE_QUIVER || this.item.id === Item.ARROW || this.item.id === Item.MONEY || this.item.id === Item.FIRESEED ||
-            ( this.objectInfo.price > 0 && this.objectInfo.count > 0 ) ) {
-            // Store the number of arrows on the quiver / gold crowns / number of items to buy by the given price
-            link += 'data-count="' + this.objectInfo.count.toFixed() + '" ';
-        }
-
-        if ( this.objectInfo.price ) {
-            link += 'data-price="' + this.objectInfo.price.toFixed() + '" ';
-        }
-
-        if ( this.objectInfo.currency) {
-            link += 'data-currency="' + this.objectInfo.currency.toString() + '" ';
-        }
-
-        if ( this.objectInfo.unlimited ) {
-            link += 'data-unlimited="true" ';
-        }
-
-        if ( this.objectInfo.useOnSection ) {
-            link += 'data-useonsection="true" ';
-        }
-
-        if ( this.objectInfo.usageCount ) {
-            link += `data-usagecount="${this.objectInfo.usageCount}" `;
-        }
+        let link = '<a href="#" ' + this.buildDataAttrs() + 'class="equipment-op btn btn-default" ';
 
         if ( title ) {
-            // Tooltip
             link += 'title="' + title + '" ';
         }
 
         link += 'data-op="' + operation + '">';
-
         link += opDescription + "</a> ";
 
         return link;

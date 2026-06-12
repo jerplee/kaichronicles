@@ -1,12 +1,18 @@
-<h1 data-translation="loadGame">Load game</h1>
+<h1 data-translation="loadGame">Load Game</h1>
 
-<form>
-    <!-- Web upload -->
-    <input name="file" type="file" id="loadGame-file" class="form-control" 
-        accept=".json" style="height:auto" value="">
+<ul class="nav nav-tabs" id="loadGame-tabs">
+    <li class="active"><a href="#loadGame-slots" data-toggle="tab">Save Slots</a></li>
+    <li><a href="#loadGame-file" data-toggle="tab">Import File</a></li>
+</ul>
 
-    <!-- Errors -->
-    <p style="color: red" id="loadGame-errors">
-    </p>
-
-</form>
+<div class="tab-content">
+    <div class="tab-pane active" id="loadGame-slots">
+        <div id="loadGame-slotsGrid" class="save-slots-grid"></div>
+    </div>
+    <div class="tab-pane" id="loadGame-file">
+        <p data-translation="loadFromFile">Load a previously exported save file:</p>
+        <input name="file" type="file" id="loadGame-file" class="form-control"
+            accept=".json" style="height:auto" value="">
+        <p style="color: red" id="loadGame-errors"></p>
+    </div>
+</div>

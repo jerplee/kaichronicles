@@ -1,4 +1,4 @@
-import { template, translations, views, loadGameView, state, routing, mechanicsEngine } from "..";
+import { template, translations, views, loadGameView, state, routing, mechanicsEngine, saveGameDb } from "..";
 
 /**
  * Load stored game controller
@@ -15,6 +15,14 @@ export class loadGameController {
         template.showStatistics(false);
         template.showKaiName(false);
         views.loadView("loadGame.html").then(() => {
+            // Render save slots
+            if (saveGameDb.isAvailable()) {
+                saveGameDb.getAllSlots().then((slots) => {
+                    loadGameView.renderSlots(slots);
+                }).catch((e) => {
+                    mechanicsEngine.debugWarning("Failed to load save slots: " + e);
+                });
+            }
             // Web page environment:
             loadGameView.bindFileUploaderEvents();
         }, null);
@@ -49,6 +57,31 @@ export class loadGameController {
             mechanicsEngine.debugWarning(e);
             loadGameView.showError( e.toString() );
         }
+    }
+
+    /**
+     * Load a save slot from IndexedDB.
+     * @param id The slot id
+     */
+    public static loadSlot(id: number) {
+        saveGameDb.getSlot(id).then((slot) => {
+            if (!slot) {
+                loadGameView.showError(translations.text("slotNotFound"));
+                return;
+            }
+            // Remember which slot we're playing so auto-save writes back to it
+            if (slot.slotKey) {
+                state.activeSlotKey = slot.slotKey;
+            }
+            const json = JSON.stringify({
+                currentState: slot.currentState,
+                previousBooksState: slot.previousBooksState
+            });
+            loadGameController.loadGame(json);
+        }).catch((e) => {
+            mechanicsEngine.debugWarning("Failed to load save slot: " + e);
+            loadGameView.showError(translations.text("loadSlotFailed"));
+        });
     }
 
     /** Return page */

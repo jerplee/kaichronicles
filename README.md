@@ -2,13 +2,18 @@
 
 [Kai Chronicles](https://kaichronicles.projectaon.org) is a game player for Lone Wolf game books. Books 1 - 29 are playable. The game player can run as a website.
 
-This is a fork from the [original "Kai Chronicles"](https://github.com/tonib/kaichronicles) as tonib stopped development in November 2021.
+This fork builds on the work of [cracrayol](https://github.com/cracrayol/kaichronicles), who continued the [original Kai Chronicles](https://github.com/tonib/kaichronicles) by tonib after development ended in 2021.
 
-This repository does not contain game books data. Data must be downloaded from the [Project Aon web site](https://www.projectaon.org). 
+I played Book 8 when I was a kid, but I could never afford to get the rest of the books and when I stumbled upon Project Aon, it was a gift to my old child self. I was amazed by the generosity of Joe Dever to make this series available to his fans and just as amazed by the community that build tools like Kai Chronicles to make it even more accessible. 
+
+When I first downloaded this project, it needed a little TLC to run cleanly. I fixed the outstanding bugs, polished the UI, and added a few quality-of-life improvements — all without touching the core game logic, which is faithfully preserved. Game logic changes were only made where a bug had already been documented. If something feels unfair, it is probably the books, not the code.
+
+This repository does not contain game books data. Data must be downloaded from the [Project Aon web site](https://www.projectaon.org).
+
 **REMEMBER** that game books data is under the [Project Aon license](https://www.projectaon.org/en/Main/License), so:
 
-* You cannot put this application on a public web server (only on your local machine, for your own use). The only place where this game can be published is on the Project Aon web site. It's available here : https://kaichronicles.projectaon.org
-* You cannot redistribute the game books data in any way
+* You cannot put this application on a **public web server** or redistribute it. The only place where this game can be published publicly is on the Project Aon web site: https://kaichronicles.projectaon.org. Running it locally on your machine or a private local network for personal use is fine.
+* You cannot redistribute the game books data in any way.
 
 ## Setup
 
@@ -41,11 +46,25 @@ Optional method for running a local website only to play the game
  
 More information about this method [here](./doc/README-docker.md)
 
+### Save System
+
+The game uses **IndexedDB** for local save storage. Up to three fixed save slots are available on the main menu. Each slot can be:
+
+- **Continued** — resume an existing save
+- **Renamed** — change the display name
+- **Deleted** — clear the slot
+- **Uploaded** — import a previously exported `.json` save file
+- **New Game** — start a fresh game in an empty slot (with a character name prompt)
+
+As you play, the active slot is saved automatically on every section change and significant game event. An additional auto-save slot is maintained as a fallback. All save data stays in your browser; no server is involved.
+
+Saved games can also be exported to `.json` files and imported later, or shared between devices.
+
 ### Developing 
 
 Game rules for each book are located at [www/data](www/data). "mechanics-X" are the game rules for the book X. "objects.xml" are the game objects
 
-There is (unfinished) documentation for [rules](doc/README-mechanics.md), [object formats](doc/README-objects.md) and [save game file format](doc/README-savegames.md).
+There is (unfinished) documentation for [rules](doc/README-mechanics.md), [object formats](doc/README-objects.md) and [save game file format](doc/README-savegames.md) (note: this describes the legacy JSON export format; the internal IndexedDB storage uses the same underlying structure).
 
 The game rules implementation are at src/ts/controller/mechanics and www/controller/mechanics.
 

@@ -102,35 +102,48 @@ export class ObjectsTable {
      */
     public renderTable() {
 
-        this.$tableBody.empty();
+        // For AVAILABLE objects, use tbody if given a <table> element
+        let $target = this.$tableBody;
+        if ( this.type === ObjectsTableType.AVAILABLE && this.$tableBody.is("table") ) {
+            let $tbody = this.$tableBody.find("tbody");
+            if ( $tbody.length === 0 ) {
+                $tbody = $("<tbody></tbody>");
+                this.$tableBody.append($tbody);
+            }
+            $target = $tbody;
+        }
 
-        // Populate the table
+        $target.empty();
+
         let html = "";
         for ( const o of this.objects ) {
-
             const objectHtml = o.renderItem();
             if ( objectHtml ) {
-                html += "<tr><td>" + objectHtml + "</td></tr>";
+                if ( this.type === ObjectsTableType.AVAILABLE ) {
+                    html += objectHtml;
+                } else {
+                    html += "<tr><td>" + objectHtml + "</td></tr>";
+                }
             }
         }
 
         if ( !html ) {
-            html = "<tr><td><i>(" + translations.text("noneMasculine") + ")</i></td></tr>";
+            if ( this.type === ObjectsTableType.AVAILABLE ) {
+                html = '<div class="available-none"><i>(' + translations.text("noneMasculine") + ")</i></div>";
+            } else {
+                html = "<tr><td><i>(" + translations.text("noneMasculine") + ")</i></td></tr>";
+            }
         }
 
-        this.$tableBody.append( html );
+        $target.append( html );
 
         // Bind events:
-        ObjectsTable.bindTableEquipmentEvents( this.$tableBody , this.type );
+        ObjectsTable.bindTableEquipmentEvents( $target , this.type );
     }
 
     public static bindTableEquipmentEvents($tableBody: JQuery<HTMLElement> , type: ObjectsTableType) {
 
-        $tableBody
-        .find(".equipment-op")
-        // Include the $element itself too
-        .addBack(".equipment-op")
-        .on("click", function(e: JQuery.Event) {
+        const clickHandler = function(e: JQuery.Event) {
             e.preventDefault();
             const $link = $(this);
 
@@ -143,6 +156,24 @@ export class ObjectsTable {
                 return;
             }
 
+            // Defer heavy game logic to avoid blocking the UI thread
+            setTimeout(() => { i.runOperation( op ); }, 0);
+        };
+
+        $tableBody
+        .find(".equipment-op, .item-image-link, .available-card")
+        .addBack(".equipment-op, .item-image-link, .available-card")
+        .on("click", clickHandler);
+
+        // Zoom icon opens details without triggering the card's get operation
+        $tableBody.find(".available-zoom").on("click", function(e: JQuery.Event) {
+            e.preventDefault();
+            e.stopPropagation();
+            const $link = $(this);
+            const op: string = $link.attr("data-op");
+            if ( !op ) { return; }
+            const i = ObjectsTableItem.restoreFromLink( $link , type );
+            if ( !i ) { return; }
             i.runOperation( op );
         });
     }

@@ -1,4 +1,4 @@
-import { Book, Mechanics, BookSectionStates, ActionChart, projectAon, mechanicsEngine } from ".";
+import { Book, Mechanics, BookSectionStates, ActionChart, projectAon, mechanicsEngine, saveGameDb } from ".";
 
 // Variabe "state" is declared at bottom of this file
 
@@ -70,6 +70,16 @@ export class State {
      * This is stored at localStorage['textSize'], not with the game state
      */
     public textSize = TextSize.Normal;
+
+    /**
+     * Debounce timer for IndexedDB auto-save writes.
+     */
+    private saveDebounceTimer: number | null = null;
+
+    /**
+     * Active manual slot key to auto-save into (e.g. "slot-1"). null = auto-save only.
+     */
+    public activeSlotKey: string | null = null;
 
     /**
      * Setup the default color or persist from local storage
@@ -175,42 +185,166 @@ export class State {
     }
 
     /**
-     * Store the current state at the browser local storage
+     * Store the current state. Writes to localStorage synchronously,
+     * and schedules an IndexedDB auto-save (debounced).
+     * If activeSlotKey is set, the slot is saved immediately.
      */
     public persistState() {
+        // Always write to localStorage as reliable synchronous backup
         try {
             const json = JSON.stringify(this.getCurrentState());
             localStorage.setItem("state", json);
         } catch (e) {
             mechanicsEngine.debugWarning(e);
-            // throw new Error(e);
+        }
+
+        // Save active slot immediately (not debounced)
+        if (saveGameDb.isAvailable() && this.activeSlotKey) {
+            console.log("[DEBUG] persistState saving to activeSlotKey:", this.activeSlotKey);
+            const slotRecord = this.buildSlotSaveRecord();
+            saveGameDb.saveToSlot(this.activeSlotKey, slotRecord).then((id) => {
+                console.log("[DEBUG] Slot saved successfully, id:", id);
+            }).catch((e) => {
+                mechanicsEngine.debugWarning("IndexedDB slot save failed: " + e);
+                console.log("[DEBUG] Slot save failed:", e);
+            });
+        } else {
+            console.log("[DEBUG] persistState skipping slot save. available:", saveGameDb.isAvailable(), "activeSlotKey:", this.activeSlotKey);
+        }
+
+        // Also schedule auto-save (debounced)
+        if (saveGameDb.isAvailable()) {
+            this.scheduleIndexedDbSave();
         }
     }
 
     /**
-     * Return true if there is an stored persisted state
+     * Schedule an IndexedDB auto-save with debounce.
      */
-    public existsPersistedState() {
-        return localStorage.getItem("state");
+    private scheduleIndexedDbSave() {
+        if (this.saveDebounceTimer) {
+            clearTimeout(this.saveDebounceTimer);
+        }
+        this.saveDebounceTimer = window.setTimeout(() => {
+            this.saveDebounceTimer = null;
+            const record = this.buildAutoSaveRecord();
+            saveGameDb.upsertAutoSave(record).catch((e) => {
+                mechanicsEngine.debugWarning("IndexedDB auto-save failed: " + e);
+            });
+        }, 500);
     }
 
     /**
-     * Restore the state from the local storage
+     * Build a SaveSlotRecord from the current state for IndexedDB storage.
+     */
+    private buildAutoSaveRecord(): import("./model/saveGameDb").SaveSlotRecord {
+        return {
+            name: "Auto-Save",
+            timestamp: Date.now(),
+            bookNumber: this.book ? this.book.bookNumber : 0,
+            sectionId: this.sectionStates ? this.sectionStates.currentSection || "" : "",
+            kaiName: this.actionChart ? this.actionChart.kaiName || "" : "",
+            endurance: this.actionChart ? this.actionChart.currentEndurance || 0 : 0,
+            maxEndurance: this.actionChart ? this.actionChart.endurance || 0 : 0,
+            combatSkill: this.actionChart ? this.actionChart.combatSkill || 0 : 0,
+            currentState: this.getCurrentState(),
+            previousBooksState: this.getPreviousBooksState(),
+            isAutoSave: true
+        };
+    }
+
+    /**
+     * Build a SaveSlotRecord for the active manual slot.
+     */
+    private buildSlotSaveRecord(): import("./model/saveGameDb").SaveSlotRecord {
+        return {
+            name: this.actionChart && this.actionChart.kaiName ? this.actionChart.kaiName : "Save",
+            timestamp: Date.now(),
+            bookNumber: this.book ? this.book.bookNumber : 0,
+            sectionId: this.sectionStates ? this.sectionStates.currentSection || "" : "",
+            kaiName: this.actionChart ? this.actionChart.kaiName || "" : "",
+            endurance: this.actionChart ? this.actionChart.currentEndurance || 0 : 0,
+            maxEndurance: this.actionChart ? this.actionChart.endurance || 0 : 0,
+            combatSkill: this.actionChart ? this.actionChart.combatSkill || 0 : 0,
+            currentState: this.getCurrentState(),
+            previousBooksState: this.getPreviousBooksState(),
+            isAutoSave: false
+        };
+    }
+
+    /**
+     * Collect previous book action charts from localStorage.
+     */
+    private getPreviousBooksState(): string[] {
+        const states: string[] = [];
+        for (let i = 1; i <= 30; i++) {
+            const key = "state-book-" + i;
+            const value = localStorage.getItem(key);
+            if (value) {
+                states[i] = value;
+            }
+        }
+        return states;
+    }
+
+    /**
+     * Return true if there is a stored persisted state (localStorage or IndexedDB).
+     */
+    public existsPersistedState() {
+        if (localStorage.getItem("state")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Restore the state from local storage (primary) or IndexedDB auto-save (fallback).
      */
     public restoreState() {
         try {
             const json = localStorage.getItem("state");
-            if (!json) {
-                throw new Error("No state to restore found");
+            if (json) {
+                const stateKeys = JSON.parse(json);
+                if (stateKeys) {
+                    this.restoreStateFromObject(stateKeys);
+                    return;
+                }
             }
-            const stateKeys = JSON.parse(json);
-            if (!stateKeys) {
-                throw new Error("Wrong JSON format");
-            }
-            this.restoreStateFromObject(stateKeys);
+            throw new Error("No state to restore found");
         } catch (e) {
             mechanicsEngine.debugWarning(e);
             this.setup(1, false);
+        }
+    }
+
+    /**
+     * Async restore from IndexedDB auto-save slot.
+     * Falls back to localStorage if IndexedDB fails or has no auto-save.
+     */
+    public async restoreFromIndexedDb(): Promise<boolean> {
+        try {
+            if (!saveGameDb.isAvailable()) {
+                return false;
+            }
+            const slot = await saveGameDb.getAutoSave();
+            if (slot && slot.currentState) {
+                this.restoreStateFromObject(slot.currentState);
+                // Also restore previous books state into localStorage for compatibility
+                if (slot.previousBooksState) {
+                    for (let i = 1; i < slot.previousBooksState.length; i++) {
+                        if (slot.previousBooksState[i]) {
+                            localStorage.setItem("state-book-" + i, slot.previousBooksState[i]);
+                        }
+                    }
+                }
+                // Write back to localStorage so subsequent restores work
+                localStorage.setItem("state", JSON.stringify(slot.currentState));
+                return true;
+            }
+            return false;
+        } catch (e) {
+            mechanicsEngine.debugWarning("Failed to restore from IndexedDB: " + e);
+            return false;
         }
     }
 
@@ -317,6 +451,27 @@ export class State {
             }
         }
         return JSON.stringify(saveGameObject);
+    }
+
+    /**
+     * Build a SaveSlotRecord from a parsed save game object.
+     */
+    public buildSaveSlotRecordFromObject(saveObj: any, name: string): import("./model/saveGameDb").SaveSlotRecord {
+        const currentState = saveObj.currentState;
+        const ac = currentState ? currentState.actionChart : null;
+        return {
+            name: name || "Imported Save",
+            timestamp: Date.now(),
+            bookNumber: currentState ? currentState.bookNumber : 0,
+            sectionId: currentState && currentState.sectionStates ? currentState.sectionStates.currentSection || "" : "",
+            kaiName: ac ? ac.kaiName || "" : "",
+            endurance: ac ? ac.currentEndurance || 0 : 0,
+            maxEndurance: ac ? ac.endurance || 0 : 0,
+            combatSkill: ac ? ac.combatSkill || 0 : 0,
+            currentState: currentState,
+            previousBooksState: saveObj.previousBooksState || [],
+            isAutoSave: false
+        };
     }
 
     /**

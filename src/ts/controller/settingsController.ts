@@ -1,4 +1,6 @@
-import { setupController, translations, views, settingsView, state, template, mechanicsEngine, Color, TextSize } from "..";
+import { setupController, translations, views, settingsView, state, template, mechanicsEngine, Color, TextSize, saveGameDb, routing, mainMenuController } from "..";
+import { saveSlotsView } from "../views/saveSlotsView";
+import { mainMenuView } from "../views/mainMenuView";
 
 /**
  * Game settings controller
@@ -93,6 +95,140 @@ export const settingsController = {
                 "Try a newer browser version. Error: " + e);
             return false;
         }
+    },
+
+    /**
+     * Refresh the save slots grid from IndexedDB.
+     */
+    refreshSlots() {
+        if ($("#menu-saveSlotsGrid").length) {
+            // Main menu has its own 3-slot grid; delegate there
+            mainMenuController.refreshSlots();
+            return;
+        }
+        if (!saveGameDb.isAvailable()) {
+            saveSlotsView.renderSlots([]);
+            return;
+        }
+        saveGameDb.getAllSlots().then((slots) => {
+            saveSlotsView.renderSlots(slots);
+        }).catch((e) => {
+            mechanicsEngine.debugWarning("Failed to load save slots: " + e);
+            saveSlotsView.renderSlots([]);
+        });
+    },
+
+    /**
+     * Create a new manual save slot.
+     */
+    saveSlot(name: string) {
+        if (!name || !name.trim()) {
+            alert(translations.text("invalidSaveName"));
+            return;
+        }
+        if (name.length > 40) {
+            alert(translations.text("saveNameTooLong"));
+            return;
+        }
+        const record = state["buildAutoSaveRecord"] ? (state as any).buildAutoSaveRecord() : {
+            name: name.trim(),
+            timestamp: Date.now(),
+            bookNumber: state.book ? state.book.bookNumber : 0,
+            sectionId: state.sectionStates ? state.sectionStates.currentSection || "" : "",
+            kaiName: state.actionChart ? state.actionChart.kaiName || "" : "",
+            endurance: state.actionChart ? state.actionChart.currentEndurance || 0 : 0,
+            maxEndurance: state.actionChart ? state.actionChart.endurance || 0 : 0,
+            combatSkill: state.actionChart ? state.actionChart.combatSkill || 0 : 0,
+            currentState: JSON.parse(localStorage.getItem("state") || "{}"),
+            previousBooksState: [],
+            isAutoSave: false
+        };
+        record.name = name.trim();
+        record.isAutoSave = false;
+
+        saveGameDb.createSlot(record).then(() => {
+            settingsController.refreshSlots();
+        }).catch((e) => {
+            mechanicsEngine.debugWarning("Failed to create save slot: " + e);
+            alert(translations.text("saveSlotFailed"));
+        });
+    },
+
+    /**
+     * Overwrite an existing save slot with current state.
+     */
+    overwriteSlot(id: number) {
+        const record = state["buildAutoSaveRecord"] ? (state as any).buildAutoSaveRecord() : {
+            name: "",
+            timestamp: Date.now(),
+            bookNumber: state.book ? state.book.bookNumber : 0,
+            sectionId: state.sectionStates ? state.sectionStates.currentSection || "" : "",
+            kaiName: state.actionChart ? state.actionChart.kaiName || "" : "",
+            endurance: state.actionChart ? state.actionChart.currentEndurance || 0 : 0,
+            maxEndurance: state.actionChart ? state.actionChart.endurance || 0 : 0,
+            combatSkill: state.actionChart ? state.actionChart.combatSkill || 0 : 0,
+            currentState: JSON.parse(localStorage.getItem("state") || "{}"),
+            previousBooksState: [],
+            isAutoSave: false
+        };
+        record.timestamp = Date.now();
+        record.isAutoSave = false;
+
+        saveGameDb.updateSlot(id, record).then(() => {
+            settingsController.refreshSlots();
+        }).catch((e) => {
+            mechanicsEngine.debugWarning("Failed to overwrite save slot: " + e);
+            alert(translations.text("overwriteSlotFailed"));
+        });
+    },
+
+    /**
+     * Rename a save slot.
+     */
+    renameSlot(id: number, newName: string) {
+        if (!newName || !newName.trim()) {
+            alert(translations.text("invalidSaveName"));
+            return;
+        }
+        saveGameDb.updateSlot(id, { name: newName.trim() }).then(() => {
+            settingsController.refreshSlots();
+        }).catch((e) => {
+            mechanicsEngine.debugWarning("Failed to rename save slot: " + e);
+            alert(translations.text("renameSlotFailed"));
+        });
+    },
+
+    /**
+     * Delete a save slot.
+     */
+    deleteSlot(id: number) {
+        saveGameDb.deleteSlot(id).then(() => {
+            settingsController.refreshSlots();
+        }).catch((e) => {
+            mechanicsEngine.debugWarning("Failed to delete save slot: " + e);
+            alert(translations.text("deleteSlotFailed"));
+        });
+    },
+
+    /**
+     * Load a save slot and redirect to the game.
+     */
+    loadSlot(id: number) {
+        saveGameDb.getSlot(id).then((slot) => {
+            if (!slot) {
+                alert(translations.text("slotNotFound"));
+                return;
+            }
+            const json = JSON.stringify({
+                currentState: slot.currentState,
+                previousBooksState: slot.previousBooksState
+            });
+            state.loadSaveGameJson(json);
+            routing.redirect("setup");
+        }).catch((e) => {
+            mechanicsEngine.debugWarning("Failed to load save slot: " + e);
+            alert(translations.text("loadSlotFailed"));
+        });
     },
 
     /** Return page */

@@ -1,4 +1,4 @@
-import { views, state, template, routing, declareCommonHelpers, mechanicsEngine, pwa } from ".";
+import { views, state, template, routing, declareCommonHelpers, mechanicsEngine, pwa, saveGameDb } from ".";
 
 /** Execution enviroment type */
 export enum EnvironmentType {
@@ -88,6 +88,38 @@ export class App {
                     state.setupDefaultTextSize();
                     template.setup();
                     routing.setup();
+
+                    // Migrate existing localStorage save to IndexedDB auto-save if needed
+                    if (saveGameDb.isAvailable() && state.existsPersistedState()) {
+                        try {
+                            const json = localStorage.getItem("state");
+                            if (json) {
+                                const parsed = JSON.parse(json);
+                                if (parsed && parsed.actionChart) {
+                                    const record = {
+                                        name: "Auto-Save",
+                                        timestamp: Date.now(),
+                                        bookNumber: parsed.bookNumber || 0,
+                                        sectionId: parsed.sectionStates ? parsed.sectionStates.currentSection || "" : "",
+                                        kaiName: parsed.actionChart ? parsed.actionChart.kaiName || "" : "",
+                                        endurance: parsed.actionChart ? parsed.actionChart.currentEndurance || 0 : 0,
+                                        maxEndurance: parsed.actionChart ? parsed.actionChart.endurance || 0 : 0,
+                                        combatSkill: parsed.actionChart ? parsed.actionChart.combatSkill || 0 : 0,
+                                        currentState: parsed,
+                                        previousBooksState: [],
+                                        isAutoSave: true
+                                    };
+                                    saveGameDb.upsertAutoSave(record).then(() => {
+                                        console.log("Migrated localStorage save to IndexedDB auto-save");
+                                    }).catch((e) => {
+                                        mechanicsEngine.debugWarning("IndexedDB migration failed: " + e);
+                                    });
+                                }
+                            }
+                        } catch (e) {
+                            mechanicsEngine.debugWarning("localStorage migration error: " + e);
+                        }
+                    }
 
                     if ( App.debugMode === DebugMode.DEBUG && state.existsPersistedState() ) {
                         // If we are developing a book, avoid to press the "Continue game"

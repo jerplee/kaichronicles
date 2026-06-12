@@ -93,3 +93,4 @@ export * from "./model/section";
 export * from "./model/sectionState";
 export * from "./model/bookSeries";
 export * from "./model/actionChartItem";
+export * from "./model/saveGameDb";
