@@ -1,4 +1,4 @@
-import { randomMechanics, state, Item, numberPickerMechanics, disciplinePickerMechanics, mechanicsEngine, CurrencyName } from "..";
+import { randomMechanics, state, Item, numberPickerMechanics, disciplinePickerMechanics, mechanicsEngine, CurrencyName, safeMathEvaluate } from "..";
 
 /**
  * Evaluation of mechanics expressions
@@ -257,8 +257,7 @@ export class ExpressionEvaluator {
     private static eval( expression: string|undefined ): any {
         try {
             expression = ExpressionEvaluator.doReplacements( expression );
-            // tslint:disable-next-line: no-eval
-            return eval( expression );
+            return safeMathEvaluate( expression );
         } catch (e) {
             mechanicsEngine.debugWarning("Error evaluating expression " + expression + ": " + e);
             return null;

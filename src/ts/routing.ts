@@ -49,8 +49,7 @@ export const routing = {
 
     /** Setup the routing events and redirect to the initial action */
     setup() {
-        // tslint:disable-next-line: no-eval
-        this.controllers = Object.keys(eval(App.PACKAGE_NAME)).filter((c) => c.endsWith('Controller'));
+        this.controllers = Object.keys((globalThis as any)[App.PACKAGE_NAME]).filter((c) => c.endsWith('Controller'));
 
         // Hash change events
         $(window).on("hashchange", routing.onHashChange );
@@ -107,8 +106,7 @@ export const routing = {
 
             const sanitizedControllerName = routing.sanitizeControllerName(controllerName);
 
-            // tslint:disable-next-line: no-eval
-            return eval( App.PACKAGE_NAME + "." + sanitizedControllerName );
+            return (globalThis as any)[App.PACKAGE_NAME][sanitizedControllerName];
         } catch (e) {
             mechanicsEngine.debugWarning(e);
             return null;

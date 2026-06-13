@@ -85,6 +85,7 @@ export * from "./model/actionChart";
 export * from "./model/sectionRenderer";
 export * from "./model/inventoryState";
 export * from "./model/expressionEvaluator";
+export * from "./model/safeMathEvaluator";
 export * from "./model/item";
 export * from "./model/combat";
 export * from "./model/randomTable";

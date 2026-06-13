@@ -1,4 +1,4 @@
-import { Mechanics, Book, Section, Disciplines, mechanicsEngine, ExpressionEvaluator, randomMechanics, LoreCircle } from "..";
+import { Mechanics, Book, Section, Disciplines, mechanicsEngine, ExpressionEvaluator, randomMechanics, LoreCircle, safeMathEvaluate } from "..";
 
 /**
  * Tools to validate book mechanics
@@ -293,8 +293,7 @@ export class BookValidator {
                 }
                 expression = expression.replaceAll( keyword , "0" );
             }
-            // tslint:disable-next-line: no-eval
-            return eval( expression );
+            return safeMathEvaluate( expression );
         } catch (e) {
             mechanicsEngine.debugWarning(e);
             this.addError( $rule , "Error evaluating expression: " + e );
