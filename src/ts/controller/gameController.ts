@@ -91,24 +91,13 @@ export const gameController = {
         gameView.bindIllustrationZoom();
 
         // Emit AI narrator events
-        const sectionHtml = gameController.currentSection.getHtml();
-        const plainText = $ && $("<div>").html(sectionHtml).text() || "";
         emit("sectionLoaded", {
             bookNumber: state.book.bookNumber,
             sectionId: sectionId,
-            html: sectionHtml,
-            plainText: plainText
+            html: gameController.currentSection.getHtml(),
+            plainText: gameController.currentSection.getPlainText()
         });
-        const choices: Array<{ text: string; sectionId: string }> = [];
-        if ($) {
-            $("#game-section .choice a.choice-link").each((_, el) => {
-                const $el = $(el);
-                choices.push({
-                    text: $el.text(),
-                    sectionId: $el.attr("href") || ""
-                });
-            });
-        }
+        const choices = gameController.currentSection.getChoices();
         if (choices.length > 0) {
             emit("choicesAvailable", {
                 bookNumber: state.book.bookNumber,

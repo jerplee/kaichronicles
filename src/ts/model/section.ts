@@ -1,5 +1,6 @@
 import { Book, Mechanics, SectionRenderer, Combat, mechanicsEngine } from "..";
 import he from 'he';
+import striptags from 'striptags';
 
 /**
  * A book section info
@@ -232,5 +233,32 @@ export class Section {
         }
         const $firstIll = $illustrations.first();
         return SectionRenderer.renderIllustration(this, $firstIll);
+    }
+
+    /**
+     * Get plain text of the section, suitable for TTS.
+     * Strips HTML tags and collapses whitespace.
+     */
+    public getPlainText(): string {
+        const html = this.getHtml();
+        const text = striptags(html);
+        return text.replace(/\s+/g, " ").trim();
+    }
+
+    /**
+     * Get the choices on this section as plain text descriptions.
+     * Each choice includes the display text and target section id.
+     */
+    public getChoices(): Array<{ text: string; sectionId: string }> {
+        const choices: Array<{ text: string; sectionId: string }> = [];
+        this.$xmlSection.find("link_text").each((_, el) => {
+            const $el = $(el);
+            const sectionId = $el.parent().attr("idref") || "";
+            const text = $el.text().replace(/\s+/g, " ").trim();
+            if (text && sectionId) {
+                choices.push({ text, sectionId });
+            }
+        });
+        return choices;
     }
 }
