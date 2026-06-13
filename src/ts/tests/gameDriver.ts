@@ -142,7 +142,7 @@ export class GameDriver {
     public async getLogWarnings(): Promise<string[]> {
         const warnings: string[] = [];
         for (const entry of await this.driver.manage().logs().get(Type.BROWSER)) {
-            if (entry.level === Level.WARNING) {
+            if (entry.level === Level.WARNING || entry.level === Level.SEVERE) {
                 warnings.push(entry.message);
             }
         }

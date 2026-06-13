@@ -216,10 +216,11 @@ export const mechanicsEngine = {
      */
     runRule(rule: Element) {
         // console.log( Mechanics.getRuleSelector(rule) );
-        if (!mechanicsEngine[rule.nodeName]) {
+        const ruleName = rule.nodeName.toLowerCase();
+        if (!mechanicsEngine[ruleName]) {
             mechanicsEngine.debugWarning("Unknown rule: " + rule.nodeName);
         } else {
-            mechanicsEngine[rule.nodeName](rule);
+            mechanicsEngine[ruleName](rule);
         }
     },
 
