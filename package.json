@@ -50,6 +50,7 @@
         "test:text": "npm run test -- --no-color > tests_log.txt 2>&1",
         "test:json": "npm run test -- --json --outputFile=tests-results.json",
         "test:coverage": "npm run test -- --coverage",
+        "validate:mechanics": "jest --testPathPatterns=mechanicsValidation",
         "predist": "webpack --config webpack.config.js",
         "dist": "node scripts/prepareVersion.js"
     }
