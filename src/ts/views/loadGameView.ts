@@ -31,8 +31,22 @@ export const loadGameView = {
         const $grid = $("#loadGame-slotsGrid");
         $grid.empty();
 
+        const autoSaves = slots.filter((s) => s.isAutoSave);
+        const hasAutoSaves = autoSaves.length > 0;
+
+        // Render clear-autosaves button if any autosaves exist
+        if (hasAutoSaves) {
+            $grid.append(
+                '<div class="loadgame-actions" style="margin-bottom: 8px;">' +
+                '<button id="loadGame-clearAutoSaves" class="btn btn-xs btn-default">' +
+                'Clear Autosaves (' + autoSaves.length + ')' +
+                '</button>' +
+                '</div>'
+            );
+        }
+
         if (slots.length === 0) {
-            $grid.html('<p class="text-muted"><i>' + translations.text("noSaveSlots") + "</i></p>");
+            $grid.append('<p class="text-muted"><i>' + translations.text("noSaveSlots") + "</i></p>");
             return;
         }
 
@@ -50,16 +64,17 @@ export const loadGameView = {
             '</thead>' +
             '<tbody></tbody>' +
             '</table>';
-        $grid.html(tableHtml);
+        $grid.append(tableHtml);
         const $tbody = $grid.find("tbody");
 
         for (const slot of slots) {
             const date = new Date(slot.timestamp).toLocaleDateString();
             const time = new Date(slot.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
             const seriesClass = this.getSeriesClass(slot.bookNumber);
+            const autoBadge = slot.isAutoSave ? ' <span class="label label-info" style="font-size:9px">AUTO</span>' : "";
 
             const rowHtml = '<tr class="' + seriesClass + '" data-id="' + slot.id + '">' +
-                '<td class="lg-name">' + this.escapeHtml(slot.name) + "</td>" +
+                '<td class="lg-name">' + this.escapeHtml(slot.name) + autoBadge + "</td>" +
                 '<td class="lg-book">Book ' + slot.bookNumber + "</td>" +
                 '<td class="lg-section">' + this.formatSectionId(slot.sectionId) + "</td>" +
                 '<td class="lg-stat">' + slot.combatSkill + "</td>" +
@@ -78,6 +93,16 @@ export const loadGameView = {
             e.preventDefault();
             const id = $(this).closest("tr").data("id");
             loadGameController.loadSlot(id);
+        });
+    },
+
+    /**
+     * Bind the Clear Autosaves button click handler.
+     */
+    bindClearAutoSavesEvent(handler: () => void) {
+        $("#loadGame-clearAutoSaves").on("click", function(e) {
+            e.preventDefault();
+            handler();
         });
     },
 

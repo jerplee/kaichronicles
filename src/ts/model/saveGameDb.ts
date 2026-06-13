@@ -300,6 +300,38 @@ export const saveGameDb = {
     },
 
     /**
+     * Delete all auto-save slots.
+     * @returns Number of autosaves deleted.
+     */
+    async clearAutoSaves(): Promise<number> {
+        const autoSaves = await this.getAutoSaves().catch(() => [] as SaveSlotRecord[]);
+        for (const slot of autoSaves) {
+            if (slot.id) {
+                await this.deleteSlot(slot.id).catch(() => { /* ignore */ });
+            }
+        }
+        return autoSaves.length;
+    },
+
+    /**
+     * Prune auto-saves down to MAX_AUTOSAVES by deleting the oldest excess slots.
+     * @returns Number of autosaves deleted.
+     */
+    async pruneAutoSaves(): Promise<number> {
+        const autoSaves = await this.getAutoSaves().catch(() => [] as SaveSlotRecord[]);
+        if (autoSaves.length <= MAX_AUTOSAVES) {
+            return 0;
+        }
+        const toDelete = autoSaves.slice(0, autoSaves.length - MAX_AUTOSAVES);
+        for (const slot of toDelete) {
+            if (slot.id) {
+                await this.deleteSlot(slot.id).catch(() => { /* ignore */ });
+            }
+        }
+        return toDelete.length;
+    },
+
+    /**
      * Check if IndexedDB is available.
      */
     isAvailable(): boolean {

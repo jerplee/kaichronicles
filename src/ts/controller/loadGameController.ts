@@ -15,17 +15,50 @@ export class loadGameController {
         template.showStatistics(false);
         template.showKaiName(false);
         views.loadView("loadGame.html").then(() => {
-            // Render save slots
-            if (saveGameDb.isAvailable()) {
-                saveGameDb.getAllSlots().then((slots) => {
-                    loadGameView.renderSlots(slots);
-                }).catch((e) => {
-                    mechanicsEngine.debugWarning("Failed to load save slots: " + e);
-                });
-            }
+            // Prune excess autosaves, then render
+            loadGameController.refreshSlots();
             // Web page environment:
             loadGameView.bindFileUploaderEvents();
+            loadGameView.bindClearAutoSavesEvent(() => {
+                loadGameController.clearAutoSaves();
+            });
         }, null);
+    }
+
+    /**
+     * Refresh the save slots grid, pruning excess autosaves first.
+     */
+    private static refreshSlots() {
+        if (!saveGameDb.isAvailable()) {
+            return;
+        }
+        saveGameDb.pruneAutoSaves().then((prunedCount) => {
+            if (prunedCount > 0) {
+                console.log("Pruned " + prunedCount + " old auto-save(s)");
+            }
+            return saveGameDb.getAllSlots();
+        }).then((slots) => {
+            loadGameView.renderSlots(slots);
+        }).catch((e) => {
+            mechanicsEngine.debugWarning("Failed to load save slots: " + e);
+        });
+    }
+
+    /**
+     * Clear all auto-saves and refresh the view.
+     */
+    public static clearAutoSaves() {
+        if (!saveGameDb.isAvailable()) {
+            return;
+        }
+        saveGameDb.clearAutoSaves().then((deleted) => {
+            if (deleted > 0) {
+                console.log("Cleared " + deleted + " auto-save(s)");
+            }
+            loadGameController.refreshSlots();
+        }).catch((e) => {
+            mechanicsEngine.debugWarning("Failed to clear auto-saves: " + e);
+        });
     }
 
     /**

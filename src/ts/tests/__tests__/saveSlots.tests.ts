@@ -320,6 +320,89 @@ describe("Save Slot System", () => {
         expect(mostRecent!.kaiName).toBe("Fourth");
     });
 
+    test("pruneAutoSaves removes excess old autosaves", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        const makeRecord = (timestamp: number): SaveSlotRecord => ({
+            name: "Auto",
+            timestamp,
+            bookNumber: 1,
+            sectionId: "sect1",
+            kaiName: "Kai",
+            endurance: 20,
+            maxEndurance: 20,
+            combatSkill: 15,
+            currentState: {},
+            previousBooksState: [],
+            isAutoSave: true
+        });
+
+        // Create 5 autosaves
+        await saveGameDb.upsertAutoSave(makeRecord(1000));
+        await saveGameDb.upsertAutoSave(makeRecord(2000));
+        await saveGameDb.upsertAutoSave(makeRecord(3000));
+        await saveGameDb.upsertAutoSave(makeRecord(4000));
+        await saveGameDb.upsertAutoSave(makeRecord(5000));
+
+        const pruned = await (saveGameDb as any).pruneAutoSaves();
+        expect(pruned).toBe(2);
+
+        const autoSaves = await (saveGameDb as any).getAutoSaves();
+        expect(autoSaves.length).toBe(3);
+        expect(autoSaves[0].timestamp).toBe(3000);
+        expect(autoSaves[2].timestamp).toBe(5000);
+    });
+
+    test("clearAutoSaves removes all autosaves but leaves manual slots", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        const autoRecord: SaveSlotRecord = {
+            name: "Auto",
+            timestamp: Date.now(),
+            bookNumber: 1,
+            sectionId: "sect1",
+            kaiName: "AutoKai",
+            endurance: 20,
+            maxEndurance: 20,
+            combatSkill: 15,
+            currentState: {},
+            previousBooksState: [],
+            isAutoSave: true
+        };
+        const manualRecord: SaveSlotRecord = {
+            name: "Manual",
+            timestamp: Date.now(),
+            bookNumber: 1,
+            sectionId: "sect2",
+            kaiName: "ManualKai",
+            endurance: 25,
+            maxEndurance: 25,
+            combatSkill: 18,
+            currentState: {},
+            previousBooksState: [],
+            isAutoSave: false
+        };
+
+        await saveGameDb.upsertAutoSave(autoRecord);
+        await saveGameDb.saveToSlot(SLOT_KEYS[0], manualRecord);
+
+        const deleted = await (saveGameDb as any).clearAutoSaves();
+        expect(deleted).toBeGreaterThanOrEqual(1);
+
+        const autoSaves = await (saveGameDb as any).getAutoSaves();
+        expect(autoSaves.length).toBe(0);
+
+        const manual = await saveGameDb.getSlotByKey(SLOT_KEYS[0]);
+        expect(manual).toBeDefined();
+        expect(manual!.name).toBe("Manual");
+    });
+
     test("SaveDbError carries message", () => {
         const { SaveDbError } = require("../../model/saveGameDb");
         const err = new SaveDbError("test failure");
