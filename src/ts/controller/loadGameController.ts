@@ -19,9 +19,6 @@ export class loadGameController {
             loadGameController.refreshSlots();
             // Web page environment:
             loadGameView.bindFileUploaderEvents();
-            loadGameView.bindClearAutoSavesEvent(() => {
-                loadGameController.clearAutoSaves();
-            });
         }, null);
     }
 

@@ -15,7 +15,7 @@
   "edge_side_panel": {},
   "dir": "ltr",
   "lang": "en",
-  "scope": "https://kaichronicles.projectaon.org",
+  "scope": "/",
   "icons": [
     {
       "src": "images/app-icons/16x16.png",

@@ -43,6 +43,11 @@ export const loadGameView = {
                 '</button>' +
                 '</div>'
             );
+            // Bind click handler right after creating the button
+            $grid.find("#loadGame-clearAutoSaves").on("click", function(e) {
+                e.preventDefault();
+                loadGameController.clearAutoSaves();
+            });
         }
 
         if (slots.length === 0) {
@@ -96,15 +101,6 @@ export const loadGameView = {
         });
     },
 
-    /**
-     * Bind the Clear Autosaves button click handler.
-     */
-    bindClearAutoSavesEvent(handler: () => void) {
-        $("#loadGame-clearAutoSaves").on("click", function(e) {
-            e.preventDefault();
-            handler();
-        });
-    },
 
     getSeriesClass(bookNumber: number): string {
         if (bookNumber <= 5) { return "series-kai"; }
