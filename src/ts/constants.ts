@@ -3,6 +3,9 @@
  * All hardcoded literals that appear in multiple files should live here.
  */
 
+/** Application version. Update this and package.json version together. */
+export const APP_VERSION = "1.2";
+
 /** Maximum book number in the Lone Wolf series (books 1–30). */
 export const MAX_BOOK_NUMBER = 30;
 

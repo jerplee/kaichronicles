@@ -398,6 +398,14 @@ export const template = {
         $("#template-header").removeClass("navbar-fixed-top");
     },
 
+    /**
+     * Hides the copyright footer.
+     *  Needed for testing with selenium (the fixed footer blocks clicks on bottom elements)
+     */
+    hideCopyrightsForTests() {
+        $("#game-copyrights-wrapper").hide();
+    },
+
     addSectionReadyMarker() {
         if (App.debugMode === DebugMode.TEST) {
             // Append a "mark" to let the tests controller know the section is completly loaded

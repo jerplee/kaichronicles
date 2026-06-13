@@ -1,4 +1,4 @@
-import { views, state, template, routing, declareCommonHelpers, mechanicsEngine, pwa, saveGameDb, StorageKeys } from ".";
+import { views, state, template, routing, declareCommonHelpers, mechanicsEngine, pwa, saveGameDb, StorageKeys, APP_VERSION } from ".";
 
 /** Execution enviroment type */
 export enum EnvironmentType {
@@ -20,6 +20,9 @@ export class App {
 
     /** The webpack library name */
     public static readonly PACKAGE_NAME = "kai";
+
+    /** Application version */
+    public static readonly VERSION = APP_VERSION;
 
     /** Execution environment type */
     public static environment: EnvironmentType;
@@ -45,8 +48,9 @@ export class App {
         // Are we in debug / test mode?
         if (window.getUrlParameter("test") === "true") {
             App.debugMode = DebugMode.TEST;
-            // To avoid Selenium clicks blocked by navbar
+            // To avoid Selenium clicks blocked by navbar / copyright footer
             template.fixedNavbarTop();
+            template.hideCopyrightsForTests();
         } else if (window.getUrlParameter("debug") === "true") {
             App.debugMode = DebugMode.DEBUG;
         } else {

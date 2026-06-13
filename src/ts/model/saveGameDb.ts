@@ -260,12 +260,13 @@ export const saveGameDb = {
             const tx = db.transaction(STORE_NAME, "readonly");
             const store = tx.objectStore(STORE_NAME);
             const index = store.index("isAutoSave");
-            const request = index.openCursor(null, "next");
+            // Only iterate entries where isAutoSave === true
+            const request = index.openCursor(IDBKeyRange.only(true), "next");
             const results: SaveSlotRecord[] = [];
 
             request.onsuccess = () => {
                 const cursor = request.result;
-                if (cursor && cursor.value.isAutoSave) {
+                if (cursor) {
                     results.push(cursor.value as SaveSlotRecord);
                     cursor.continue();
                 } else {

@@ -289,19 +289,21 @@ export class ExpressionEvaluator {
     /**
      * Evaluates an integer expression
      * @param expression Expression to evaluate
-     * @returns The expression value
+     * @returns The expression value, or null if empty/undefined
      */
-    public static evalInteger( expression: string|undefined ): number {
-        return Math.floor( ExpressionEvaluator.eval( expression ) );
+    public static evalInteger( expression: string|undefined ): number|null {
+        const result = ExpressionEvaluator.eval( expression );
+        return result === null ? null : Math.floor( result );
     }
 
     /**
-     * Evaluates an integer expression
+     * Evaluates a float expression
      * @param expression Expression to evaluate
-     * @returns The expression value
+     * @returns The expression value, or null if empty/undefined
      */
-    public static evalFloat( expression: string|undefined ): number {
-        return <number>(ExpressionEvaluator.eval( expression ));
+    public static evalFloat( expression: string|undefined ): number|null {
+        const result = ExpressionEvaluator.eval( expression );
+        return result === null ? null : <number>result;
     }
 
 }

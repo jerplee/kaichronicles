@@ -1,6 +1,7 @@
 
 body {
     padding-top: 50px;
+    padding-bottom: 45px;
 }
 
 html {
@@ -1129,6 +1130,7 @@ a.equipment-op {
     overflow: hidden;
     text-overflow: ellipsis;
     z-index: 10;
+    pointer-events: none;
 }
 
 /* --- Dark Mode for all new styles --- */

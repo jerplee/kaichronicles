@@ -27,7 +27,7 @@ export class GameDriver {
     private static readonly BASEPATH = "www/";
 
     public constructor() {
-        this.newGameUrl = "http://localhost:3001";
+        this.newGameUrl = "http://localhost:3002";
         if (process.env.KAIURL) {
             this.newGameUrl = process.env.KAIURL;
         }
@@ -199,6 +199,8 @@ export class GameDriver {
 
         // Go to new game page
         await this.driver.get(this.newGameUrl);
+        // Hide fixed copyright footer to prevent Selenium click interception
+        await this.driver.executeScript('var el = document.getElementById("game-copyrights-wrapper"); if (el) el.style.display = "none";');
         // Select new book
         await( await this.driver.wait( until.elementLocated( By.css(`#newgame-book > option[value='${bookNumber}']`) ) , 10000) ).click();
 

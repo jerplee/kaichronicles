@@ -5,7 +5,7 @@ const webpackConfig = require("../../../webpack.config.js");
 module.exports = async function () {
   const compiler = Webpack(webpackConfig);
   const devServerOptions = { ...webpackConfig.devServer, open: false };
-  devServerOptions.port = 3001;
+  devServerOptions.port = 3002;
   const server = new WebpackDevServer(devServerOptions, compiler);
 
   globalThis.__SERVER__ = server;
