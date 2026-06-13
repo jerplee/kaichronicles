@@ -275,47 +275,49 @@ describe("Save Slot System", () => {
         expect(slot2).toBeDefined();
     });
 
-    test("upsertAutoSave overwrites previous auto-save", async () => {
+    test("upsertAutoSave creates up to 3 auto-saves then overwrites oldest", async () => {
         if (!saveGameDb.isAvailable()) {
             console.log("IndexedDB not available, skipping test");
             return;
         }
 
-        const record1: SaveSlotRecord = {
+        const makeRecord = (timestamp: number, kaiName: string, sectionId: string): SaveSlotRecord => ({
             name: "Auto-Save",
-            timestamp: 1000,
+            timestamp,
             bookNumber: 1,
-            sectionId: "sect1",
-            kaiName: "Old",
+            sectionId,
+            kaiName,
             endurance: 20,
             maxEndurance: 20,
             combatSkill: 15,
             currentState: {},
             previousBooksState: [],
             isAutoSave: true
-        };
+        });
 
-        const record2: SaveSlotRecord = {
-            name: "Auto-Save",
-            timestamp: 2000,
-            bookNumber: 1,
-            sectionId: "sect2",
-            kaiName: "New",
-            endurance: 18,
-            maxEndurance: 20,
-            combatSkill: 16,
-            currentState: {},
-            previousBooksState: [],
-            isAutoSave: true
-        };
+        // Create 3 auto-saves
+        await saveGameDb.upsertAutoSave(makeRecord(1000, "First", "sect1"));
+        await saveGameDb.upsertAutoSave(makeRecord(2000, "Second", "sect2"));
+        await saveGameDb.upsertAutoSave(makeRecord(3000, "Third", "sect3"));
 
-        await saveGameDb.upsertAutoSave(record1);
-        await saveGameDb.upsertAutoSave(record2);
+        let autoSaves = await (saveGameDb as any).getAutoSaves();
+        expect(autoSaves.length).toBe(3);
+        expect(autoSaves[0].kaiName).toBe("First");
+        expect(autoSaves[2].kaiName).toBe("Third");
 
-        const autoSave = await saveGameDb.getAutoSave();
-        expect(autoSave).toBeDefined();
-        expect(autoSave!.kaiName).toBe("New");
-        expect(autoSave!.sectionId).toBe("sect2");
+        // 4th auto-save should overwrite the oldest (First)
+        await saveGameDb.upsertAutoSave(makeRecord(4000, "Fourth", "sect4"));
+
+        autoSaves = await (saveGameDb as any).getAutoSaves();
+        expect(autoSaves.length).toBe(3);
+        expect(autoSaves[0].kaiName).toBe("Second"); // oldest now
+        expect(autoSaves[1].kaiName).toBe("Third");
+        expect(autoSaves[2].kaiName).toBe("Fourth"); // newest
+
+        // getAutoSave should return the most recent
+        const mostRecent = await saveGameDb.getAutoSave();
+        expect(mostRecent).toBeDefined();
+        expect(mostRecent!.kaiName).toBe("Fourth");
     });
 
     test("SaveDbError carries message", () => {

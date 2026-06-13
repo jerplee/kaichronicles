@@ -25,7 +25,7 @@ export const loadGameView = {
     },
 
     /**
-     * Render save slot cards in the load game view.
+     * Render save slots as a compact list in the load game view.
      */
     renderSlots(slots: SaveSlotRecord[]) {
         const $grid = $("#loadGame-slotsGrid");
@@ -36,35 +36,47 @@ export const loadGameView = {
             return;
         }
 
+        const tableHtml = '<table class="table table-hover table-condensed loadgame-table">' +
+            '<thead>' +
+            '<tr>' +
+            '<th>Name</th>' +
+            '<th>Book</th>' +
+            '<th>Section</th>' +
+            '<th>CS</th>' +
+            '<th>EP</th>' +
+            '<th>Date</th>' +
+            '<th></th>' +
+            '</tr>' +
+            '</thead>' +
+            '<tbody></tbody>' +
+            '</table>';
+        $grid.html(tableHtml);
+        const $tbody = $grid.find("tbody");
+
         for (const slot of slots) {
-            const date = new Date(slot.timestamp).toLocaleString();
+            const date = new Date(slot.timestamp).toLocaleDateString();
+            const time = new Date(slot.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
             const seriesClass = this.getSeriesClass(slot.bookNumber);
 
-            const cardHtml = '<div class="save-slot-card ' + seriesClass + '" data-id="' + slot.id + '">' +
-                '<div class="save-slot-header">' +
-                '<span class="save-slot-name">' + this.escapeHtml(slot.name) + "</span>" +
-                '<span class="save-slot-book">Book ' + slot.bookNumber + "</span>" +
-                "</div>" +
-                '<div class="save-slot-meta">' +
-                '<span class="save-slot-section">Section ' + slot.sectionId + "</span>" +
-                '<span class="save-slot-date">' + date + "</span>" +
-                "</div>" +
-                '<div class="save-slot-stats">' +
-                "<span>CS: " + slot.combatSkill + "</span>" +
-                "<span>EP: " + slot.endurance + "/" + slot.maxEndurance + "</span>" +
-                "</div>" +
-                '<div class="save-slot-actions">' +
-                '<button class="btn btn-sm btn-primary slot-load">Load Game</button>' +
-                "</div>" +
-                "</div>";
+            const rowHtml = '<tr class="' + seriesClass + '" data-id="' + slot.id + '">' +
+                '<td class="lg-name">' + this.escapeHtml(slot.name) + "</td>" +
+                '<td class="lg-book">Book ' + slot.bookNumber + "</td>" +
+                '<td class="lg-section">' + this.formatSectionId(slot.sectionId) + "</td>" +
+                '<td class="lg-stat">' + slot.combatSkill + "</td>" +
+                '<td class="lg-stat">' + slot.endurance + "/" + slot.maxEndurance + "</td>" +
+                '<td class="lg-date">' + date + " <small>" + time + "</small></td>" +
+                '<td class="lg-action">' +
+                '<button class="btn btn-xs btn-primary slot-load">Load</button>' +
+                "</td>" +
+                "</tr>";
 
-            $grid.append(cardHtml);
+            $tbody.append(rowHtml);
         }
 
         // Bind load events
-        $grid.find(".slot-load").on("click", function(e) {
+        $tbody.find(".slot-load").on("click", function(e) {
             e.preventDefault();
-            const id = $(this).closest(".save-slot-card").data("id");
+            const id = $(this).closest("tr").data("id");
             loadGameController.loadSlot(id);
         });
     },
@@ -74,6 +86,14 @@ export const loadGameView = {
         if (bookNumber <= 12) { return "series-magnakai"; }
         if (bookNumber <= 20) { return "series-grandmaster"; }
         return "series-neworder";
+    },
+
+    formatSectionId(sectionId: string): string {
+        if (!sectionId) { return ""; }
+        if (sectionId.toLowerCase().startsWith("sect")) {
+            return "Section " + sectionId.substring(4);
+        }
+        return "Section " + sectionId;
     },
 
     escapeHtml(text: string): string {

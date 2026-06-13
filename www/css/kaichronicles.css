@@ -12,6 +12,13 @@ body.modal-open {
     /* And this is needed to avoid the margin on modals */
     padding-right: 0!important;
 }
+body.modal-open .navbar-fixed-top,
+body.modal-open .navbar-fixed-bottom {
+    /* Bootstrap 3 adds padding-right to fixed navbars when modal opens.
+       Force it to 0 so the navbar does not shift. */
+    padding-right: 0 !important;
+    right: 0 !important;
+}
 
 #content {
     padding: 40px 15px;
@@ -1430,9 +1437,72 @@ body.dark .menu-footer a:hover {
 body.dark .save-slot-card.action-card:hover {
     background: #333;
 }
-body.dark .save-slot-card.action-card .action-icon {
+
+/* ── Compact Load-Game Table ── */
+.loadgame-table {
+    font-size: 13px;
+    margin-top: 8px;
+}
+.loadgame-table th {
+    background: #f5f5f5;
+    border-bottom: 2px solid #ddd;
+}
+.loadgame-table td {
+    vertical-align: middle;
+}
+.loadgame-table .lg-name {
+    font-weight: bold;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.loadgame-table .lg-book {
+    white-space: nowrap;
+}
+.loadgame-table .lg-section {
+    white-space: nowrap;
+}
+.loadgame-table .lg-stat {
+    text-align: center;
+}
+.loadgame-table .lg-date small {
+    color: #888;
+}
+.loadgame-table .lg-action {
+    text-align: right;
+    width: 60px;
+}
+
+/* Series color coding on table rows */
+.loadgame-table tr.series-kai td.lg-book {
+    border-left: 3px solid #337ab7;
+    padding-left: 8px;
+}
+.loadgame-table tr.series-magnakai td.lg-book {
+    border-left: 3px solid #5cb85c;
+    padding-left: 8px;
+}
+.loadgame-table tr.series-grandmaster td.lg-book {
+    border-left: 3px solid #f0ad4e;
+    padding-left: 8px;
+}
+.loadgame-table tr.series-neworder td.lg-book {
+    border-left: 3px solid #d9534f;
+    padding-left: 8px;
+}
+
+body.dark .loadgame-table th {
+    background: #2a2a2a;
+    border-bottom-color: #444;
+    color: #ddd;
+}
+body.dark .loadgame-table td {
+    border-top-color: #444;
+}
+body.dark .loadgame-table .lg-date small {
     color: #aaa;
 }
-body.dark .save-slot-card.action-card .action-label {
-    color: #ddd;
+body.dark .loadgame-table tr:hover td {
+    background: #333;
 }

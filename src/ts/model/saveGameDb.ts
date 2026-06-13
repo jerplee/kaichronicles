@@ -7,6 +7,7 @@ import { mechanicsEngine } from "..";
 const DB_NAME = "kaiChroniclesSaveSlots";
 const DB_VERSION = 1;
 const STORE_NAME = "saveSlots";
+const MAX_AUTOSAVES = 3;
 
 export interface SaveSlotRecord {
     id?: number;
@@ -251,6 +252,35 @@ export const saveGameDb = {
     },
 
     /**
+     * Get all auto-save slots sorted by timestamp ascending (oldest first).
+     */
+    async getAutoSaves(): Promise<SaveSlotRecord[]> {
+        const db = await this.openDb();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, "readonly");
+            const store = tx.objectStore(STORE_NAME);
+            const index = store.index("isAutoSave");
+            const request = index.openCursor(null, "next");
+            const results: SaveSlotRecord[] = [];
+
+            request.onsuccess = () => {
+                const cursor = request.result;
+                if (cursor && cursor.value.isAutoSave) {
+                    results.push(cursor.value as SaveSlotRecord);
+                    cursor.continue();
+                } else {
+                    resolve(results);
+                }
+            };
+            request.onerror = () => {
+                reject(new SaveDbError("Failed to get auto-saves: " + request.error));
+            };
+            tx.oncomplete = () => { db.close(); };
+            tx.onerror = () => { db.close(); };
+        });
+    },
+
+    /**
      * Clear all save slots.
      */
     async clearAll(): Promise<void> {
@@ -277,13 +307,17 @@ export const saveGameDb = {
     },
 
     /**
-     * Upsert the auto-save slot. If an auto-save exists, update it; otherwise create it.
+     * Upsert the auto-save slot.
+     * Maintains up to MAX_AUTOSAVES slots. If fewer exist, creates a new one.
+     * If at capacity, overwrites the oldest (earliest timestamp) slot.
      */
     async upsertAutoSave(record: SaveSlotRecord): Promise<number> {
-        const autoSave = await this.getAutoSave().catch(() => undefined);
-        if (autoSave && autoSave.id) {
-            await this.updateSlot(autoSave.id, { ...record, isAutoSave: true });
-            return autoSave.id;
+        const autoSaves = await this.getAutoSaves().catch(() => [] as SaveSlotRecord[]);
+        if (autoSaves.length >= MAX_AUTOSAVES) {
+            // Overwrite the oldest auto-save
+            const oldest = autoSaves[0];
+            await this.updateSlot(oldest.id!, { ...record, isAutoSave: true });
+            return oldest.id!;
         } else {
             return await this.createSlot({ ...record, isAutoSave: true });
         }
