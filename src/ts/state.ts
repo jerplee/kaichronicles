@@ -1,4 +1,4 @@
-import { Book, Mechanics, BookSectionStates, ActionChart, projectAon, mechanicsEngine, saveGameDb, MAX_BOOK_NUMBER, StorageKeys } from ".";
+import { Book, Mechanics, BookSectionStates, ActionChart, projectAon, mechanicsEngine, saveGameDb, MAX_BOOK_NUMBER, StorageKeys, emit } from ".";
 
 // Variabe "state" is declared at bottom of this file
 
@@ -358,6 +358,10 @@ export class State {
         this.actionChartSect1 = stateKeys.actionChartSect1;
         this.sectionStates = new BookSectionStates();
         this.sectionStates.fromStateObject(stateKeys.sectionStates);
+        emit("stateRestored", {
+            bookNumber: this.book.bookNumber,
+            sectionId: this.sectionStates.currentSection || ""
+        });
     }
 
     /**

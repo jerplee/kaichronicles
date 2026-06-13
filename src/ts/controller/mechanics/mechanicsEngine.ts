@@ -3,7 +3,7 @@ import { views, translations, Section, SectionState, gameView, state, CombatMech
     CurrencyName, LoreCircle, BookSeriesId, MealMechanics, ActionChartItem, InventoryState, actionChartView, template, Book,
     GrandMasterUpgrade, kaimonasteryController, SpecialSectionRegistry, ObjectsTable, ObjectsTableType, setupController, KaiDiscipline, MgnDiscipline,
     GndDiscipline, NewOrderDiscipline, projectAon, DebugMode,
-    SectionRenderer} from "../..";
+    SectionRenderer, emit} from "../..";
 import DOMPurify from 'dompurify';
 
 /**
@@ -539,6 +539,12 @@ export const mechanicsEngine = {
 
         // Mark the rule as executed
         sectionState.markRuleAsExecuted(rule);
+
+        emit("inventoryChanged", {
+            bookNumber: state.book.bookNumber,
+            sectionId: state.sectionStates.currentSection,
+            added: [objectId || cls || "item"]
+        });
     },
 
     /**
@@ -1435,6 +1441,16 @@ export const mechanicsEngine = {
         }
 
         state.sectionStates.markRuleAsExecuted(rule);
+
+        const removedIds = droppedObjects.map((o) => o.getItem().id);
+        if (state.actionChart.arrows < originalArrows) {
+            removedIds.push("arrow");
+        }
+        emit("inventoryChanged", {
+            bookNumber: state.book.bookNumber,
+            sectionId: state.sectionStates.currentSection,
+            removed: removedIds
+        });
     },
 
     /**
@@ -2011,6 +2027,12 @@ export const mechanicsEngine = {
         }
 
         if (state.actionChart.currentEndurance <= 0 && $("#mechanics-death").length === 0) {
+
+            emit("gameOver", {
+                bookNumber: state.book.bookNumber,
+                sectionId: state.sectionStates.currentSection,
+                reason: "death"
+            });
 
             // Add the death UI
             gameView.appendToSection(mechanicsEngine.getMechanicsUI("mechanics-death"), "afterChoices");

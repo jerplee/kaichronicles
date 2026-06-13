@@ -1,4 +1,4 @@
-import { Section, setupController, state, Book, routing, views, gameView, template, mechanicsEngine, App, BookValidator, DebugMode } from "..";
+import { Section, setupController, state, Book, routing, views, gameView, template, mechanicsEngine, App, BookValidator, DebugMode, emit } from "..";
 
 /**
  * The game controller
@@ -89,6 +89,33 @@ export const gameController = {
 
         // Bind illustration zoom
         gameView.bindIllustrationZoom();
+
+        // Emit AI narrator events
+        const sectionHtml = gameController.currentSection.getHtml();
+        const plainText = $ && $("<div>").html(sectionHtml).text() || "";
+        emit("sectionLoaded", {
+            bookNumber: state.book.bookNumber,
+            sectionId: sectionId,
+            html: sectionHtml,
+            plainText: plainText
+        });
+        const choices: Array<{ text: string; sectionId: string }> = [];
+        if ($) {
+            $("#game-section .choice a.choice-link").each((_, el) => {
+                const $el = $(el);
+                choices.push({
+                    text: $el.text(),
+                    sectionId: $el.attr("href") || ""
+                });
+            });
+        }
+        if (choices.length > 0) {
+            emit("choicesAvailable", {
+                bookNumber: state.book.bookNumber,
+                sectionId: sectionId,
+                choices: choices
+            });
+        }
 
         // Scroll to top (or to the indicated place)
         if (!yScroll) {

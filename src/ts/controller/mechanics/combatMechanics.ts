@@ -1,4 +1,4 @@
-import { state, mechanicsEngine, Combat, template, SpecialObjectsUse, CombatTurn, GndDiscipline, translations, BookSeriesId, NewOrderDiscipline, BookSeries, COMBATTABLE_DEATH } from "../..";
+import { state, mechanicsEngine, Combat, template, SpecialObjectsUse, CombatTurn, GndDiscipline, translations, BookSeriesId, NewOrderDiscipline, BookSeries, COMBATTABLE_DEATH, emit } from "../..";
 import striptags from 'striptags';
 
 /**
@@ -85,6 +85,15 @@ export class CombatMechanics {
             $combatOriginal.find(CombatMechanics.AUDIT_BTN_SELECTOR).on("click", function(e) {
                 e.preventDefault();
                 CombatMechanics.showCombatAudit( $(this).parents(".mechanics-combatUI").first() );
+            });
+
+            // Emit AI narrator event
+            emit("combatStarted", {
+                bookNumber: state.book.bookNumber,
+                sectionId: state.sectionStates.currentSection,
+                enemyName: combat.enemy,
+                enemyCombatSkill: combat.combatSkill,
+                enemyEndurance: combat.endurance
             });
 
             // Set player name if not Lone Wolf
@@ -313,6 +322,15 @@ export class CombatMechanics {
             // Update side-by-side fighter status panel
             CombatMechanics.updateFighterStatusPanel($combatUI, combat, false);
 
+            // Emit AI narrator combat round event
+            emit("combatRound", {
+                bookNumber: state.book.bookNumber,
+                sectionId: state.sectionStates.currentSection,
+                turnNumber: combat.turns.length,
+                playerEndurance: state.actionChart.currentEndurance,
+                enemyEndurance: combat.endurance
+            });
+
             if ( sectionState.combatEluded || combat.isFinished() ) {
                 // Combat finished
 
@@ -324,6 +342,14 @@ export class CombatMechanics {
 
                 // Mark as finished for styling
                 $combatUI.addClass("combat-finished");
+
+                // Emit AI narrator combat ended event
+                emit("combatEnded", {
+                    bookNumber: state.book.bookNumber,
+                    sectionId: state.sectionStates.currentSection,
+                    playerWon: combat.endurance <= 0 || sectionState.combatEluded,
+                    playerEndurance: state.actionChart.currentEndurance
+                });
 
                 // Test player death
                 mechanicsEngine.testDeath();

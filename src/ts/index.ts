@@ -4,6 +4,7 @@
  */
 
 export * from "./constants";
+export * from "./aiNarrator";
 export * from "./state";
 export * from "./template";
 export * from "./views";
