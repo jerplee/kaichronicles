@@ -1,6 +1,22 @@
 TODO
 ====
 
+## Completed in this update
+
+- ~~Unified About/FAQ/Privacy/License page into a single `aboutApp` page with full Project Aon license text~~
+- ~~Added GitHub repository link to app footer alongside Project Aon link~~
+- ~~Replaced main menu grid with a single-column stacked save-slot card layout~~
+- ~~Added hero banner carousel with a random book cover on each visit; "Books 1–29" subtitle centered over it~~
+- ~~Fixed delete save confirmation modal text to read "Confirm delete of save \"[name]\"?"~~
+- ~~Added stats icon (`glyphicon-stats`) to sidebar Action Chart link~~
+- ~~Added user-selectable font family (Noto Sans / Merriweather) via Settings; persisted to localStorage~~
+- ~~Added text-size selector (Normal / Large) to Settings~~
+- ~~Added hunting availability indicator to sidebar and Action Chart~~
+- ~~Replaced/refactored modal dialog system (removed hardcoded "Alert" titles from message/confirm dialogs)~~
+- ~~Reordered sidebar: Main Menu now appears above Settings~~
+- ~~Added README disclaimer: "This software is provided as-is, without warranty or official support"~~
+- ~~Added README note that Docker setup has not been tested after recent UI/build updates~~
+
 ## Gameplay
 
 - Replace list of items with available object list ??
@@ -13,17 +29,13 @@ TODO
 
 ## Bugs
 
-- Bugs reported on Google Play:
-  * Finally, finally there's a proper LW game book app. The only problem I've noticed is that it only gives Silver Bow's bonus in the sections of book 6 that specifically mention it, and not at all 'rolls' as it is supposed to.
 - You are erroneously allowed to apply multiple Alether effects per combat. You are always limited to one (the berries you can purchase in book 6 even explicitly say so).
 - Action chart buttons don't work on iPad Safari
-- ERROR: Book 8, sect139: 
+- ERROR: Book 8, sect139:
   ```actionChartController.pick('quiver'); actionChartController.pick('quiver'); actionChartController.increaseArrows(10);```
   Sell Quiver: OBJECTS TABLE TO SELL IS NOT UPDATED !!!!
 
 ## Development / refactorings (TO DO NOW)
-- Check older savegames with usageCount = undefined in section states, action chart and InventoryState
-  Check also savegames from v1.6 (changes for this in ActionChart.fromObject())
 - Test load previous savegame / state versions to v1.12 !!!
 - In Grand Master books, if you have Psi-surge, check the bonus for Mindblast
 - IMPROVE TESTING
@@ -49,16 +61,12 @@ TODO
 - Allow to select the current bow
 - Toasts with images: align text when the text is multiline
 - Combats should be sequential: First finish the first one, then the second, etc
-- If the hunting is disabled on the current section, show it on some place (Action Chart?)
 - Common performance (web):
   * Rendering performance on book 2 / sect equimpnt
 - Test all books / all sections rendering. It should be valid HTML5
   (https://validator.w3.org/docs/api.html)
 - Test tags <ch.* /> replacements
 - Dialogs with text input: Allow to confirm with the screen keyboard ("go" button)
-- Remove the "Alert" text from the message dialog (same for confirms)
-- Allow to change the font size / family
-  * See http://www.lalit.org/lab/javascript-css-font-detect/
 - Add erratas section?
 - Add illustrations index?
 - Mechanics: Allow to declare a set of rules that can be runned on multiple sections. See book 12, references to sect208 

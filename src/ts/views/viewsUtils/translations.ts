@@ -198,6 +198,19 @@ export class Translations {
         "confirmRestartSection1" : "Are you sure you want to restart the book?\r\nYou will restart from the section 1.",
         "deleteSaveConfirm" : 'Confirm delete of save "{0}"?',
         "close" : "Close",
+        "voiceMode" : "Voice Mode",
+        "voiceOff" : "Off",
+        "voiceOn" : "On",
+        "voiceAutoRead" : "Auto-read sections",
+        "voiceWakeWord" : "Use wake word \"Hey Kai\"",
+        "voiceShowOnline" : "Show online voices",
+        "voiceName" : "Voice",
+        "voiceDownloadHint" : "More natural voices can be downloaded via your OS speech settings.",
+        "voiceTest" : "Test voice",
+        "voiceListening" : "Listening...",
+        "voiceSpeaking" : "Speaking...",
+        "voiceProcessing" : "Processing...",
+        "voiceIdle" : "Voice ready",
 
         //////////////////////////////////////
         // Template (Main page)

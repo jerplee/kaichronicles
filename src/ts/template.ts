@@ -1,4 +1,5 @@
-import { routing, state, Item, translations, randomTable, mechanicsEngine, App, DebugMode, Color, TextSize, Font, BookSeriesId, KaiDiscipline, MgnDiscipline, GndDiscipline, NewOrderDiscipline, settingsController, ModalIds } from ".";
+import { routing, state, Item, translations, randomTable, mechanicsEngine, App, DebugMode, Color, TextSize, Font, BookSeriesId, KaiDiscipline, MgnDiscipline, GndDiscipline, NewOrderDiscipline, settingsController, ModalIds, voiceManager } from ".";
+import { VOICE_FEATURE_ENABLED } from "./voice/voiceTypes";
 
 /**
  * The HTML template API
@@ -67,6 +68,30 @@ export const template = {
             settingsController.changeColorTheme(state.color === Color.Light ? Color.Dark : Color.Light);
         });
 
+        // Voice mode sidebar toggle (feature-gated)
+        if (VOICE_FEATURE_ENABLED) {
+            $("#sidebar-voiceMode").on("click", (e) => {
+                // If clicking the help icon, show help instead of toggling
+                const $target = $(e.target);
+                if ($target.closest("#sidebar-voiceHelp").length > 0) {
+                    e.preventDefault();
+                    template.showVoiceHelp();
+                    return;
+                }
+                e.preventDefault();
+                voiceManager.toggle();
+            });
+
+            // Voice help icon separate handler
+            $("#sidebar-voiceHelp").on("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                template.showVoiceHelp();
+            });
+        } else {
+            $(".sidebar-nav-voice").hide();
+        }
+
         // Sidebar nav items: close mobile drawer after click
         $("#game-sidebar a").on("click", () => {
             $("#game-sidebar").removeClass("open");
@@ -100,6 +125,17 @@ export const template = {
             template.updateKaiName();
         } else {
             $("#sidebar-kaiName").hide();
+        }
+    },
+
+    /**
+     * Show / hide the character HUD section in the sidebar
+     */
+    showSidebarHud(show: boolean) {
+        if (show) {
+            $(".sidebar-hud").show();
+        } else {
+            $(".sidebar-hud").hide();
         }
     },
 
@@ -588,6 +624,47 @@ export const template = {
         const $modal = $("#" + ModalIds.ALERT_MODAL);
         $("#" + ModalIds.ALERT_MESSAGE).text(message);
         $modal.modal("show");
+    },
+
+    /**
+     * Show a Bootstrap alert modal with HTML content.
+     */
+    showAlertHtml(html: string, title?: string) {
+        const $modal = $("#" + ModalIds.ALERT_MODAL);
+        $("#" + ModalIds.ALERT_MESSAGE).html(html);
+        if (title) {
+            $("#template-alertTitle").text(title);
+        }
+        $modal.modal("show");
+    },
+
+    /**
+     * Show the voice commands help alert.
+     */
+    showVoiceHelp() {
+        const wakeWordHtml = state.voiceWakeWord
+            ? '<p class="voice-help-note"><strong>Wake word required:</strong> Say <em>"Hey Kai"</em> before each command.</p>'
+            : "";
+        template.showAlertHtml(
+            '<div class="voice-help-content">' +
+            '<h5>Navigation</h5>' +
+            '<ul><li><em>"Open map"</em> – Show map</li>' +
+            '<li><em>"Open stats"</em> – Show action chart</li>' +
+            '<li><em>"Go to book"</em> – Resume reading</li></ul>' +
+            '<h5>Choices</h5>' +
+            '<ul><li><em>"Choose 2"</em> – Select option 2</li>' +
+            '<li><em>"Pick 1"</em> – Select option 1</li></ul>' +
+            '<h5>Combat</h5>' +
+            '<ul><li><em>"Play turn"</em> – Run combat turn</li>' +
+            '<li><em>"Elude"</em> – Try to escape</li></ul>' +
+            '<h5>Voice Control</h5>' +
+            '<ul><li><em>"Read"</em> – Read current section</li>' +
+            '<li><em>"Stop"</em> – Stop speaking</li>' +
+            '<li><em>"Repeat"</em> – Repeat last text</li></ul>' +
+            wakeWordHtml +
+            '</div>',
+            "Voice Commands"
+        );
     },
 
     /**

@@ -4,9 +4,23 @@
 
 This fork builds on the work of [cracrayol](https://github.com/cracrayol/kaichronicles), who continued the [original Kai Chronicles](https://github.com/tonib/kaichronicles) by tonib after development ended in 2021.
 
-I played Book 8 when I was a kid, but I could never afford to get the rest of the books and when I stumbled upon Project Aon, it was a gift to my old child self. I was amazed by the generosity of Joe Dever to make this series available to his fans and just as amazed by the community that build tools like Kai Chronicles to make it even more accessible. 
+### Update Notes — June 2026
 
-When I first downloaded this project, it needed a little TLC to run cleanly. I fixed the outstanding bugs, polished the UI, and added a few quality-of-life improvements — all without touching the core game logic, which is faithfully preserved. Game logic changes were only made where a bug had already been documented. If something feels unfair, it is probably the books, not the code.
+I played "Masters of Darkness" as a kid but could never afford the rest of the series. Stumbling on Project Aon was a gift to my childhood self — I'm grateful to Joe Dever, the original artists, and the community that kept Lone Wolf alive.
+
+With AI coding agents now widely available, I wanted to see what improvements could be made to this project. The app now builds cleanly, downloads books properly, and includes quality-of-life UI improvements. Core game logic is preserved; only documented bugs have been touched. If something feels unfair, it's probably the books, not the code.
+
+Here's what's changed:
+
+* A more modern UI with a dark theme (still built on Bootstrap and jQuery)
+* IndexedDB save system with three fixed slots, auto-save, and import/export
+* In-game sidebar with character stats, map link, and hunting indicator
+* User-selectable font family and text size
+* Updated build dependencies and tooling
+* Improved error handling and user feedback
+* Gameplay mechanics validation for books 1-29 
+
+**This software is provided as-is, without warranty or official support.** Use it at your own risk.
 
 This repository does not contain game books data. Data must be downloaded from the [Project Aon web site](https://www.projectaon.org).
 
@@ -38,12 +52,15 @@ Open your browser on http://localhost:3000.
 
 ### Setup a Docker image
 Optional method for running a local website only to play the game
+
+> **Note:** The Docker setup has not been tested after recent UI and build-system updates. It may still work, but no guarantees are provided.
+
  * Download and install [Docker](https://docs.docker.com/install/) and make sure it's is in your PATH environment variable
  * Using a terminal (Linux or iOS) or PowerShell (Windows 10) navigate to the project's directory
  * Type `docker build -t kai:1.2 .`
  * Type `docker run -p 8080:8080 kai:1.2`
  * Open http://localhost:8080
- 
+
 More information about this method [here](./doc/README-docker.md)
 
 ### Save System
@@ -83,27 +100,6 @@ npm run lint
 ```
 
 A "guide" to develop new books can be found at [doc/README-developing.md](doc/README-developing.md)
-
-### Progressive Web App (PWA) Development
-
-Kai Chronicles has been extended to act as a PWA.  It can be added to the home screen of a mobile phone, or as an app in Windows.  The app will continue to function offline due to caching of assets, though the books are not predownloaded, so starting a New Game will fail unless you have already started the book before.
-
-Of course, asset caching complicates development, not least because webpack-dev-server doesn't play nice with the precaching mechanism (https://github.com/GoogleChrome/workbox/issues/1790).  Therefore, the caching and PWA functionality should be disabled while developing.  
-
-If you want to specifically develop PWA features:
-1) Comment out:
-        `if (environment !== EnvironmentType.Development)`
-  in app.ts
-2) Make your changes to the app
-3) Run:
-      `npm run predist`
-   to regenerate the service worker code
-4) Run a dedicated http server other than webpack-dev-server:
-      `npx http-server ./www`
-5) Open the app at:
-      `http://localhost:8080`
-
-After finishing, be sure to reverse the change from step 1 before committing changes.  Hopefully this process can be improved in the future, but there shouldn't be frequent changes to the PWA functionality.
 
 ### Tests
 

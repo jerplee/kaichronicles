@@ -1,4 +1,5 @@
-import { Section, App, gameController, state, randomTable, Book, template, numberPickerMechanics, DebugMode } from "..";
+import { Section, App, gameController, state, randomTable, Book, template, numberPickerMechanics, DebugMode, voiceManager } from "..";
+import { VOICE_FEATURE_ENABLED } from "../voice/voiceTypes";
 
 /**
  * The game view interface functions
@@ -71,6 +72,14 @@ export const gameView = {
         // Show book copyright
         const copyrightHtml = state.book.getCopyrightHtml().replace(/<br\s*\/?>/gi, "  -  ");
         $("#game-copyrights").html(" - " + state.book.getBookTitle() + " - " + copyrightHtml);
+
+        // Update voice indicator visibility (feature-gated)
+        if (VOICE_FEATURE_ENABLED) {
+            voiceManager.updateSidebarIcon();
+            voiceManager.updateIndicator();
+        } else {
+            $("#voice-indicator").hide();
+        }
 
         // Setup debug options
         if (App.debugMode === DebugMode.DEBUG) {

@@ -1,4 +1,5 @@
-import { state, settingsController, translations, setupController, routing, Color, TextSize, Font, template } from "..";
+import { state, settingsController, translations, setupController, routing, Color, TextSize, Font, template, voiceManager } from "..";
+import { VOICE_FEATURE_ENABLED } from "../voice/voiceTypes";
 
 /**
  * Settings view
@@ -36,6 +37,50 @@ export const settingsView = {
         $("#settings-font").on("change", function() {
             settingsController.changeFont(Font[<string> $(this).val()]);
         });
+
+        // Voice Mode (feature-gated)
+        if (VOICE_FEATURE_ENABLED) {
+            $("#settings-voiceMode").val(state.voiceEnabled ? "on" : "off");
+            settingsView.updateVoiceOptionsVisibility();
+            $("#settings-voiceMode").on("change", function() {
+                const enabled = $(this).val() === "on";
+                voiceManager.updateSettings({ enabled });
+                settingsView.updateVoiceOptionsVisibility();
+            });
+
+            // Voice Auto-read
+            $("#settings-voiceAutoRead").prop("checked", state.voiceAutoRead);
+            $("#settings-voiceAutoRead").on("change", function() {
+                voiceManager.updateSettings({ autoRead: $(this).is(":checked") });
+            });
+
+            // Voice Wake Word
+            $("#settings-voiceWakeWord").prop("checked", state.voiceWakeWord);
+            $("#settings-voiceWakeWord").on("change", function() {
+                voiceManager.updateSettings({ wakeWord: $(this).is(":checked") });
+            });
+
+            // Voice Name selector
+            voiceManager.populateVoiceSelect($("#settings-voiceName"));
+            $("#settings-voiceName").on("change", function() {
+                const voiceName = $(this).val() as string;
+                voiceManager.updateSettings({ voiceName });
+            });
+            // Browsers load voices asynchronously; refresh list when they become available
+            if (window.speechSynthesis) {
+                window.speechSynthesis.onvoiceschanged = () => {
+                    voiceManager.populateVoiceSelect($("#settings-voiceName"));
+                };
+            }
+
+            // Voice Test
+            $("#settings-voiceTest").on("click", function() {
+                voiceManager.speak("Voice test successful. Kai Chronicles is listening.");
+            });
+        } else {
+            // Hide voice settings section when feature is disabled
+            $("#settings-voiceSection").hide();
+        }
 
         // Restart book
         $("#settings-restart-label").text(translations.text("restartBook", [state.book.bookNumber]));
@@ -99,6 +144,17 @@ export const settingsView = {
             e.preventDefault();
             $("#settings-saveName").val("").focus();
         });
+    },
+
+    /**
+     * Show or hide voice sub-options based on the voice mode dropdown.
+     */
+    updateVoiceOptionsVisibility() {
+        if ($("#settings-voiceMode").val() === "on") {
+            $("#settings-voiceOptions").show();
+        } else {
+            $("#settings-voiceOptions").hide();
+        }
     },
 
 };

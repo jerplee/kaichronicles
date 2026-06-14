@@ -1538,7 +1538,7 @@ body.dark .loadgame-table tr:hover td {
 
 /* Sidebar navigation */
 .sidebar-nav {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
 }
 
 .sidebar-nav-secondary {
@@ -1739,6 +1739,184 @@ body.dark .sidebar-nav-secondary {
     border-top-color: #444;
 }
 
+/* ── Voice mode sidebar item ── */
+.sidebar-nav-voice {
+    border-top: 1px solid #ddd;
+    flex: 0 0 auto;
+    display: none;
+}
+
+body.sidebar-visible .sidebar-nav-voice {
+    display: block;
+}
+
+body.dark .sidebar-nav-voice {
+    border-top-color: #444;
+}
+
+#sidebar-voiceMode.voice-active {
+    color: #5cb85c;
+}
+
+body.dark #sidebar-voiceMode.voice-active {
+    color: #5cb85c;
+}
+
+.sidebar-voice-help {
+    margin-left: auto;
+    padding: 2px 6px;
+    color: #337ab7;
+    font-size: 0.9em;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.15s;
+}
+
+.sidebar-voice-help:hover,
+.sidebar-voice-help:focus {
+    background: rgba(51, 122, 183, 0.12);
+    color: #23527c;
+    text-decoration: none;
+}
+
+body.dark .sidebar-voice-help {
+    color: #6ba3d6;
+}
+
+body.dark .sidebar-voice-help:hover,
+body.dark .sidebar-voice-help:focus {
+    background: rgba(107, 163, 214, 0.15);
+    color: #8dbde8;
+}
+
+/* Voice help modal content */
+.voice-help-content h5 {
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+}
+
+.voice-help-content h5:first-child {
+    margin-top: 0;
+}
+
+.voice-help-content ul {
+    margin-bottom: 8px;
+    padding-left: 20px;
+}
+
+.voice-help-content ul li {
+    margin-bottom: 3px;
+}
+
+.voice-help-note {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #f0f8ff;
+    border-left: 3px solid #337ab7;
+    border-radius: 3px;
+}
+
+body.dark .voice-help-content h5 {
+    color: #ddd;
+}
+
+body.dark .voice-help-note {
+    background: #1a2a3a;
+    border-left-color: #6ba3d6;
+}
+
+/* ── Voice indicator (in-game floating badge) ── */
+#voice-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    font-size: 0.9em;
+    color: #555;
+    transition: border-color 0.2s, background 0.2s;
+    pointer-events: auto;
+    user-select: none;
+}
+
+#voice-indicator .voice-icon {
+    font-size: 0.85em;
+}
+
+#voice-indicator.voice-listening {
+    border-color: #5cb85c;
+    color: #5cb85c;
+    animation: voice-pulse 1.5s infinite;
+}
+
+#voice-indicator.voice-speaking {
+    border-color: #337ab7;
+    color: #337ab7;
+}
+
+#voice-indicator.voice-processing {
+    border-color: #f0ad4e;
+    color: #f0ad4e;
+}
+
+#voice-indicator.voice-error {
+    border-color: #d9534f;
+    color: #d9534f;
+}
+
+@keyframes voice-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(92, 184, 92, 0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(92, 184, 92, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(92, 184, 92, 0); }
+}
+
+body.dark #voice-indicator {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #ccc;
+}
+
+/* Voice options in settings */
+.voice-options {
+    padding-left: 15px;
+}
+
+.voice-options .checkbox + .checkbox {
+    margin-top: 8px;
+}
+
+.voice-help-link {
+    margin-left: 6px;
+    color: #337ab7;
+    text-decoration: none;
+    font-size: 0.9em;
+    vertical-align: middle;
+}
+
+.voice-help-link:hover,
+.voice-help-link:focus {
+    color: #23527c;
+    text-decoration: none;
+}
+
+body.dark .voice-help-link {
+    color: #6ba3d6;
+}
+
+body.dark .voice-help-link:hover,
+body.dark .voice-help-link:focus {
+    color: #8dbde8;
+}
+
 body.dark .page-card {
     background: #2a2a2a;
     border-color: #444;
@@ -1784,7 +1962,7 @@ body.font-serif .glyphicon {
     border-radius: 4px;
     overflow: hidden;
     margin-bottom: 20px;
-    height: 220px;
+    height: 300px;
     background: #222;
 }
 
@@ -1803,19 +1981,25 @@ body.font-serif .glyphicon {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: 33% center;
     opacity: 0;
     transition: opacity 1.5s ease-in-out;
 }
 
 .menu-hero-img.active {
-    opacity: 0.35;
+    opacity: 0.45;
 }
 
 .menu-hero-overlay {
     position: relative;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
     text-align: center;
-    padding: 50px 20px 20px;
+    padding: 0 20px;
     color: #fff;
     text-shadow: 0 2px 8px rgba(0,0,0,0.8);
 }

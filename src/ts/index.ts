@@ -5,6 +5,9 @@
 
 export * from "./constants";
 export * from "./aiNarrator";
+export * from "./voice/voiceTypes";
+export * from "./voice/commandParser";
+export * from "./voice/voiceManager";
 export * from "./state";
 export * from "./template";
 export * from "./views";

@@ -51,7 +51,45 @@
           <option value="Serif">Serif</option>
       </select>
     </div>
-    
+
+    <div id="settings-voiceSection">
+      <hr />
+
+      <div class="form-group">
+        <label for="settings-voiceMode" data-translation="voiceMode">
+          Voice Mode
+        </label>
+        <select class="form-control" id="settings-voiceMode">
+            <option value="off" data-translation="voiceOff">Off</option>
+            <option value="on" data-translation="voiceOn">On</option>
+        </select>
+      </div>
+
+      <div class="form-group voice-options" id="settings-voiceOptions" style="display:none;">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" id="settings-voiceAutoRead" />
+            <span data-translation="voiceAutoRead">Auto-read sections</span>
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" id="settings-voiceWakeWord" />
+            <span data-translation="voiceWakeWord">Use wake word "Hey Kai"</span>
+          </label>
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label for="settings-voiceName" data-translation="voiceName">Voice</label>
+          <select class="form-control" id="settings-voiceName"></select>
+        </div>
+        <button class="btn btn-default" type="button" id="settings-voiceTest">
+          <span class="glyphicon glyphicon-play"></span> <span data-translation="voiceTest">Test voice</span>
+        </button>
+      </div>
+
+      <hr />
+    </div>
+
     <button class="btn btn-default large-button" type="button" id="settings-gamerules">
         <img src="images/game-icons/bookmark.png" alt="Rules" />
         <b data-translation="gameRules">Game rules</b>

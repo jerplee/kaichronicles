@@ -93,6 +93,30 @@ export class State {
     public activeSlotKey: string | null = null;
 
     /**
+     * Voice Mode enabled.
+     * Stored at localStorage['voiceSettings'], not with the game state.
+     */
+    public voiceEnabled = false;
+
+    /**
+     * Auto-read sections when voice mode is on.
+     * Stored at localStorage['voiceSettings'].
+     */
+    public voiceAutoRead = true;
+
+    /**
+     * Use wake word "Hey Kai" for voice commands.
+     * Stored at localStorage['voiceSettings'].
+     */
+    public voiceWakeWord = false;
+
+    /**
+     * Preferred TTS voice name (empty = auto-select).
+     * Stored at localStorage['voiceSettings'].
+     */
+    public voiceName = "";
+
+    /**
      * Setup the default color or persist from local storage
      */
     public setupDefaultColorTheme() {
@@ -137,6 +161,44 @@ export class State {
             }
         } catch (e) {
             this.font = Font.SansSerif;
+            mechanicsEngine.debugWarning(e);
+        }
+    }
+
+    /**
+     * Setup voice settings or persist from local storage
+     */
+    public setupDefaultVoiceSettings() {
+        try {
+            const raw = localStorage.getItem("voiceSettings");
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                this.voiceEnabled = !!parsed.enabled;
+                this.voiceAutoRead = parsed.autoRead !== undefined ? !!parsed.autoRead : true;
+                this.voiceWakeWord = !!parsed.wakeWord;
+                this.voiceName = typeof parsed.voiceName === "string" ? parsed.voiceName : "";
+            }
+        } catch (e) {
+            this.voiceEnabled = false;
+            this.voiceAutoRead = true;
+            this.voiceWakeWord = false;
+            this.voiceName = "";
+            mechanicsEngine.debugWarning(e);
+        }
+    }
+
+    /**
+     * Persist voice settings to localStorage.
+     */
+    public persistVoiceSettings() {
+        try {
+            localStorage.setItem("voiceSettings", JSON.stringify({
+                enabled: this.voiceEnabled,
+                autoRead: this.voiceAutoRead,
+                wakeWord: this.voiceWakeWord,
+                voiceName: this.voiceName,
+            }));
+        } catch (e) {
             mechanicsEngine.debugWarning(e);
         }
     }

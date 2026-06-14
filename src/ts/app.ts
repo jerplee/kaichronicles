@@ -1,4 +1,5 @@
-import { views, state, template, routing, declareCommonHelpers, mechanicsEngine, pwa, saveGameDb, StorageKeys, APP_VERSION } from ".";
+import { views, state, template, routing, declareCommonHelpers, mechanicsEngine, pwa, saveGameDb, StorageKeys, APP_VERSION, voiceManager } from ".";
+import { VOICE_FEATURE_ENABLED } from "./voice/voiceTypes";
 
 /** Execution enviroment type */
 export enum EnvironmentType {
@@ -91,8 +92,16 @@ export class App {
                     state.setupDefaultColorTheme();
                     state.setupDefaultTextSize();
                     state.setupDefaultFont();
+                    if (VOICE_FEATURE_ENABLED) {
+                        state.setupDefaultVoiceSettings();
+                    }
                     template.setup();
                     routing.setup();
+
+                    // Initialize voice manager sidebar state (feature-gated)
+                    if (VOICE_FEATURE_ENABLED) {
+                        voiceManager.updateSidebarIcon();
+                    }
 
                     // Migrate existing localStorage save to IndexedDB auto-save if needed
                     if (saveGameDb.isAvailable() && state.existsPersistedState()) {
