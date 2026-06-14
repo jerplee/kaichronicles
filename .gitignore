@@ -32,3 +32,9 @@ Thumbs.db
 AGENTS.md
 .devin/
 .planning/
+
+# Validation artifacts
+validation-output.txt
+validation-output2.txt
+validation-results.txt
+validation-report.json

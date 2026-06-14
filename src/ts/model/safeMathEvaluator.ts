@@ -15,11 +15,13 @@ export function safeMathEvaluate(expression: string): any {
 
 enum TokenType {
     Number,
+    Identifier,
     Plus, Minus, Multiply, Divide, Modulo,
     LessThan, GreaterThan, LessThanOrEqual, GreaterThanOrEqual,
     Equal, NotEqual, StrictEqual, StrictNotEqual,
     And, Or,
     Question, Colon,
+    Comma,
     LParen, RParen,
     EOF
 }
@@ -27,6 +29,7 @@ enum TokenType {
 interface Token {
     type: TokenType;
     value?: number;
+    name?: string;
 }
 
 function tokenize(expr: string): Token[] {
@@ -94,6 +97,20 @@ function tokenize(expr: string): Token[] {
         }
         if (ch === "?") { tokens.push({ type: TokenType.Question }); i++; continue; }
         if (ch === ":") { tokens.push({ type: TokenType.Colon }); i++; continue; }
+        if (ch === ",") { tokens.push({ type: TokenType.Comma }); i++; continue; }
+        if (/[a-zA-Z]/.test(ch)) {
+            let id = "";
+            while (i < expr.length && /[a-zA-Z0-9_.]/.test(expr[i])) {
+                id += expr[i];
+                i++;
+            }
+            if (id === "Math.max" || id === "Math.min") {
+                tokens.push({ type: TokenType.Identifier, name: id });
+            } else {
+                throw new Error("Unexpected character: " + ch);
+            }
+            continue;
+        }
         throw new Error("Unexpected character: " + ch);
     }
     tokens.push({ type: TokenType.EOF });
@@ -251,6 +268,25 @@ class Parser {
         if (t === TokenType.Number) {
             const token = this.eat(TokenType.Number);
             return token.value;
+        }
+        if (t === TokenType.Identifier) {
+            const name = this.eat(TokenType.Identifier).name;
+            this.eat(TokenType.LParen);
+            const args: any[] = [];
+            if (this.current().type !== TokenType.RParen) {
+                args.push(this.parseExpression());
+                while (this.current().type === TokenType.Comma) {
+                    this.eat(TokenType.Comma);
+                    args.push(this.parseExpression());
+                }
+            }
+            this.eat(TokenType.RParen);
+            if (name === "Math.max") {
+                return Math.max(...args);
+            } else if (name === "Math.min") {
+                return Math.min(...args);
+            }
+            throw new Error("Unknown function: " + name);
         }
         if (t === TokenType.LParen) {
             this.eat(TokenType.LParen);

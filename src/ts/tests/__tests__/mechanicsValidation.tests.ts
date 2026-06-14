@@ -50,24 +50,16 @@ function createValidator(bookNumber: number): BookValidator {
 
 describe("Book mechanics validation", () => {
 
-    test("book 1 mechanics have no semantic errors", () => {
-        const validator = createValidator(1);
-        validator.validateBook();
+    for (let bookNumber = 1; bookNumber <= 29; bookNumber++) {
+        test(`book ${bookNumber} mechanics have no semantic errors`, () => {
+            const validator = createValidator(bookNumber);
+            validator.validateBook();
 
-        if (validator.errors.length > 0) {
-            console.error("Book 1 validation errors:\n" + validator.errors.join("\n"));
-        }
-        expect(validator.errors).toHaveLength(0);
-    }, 60000);
-
-    test("book 2 mechanics have no semantic errors", () => {
-        const validator = createValidator(2);
-        validator.validateBook();
-
-        if (validator.errors.length > 0) {
-            console.error("Book 2 validation errors:\n" + validator.errors.join("\n"));
-        }
-        expect(validator.errors).toHaveLength(0);
-    }, 60000);
+            if (validator.errors.length > 0) {
+                console.error(`Book ${bookNumber} validation errors:\n` + validator.errors.join("\n"));
+            }
+            expect(validator.errors).toHaveLength(0);
+        }, 60000);
+    }
 
 });

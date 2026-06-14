@@ -232,13 +232,17 @@ export const saveGameDb = {
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STORE_NAME, "readonly");
             const store = tx.objectStore(STORE_NAME);
-            const index = store.index("isAutoSave");
+            const index = store.index("timestamp");
             const request = index.openCursor(null, "prev");
 
             request.onsuccess = () => {
                 const cursor = request.result;
-                if (cursor && cursor.value.isAutoSave) {
-                    resolve(cursor.value as SaveSlotRecord);
+                if (cursor) {
+                    if (cursor.value.isAutoSave) {
+                        resolve(cursor.value as SaveSlotRecord);
+                    } else {
+                        cursor.continue();
+                    }
                 } else {
                     resolve(undefined);
                 }
@@ -259,15 +263,16 @@ export const saveGameDb = {
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STORE_NAME, "readonly");
             const store = tx.objectStore(STORE_NAME);
-            const index = store.index("isAutoSave");
-            // Only iterate entries where isAutoSave === true
-            const request = index.openCursor(IDBKeyRange.only(true), "next");
+            const index = store.index("timestamp");
+            const request = index.openCursor(null, "next");
             const results: SaveSlotRecord[] = [];
 
             request.onsuccess = () => {
                 const cursor = request.result;
                 if (cursor) {
-                    results.push(cursor.value as SaveSlotRecord);
+                    if (cursor.value.isAutoSave) {
+                        results.push(cursor.value as SaveSlotRecord);
+                    }
                     cursor.continue();
                 } else {
                     resolve(results);

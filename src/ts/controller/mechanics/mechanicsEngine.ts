@@ -216,12 +216,16 @@ export const mechanicsEngine = {
      */
     runRule(rule: Element) {
         // console.log( Mechanics.getRuleSelector(rule) );
-        const ruleName = rule.nodeName.toLowerCase();
+        let ruleName = rule.nodeName;
         if (!mechanicsEngine[ruleName]) {
-            mechanicsEngine.debugWarning("Unknown rule: " + rule.nodeName);
-        } else {
-            mechanicsEngine[ruleName](rule);
+            // Fallback for HTML/jsdom where nodeName is uppercase
+            ruleName = ruleName.toLowerCase();
+            if (!mechanicsEngine[ruleName]) {
+                mechanicsEngine.debugWarning("Unknown rule: " + rule.nodeName);
+                return;
+            }
         }
+        mechanicsEngine[ruleName](rule);
     },
 
     /**
