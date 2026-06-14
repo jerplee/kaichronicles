@@ -1348,67 +1348,16 @@ body.dark .menu-saveinfo {
     color: #999;
 }
 
-/* ── Main Menu Footer (matches game copyright footer) ── */
-.menu-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 0.85em;
-    font-style: italic;
-    color: #777;
-    padding: 12px 15px;
-    border-top: 1px solid #ddd;
-    background: #f8f8f8;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    z-index: 10;
-}
-
-.menu-footer a {
-    color: #777;
-    text-decoration: underline;
-}
-
-.menu-footer a:hover {
-    color: #333;
-}
-
-body.dark .menu-footer {
-    color: #999;
-    border-top-color: #444;
-    background: #2a2a2a;
-}
-body.dark .menu-footer a {
-    color: #999;
-}
-body.dark .menu-footer a:hover {
-    color: #ccc;
-}
-
-/* ── Main Menu Slot Grid (3 per row) ── */
+/* ── Main Menu Slot Grid (stacked vertically) ── */
 .menu-slots-grid {
-    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .menu-slots-grid .save-slot-card {
-    flex: 0 0 calc(33.333% - 8px);
+    flex: 0 0 auto;
+    width: 100%;
     max-width: none;
-    min-width: 200px;
-}
-
-@media (max-width: 768px) {
-    .menu-slots-grid .save-slot-card {
-        flex: 0 0 calc(50% - 6px);
-    }
-}
-
-@media (max-width: 480px) {
-    .menu-slots-grid .save-slot-card {
-        flex: 1 1 100%;
-    }
 }
 
 /* Fallback action cards when no saves exist */
@@ -1508,3 +1457,381 @@ body.dark .loadgame-table .lg-date small {
 body.dark .loadgame-table tr:hover td {
     background: #333;
 }
+
+/* ============================================================
+   SIDEBAR + PAGE CARD + FOOTER REDESIGN
+   ============================================================ */
+
+/* ── Game Sidebar (fixed left panel) ── */
+#game-sidebar {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    width: 200px;
+    bottom: 0;
+    background: #f8f8f8;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 5;
+    display: none;
+    flex-direction: column;
+}
+
+/* Sidebar portrait / HUD */
+.sidebar-section {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.sidebar-portrait {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: block;
+    border: 2px solid #ccc;
+    background: #fff;
+}
+
+.sidebar-kai-name {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1em;
+    margin-bottom: 2px;
+    color: #333;
+}
+
+.sidebar-rank {
+    text-align: center;
+    font-size: 0.8em;
+    color: #777;
+    margin-bottom: 12px;
+}
+
+.sidebar-stat {
+    margin-bottom: 8px;
+}
+
+.sidebar-stat-label {
+    font-size: 0.8em;
+    color: #666;
+    margin-bottom: 2px;
+}
+
+.sidebar-stat .progress {
+    height: 5px;
+    margin-bottom: 3px;
+    background: #e0e0e0;
+    border-radius: 3px;
+}
+
+.sidebar-stat .progress-bar {
+    border-radius: 3px;
+}
+
+.sidebar-stat-value {
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #555;
+}
+
+/* Sidebar navigation */
+.sidebar-nav {
+    flex: 1 1 auto;
+}
+
+.sidebar-nav-secondary {
+    border-top: 1px solid #ddd;
+    flex: 0 0 auto;
+}
+
+.sidebar-nav-item {
+    display: block;
+    padding: 10px 15px;
+    color: #555;
+    text-decoration: none;
+    border-bottom: 1px solid #eee;
+    font-size: 0.95em;
+    transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-nav-item:hover,
+.sidebar-nav-item:focus {
+    background: #eee;
+    color: #333;
+    text-decoration: none;
+}
+
+.sidebar-nav-item.active {
+    background: #337ab7;
+    color: #fff;
+    border-bottom-color: #337ab7;
+}
+
+.sidebar-nav-item .glyphicon {
+    margin-right: 8px;
+    font-size: 0.95em;
+}
+
+/* ── Page Card (shared content wrapper) ── */
+.page-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    padding: 30px 40px;
+    margin-bottom: 20px;
+}
+
+/* ── App Footer (unified footer bar) ── */
+.app-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.85em;
+    color: #777;
+    padding: 10px 15px;
+    border-top: 1px solid #ddd;
+    background: #f8f8f8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 10;
+    display: none;
+}
+
+.app-footer a {
+    color: #777;
+    text-decoration: underline;
+}
+
+.app-footer a:hover {
+    color: #333;
+}
+
+.app-footer .footer-theme-toggle {
+    float: right;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+/* ── Layout: sidebar visible shifts content ── */
+body.sidebar-visible #game-sidebar {
+    display: flex;
+}
+
+body.sidebar-visible #content {
+    margin-left: 200px;
+}
+
+body.sidebar-visible .app-footer {
+    display: block;
+    padding-left: 215px;
+}
+
+/* Navbar title always centered */
+#template-header .navbar-header {
+    text-align: center;
+    float: none;
+    position: relative;
+}
+
+#template-header .navbar-brand {
+    float: none;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Hamburger stays on the left */
+#template-header .navbar-toggle {
+    position: absolute;
+    left: 0;
+    top: 8px;
+    margin-left: 15px;
+    float: none;
+}
+
+body.sidebar-visible #template-title {
+    float: none;
+    display: inline-block !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ── Mobile sidebar drawer ── */
+@media (max-width: 767px) {
+    #game-sidebar {
+        transform: translateX(-200px);
+        transition: transform 0.25s ease;
+        display: flex !important;
+    }
+
+    #game-sidebar.open {
+        transform: translateX(0);
+    }
+
+    body.sidebar-visible #content {
+        margin-left: 0;
+    }
+
+    body.sidebar-visible .app-footer {
+        padding-left: 15px;
+    }
+}
+
+/* ── Dark mode variants ── */
+body.dark #game-sidebar {
+    background: #2a2a2a;
+    border-right-color: #444;
+}
+
+body.dark .sidebar-section {
+    border-bottom-color: #444;
+}
+
+body.dark .sidebar-portrait {
+    border-color: #555;
+    background: #333;
+}
+
+body.dark .sidebar-kai-name {
+    color: #ddd;
+}
+
+body.dark .sidebar-rank {
+    color: #999;
+}
+
+body.dark .sidebar-stat-label {
+    color: #aaa;
+}
+
+body.dark .sidebar-stat .progress {
+    background: #444;
+}
+
+body.dark .sidebar-stat-value {
+    color: #ccc;
+}
+
+body.dark .sidebar-nav-item {
+    color: #ccc;
+    border-bottom-color: #444;
+}
+
+body.dark .sidebar-nav-item:hover,
+body.dark .sidebar-nav-item:focus {
+    background: #333;
+    color: #fff;
+}
+
+body.dark .sidebar-nav-item.active {
+    background: #337ab7;
+    color: #fff;
+    border-bottom-color: #337ab7;
+}
+
+body.dark .sidebar-nav-secondary {
+    border-top-color: #444;
+}
+
+body.dark .page-card {
+    background: #2a2a2a;
+    border-color: #444;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+body.dark .app-footer {
+    background: #2a2a2a;
+    border-top-color: #444;
+    color: #999;
+}
+
+body.dark .app-footer a {
+    color: #999;
+}
+
+body.dark .app-footer a:hover {
+    color: #ccc;
+}
+
+/* ── Font Family Overrides ── */
+body.font-sans,
+body.font-sans * {
+    font-family: "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+body.font-sans .glyphicon {
+    font-family: "Glyphicons Halflings" !important;
+}
+
+body.font-serif,
+body.font-serif * {
+    font-family: "Merriweather", Georgia, "Times New Roman", serif !important;
+}
+
+body.font-serif .glyphicon {
+    font-family: "Glyphicons Halflings" !important;
+}
+
+/* ── Main Menu Hero Carousel ── */
+.menu-hero {
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    height: 220px;
+    background: #222;
+}
+
+.menu-hero-carousel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.menu-hero-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+.menu-hero-img.active {
+    opacity: 0.35;
+}
+
+.menu-hero-overlay {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 50px 20px 20px;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+
+.menu-hero-overlay h1 {
+    margin: 0 0 4px;
+    font-size: 2.4em;
+    font-weight: bold;
+    color: #fff;
+}
+
+.menu-hero-subtitle {
+    margin: 0;
+    font-size: 1.2em;
+    color: #ccc;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+

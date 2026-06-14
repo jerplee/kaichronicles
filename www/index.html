@@ -18,6 +18,11 @@
     <link href="lib/bootstrap-3.4.1-dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="lib/toastr/toastr.min.css" rel="stylesheet">
 
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+
     <!-- Custom CSS -->
     <link href="css/kaichronicles.css" rel="stylesheet">
 
@@ -31,50 +36,18 @@
 
         <div class="navbar-header">
 
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" 
-            data-target="#navbar" aria-expanded="false" aria-controls="navbar" 
-            id="template-menubutton">
-            <span class="sr-only">Toggle navigation</span>
+          <button type="button" class="navbar-toggle collapsed"
+            id="template-menubutton" title="Toggle sidebar">
+            <span class="sr-only">Toggle sidebar</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
 
-          <a class="navbar-brand" href="#mainMenu" id="template-img-logo">
-            <img src="images/logo-white-bg-40.png" 
-                 style="display: inline-block; margin-top:-10px;" alt="Logo" />
-          </a>
-          <a class="navbar-brand hidden-xs hidden-sm" href="#mainMenu" id="template-title">
+          <a class="navbar-brand" href="#mainMenu" id="template-title">
             Kai Chronicles
           </a>
-          <a href="#" class="navbar-theme-toggle" id="template-themeToggle" title="Toggle dark mode">
-            <span class="glyphicon glyphicon-adjust"></span>
-          </a>
-          <p class="navbar-text" id="template-statistics">
-              <span id="template-kaiName"></span>
-              <span data-translation="CS">C.S.</span>: 
-              <span id="template-combatSkill">99</span>
-              <span data-translation="E">E.</span>: 
-              <span id="template-endurance">99</span>
-          </p>
-        </div>
 
-        <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav" id="navbar-content">
-            <li>
-                <a href="#actionChart" id="template-actionChart" data-translation="actionChart">
-                    Action Chart
-                </a>
-            </li>
-            <li><a href="#map" id="template-map" data-translation="map">Map</a></li>
-            <li><a href="#combatTables" id="template-combatTablesLink" data-translation="combatTables">Combat Tables</a></li>
-            <li><a href="#settings" data-translation="settings">Settings</a></li>
-            <li>
-              <a href="#mainMenu" id="template-mainMenu" data-translation="mainMenu">
-                Main Menu
-              </a>
-            </li>
-          </ul>
         </div>
 
       </div>
@@ -83,6 +56,64 @@
     <div id="template-offline" class="alert alert-warning text-center" style="display:none; margin-bottom:0; border-radius:0;">
         <span class="glyphicon glyphicon-signal"></span> <span data-translation="offline">You are offline</span>
     </div>
+
+    <!-- Game Sidebar (in-game navigation + character HUD) -->
+    <div id="game-sidebar">
+
+      <!-- Character HUD -->
+      <div class="sidebar-section sidebar-hud">
+        <img src="images/logo-white-bg-40.png" class="sidebar-portrait" alt="Player" id="sidebar-portrait" />
+        <div class="sidebar-kai-name" id="sidebar-kaiName">-</div>
+        <div class="sidebar-rank" id="sidebar-rank">-</div>
+
+        <div class="sidebar-stat">
+          <div class="sidebar-stat-label">
+            <span class="glyphicon glyphicon-flash"></span> Combat
+          </div>
+          <div class="progress">
+            <div class="progress-bar" id="sidebar-combat-bar" style="width: 0%"></div>
+          </div>
+          <span class="sidebar-stat-value" id="sidebar-combat-value">-</span>
+        </div>
+
+        <div class="sidebar-stat">
+          <div class="sidebar-stat-label">
+            <span class="glyphicon glyphicon-heart"></span> Endurance
+          </div>
+          <div class="progress">
+            <div class="progress-bar" id="sidebar-endurance-bar" style="width: 0%"></div>
+          </div>
+          <span class="sidebar-stat-value" id="sidebar-endurance-value">-</span>
+        </div>
+      </div>
+
+      <!-- Primary navigation -->
+      <nav class="sidebar-nav">
+        <a href="#game" class="sidebar-nav-item" id="sidebar-book">
+          <span class="glyphicon glyphicon-book"></span> <span data-translation="book">Book</span>
+        </a>
+        <a href="#actionChart" class="sidebar-nav-item" id="sidebar-actionChart">
+          <span class="glyphicon glyphicon-stats"></span> <span data-translation="actionChart">Stats</span>
+        </a>
+        <a href="#map" class="sidebar-nav-item" id="sidebar-map">
+          <span class="glyphicon glyphicon-globe"></span> <span data-translation="map">Map</span>
+        </a>
+        <a href="#combatTables" class="sidebar-nav-item" id="sidebar-combatTables">
+          <span class="glyphicon glyphicon-list-alt"></span> <span data-translation="combatTables">Tables</span>
+        </a>
+      </nav>
+
+      <!-- Secondary navigation -->
+      <nav class="sidebar-nav sidebar-nav-secondary">
+        <a href="#settings" class="sidebar-nav-item" id="sidebar-settings">
+          <span class="glyphicon glyphicon-cog"></span> <span data-translation="settings">Settings</span>
+        </a>
+        <a href="#mainMenu" class="sidebar-nav-item" id="sidebar-mainMenu">
+          <span class="glyphicon glyphicon-home"></span> <span data-translation="mainMenu">Main Menu</span>
+        </a>
+      </nav>
+
+    </div><!-- /#game-sidebar -->
 
     <div class="container" id="template-container">
 
@@ -95,6 +126,14 @@
       </div>
 
     </div><!-- /.container -->
+
+    <!-- Unified App Footer -->
+    <div class="app-footer" id="app-footer">
+      <span id="app-footer-content"></span>
+      <span class="footer-theme-toggle" id="footer-themeToggle" title="Toggle dark mode">
+        <span class="glyphicon glyphicon-adjust"></span>
+      </span>
+    </div>
 
     <!-- Reusable Alert Modal -->
     <div class="modal fade" id="template-alertModal" tabindex="-1" role="dialog" aria-labelledby="template-alertTitle">
@@ -193,43 +232,6 @@
         </div>
         
       </div>
-    </div>
-
-    <!-- Modal to see combat tables -->
-    <div class="modal fade" id="template-combatTables" tabindex="-1" role="dialog" 
-        aria-labelledby="template-ctTitle">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title" id="template-ctTitle" data-translation="combatTables">
-                        Combat Tables
-                    </h4>
-                </div>
-
-                <div class="modal-body">
-                    <div class="illustration">
-                        <img src="" 
-                            alt="Combat table" id="template-ctimage0" />
-                    </div>
-                    <div class="illustration">
-                        <img src="" 
-                            alt="Combat table" id="template-ctimage1" />
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal"
-                      data-translation="close">
-                        Close
-                    </button>
-                </div>
-            </div>
-        
-        </div>
     </div>
 
     <!-- Manual random table -->

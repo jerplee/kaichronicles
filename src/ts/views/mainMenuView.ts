@@ -1,4 +1,4 @@
-import { translations, routing, settingsController, loadGameController, template, SLOT_KEYS } from "..";
+import { translations, settingsController, loadGameController, template, SLOT_KEYS, projectAon, Book, BookSeriesId } from "..";
 import { SaveSlotRecord } from "../model/saveGameDb";
 
 export const mainMenuView = {
@@ -9,14 +9,39 @@ export const mainMenuView = {
     setup() {
         document.title = translations.text("kaiChronicles");
 
-        $("#menu-faq").on("click", (e) => {
-            e.preventDefault();
-            routing.redirect("faq");
+        // Populate New Game modal book selector
+        const $bookSelect = $("#menu-newGameBook");
+        let html = "";
+        let series: BookSeriesId|null = null;
+        for (let i = 1; i <= projectAon.supportedBooks.length; i++) {
+            const seriesId = new Book(i).getBookSeries().id;
+            if (seriesId !== series) {
+                html += '<optgroup label="' + translations.text(BookSeriesId[seriesId]) + '"></optgroup>';
+                series = seriesId;
+            }
+            const title = projectAon.getBookTitle(i);
+            html += '<option value="' + i.toFixed() + '">' + i.toFixed() + ". " + title + "</option>";
+        }
+        $bookSelect.html(html);
+
+        // Populate hero images and pick one at random to show
+        const heroBooks = [1, 6, 13, 21];
+        $(".menu-hero-img").each((index, img) => {
+            const book = new Book(heroBooks[index]);
+            const cover = book.getCoverURL();
+            if (cover) {
+                $(img).attr("src", cover).on("error", function() {
+                    $(this).hide();
+                });
+            } else {
+                $(img).hide();
+            }
         });
-        $("#menu-privacy").on("click", (e) => {
-            e.preventDefault();
-            routing.redirect("privacy");
-        });
+        // Pick a single random image to display
+        const $heroImages = $(".menu-hero-img");
+        $heroImages.removeClass("active");
+        const randomIndex = Math.floor(Math.random() * $heroImages.length);
+        $heroImages.eq(randomIndex).addClass("active");
     },
 
     /**
@@ -127,7 +152,7 @@ export const mainMenuView = {
             const id = $(this).closest(".save-slot-card").data("id");
             const name = $(this).closest(".save-slot-card").find(".save-slot-name").text();
             template.showConfirm(
-                (translations.text("deleteSaveConfirm") || "Delete save?") + " " + name,
+                translations.text("deleteSaveConfirm", [name]),
                 (confirmed) => {
                     if (confirmed) {
                         settingsController.deleteSlot(id);

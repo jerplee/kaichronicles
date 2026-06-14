@@ -24,6 +24,11 @@ export enum TextSize {
     Large
 }
 
+export enum Font {
+    SansSerif,
+    Serif
+}
+
 /**
  * The application state.
  */
@@ -72,6 +77,12 @@ export class State {
     public textSize = TextSize.Normal;
 
     /**
+     * Font family ( 'sansSerif' or 'serif' ).
+     * This is stored at localStorage['font'], not with the game state
+     */
+    public font = Font.SansSerif;
+
+    /**
      * Debounce timer for IndexedDB auto-save writes.
      */
     private saveDebounceTimer: number | null = null;
@@ -111,6 +122,21 @@ export class State {
             }
         } catch (e) {
             this.textSize = TextSize.Normal;
+            mechanicsEngine.debugWarning(e);
+        }
+    }
+
+    /**
+     * Setup the default font or persist from local storage
+     */
+    public setupDefaultFont() {
+        try {
+            this.font = Font[localStorage.getItem("font")];
+            if (this.font === undefined) {
+                this.font = Font.SansSerif;
+            }
+        } catch (e) {
+            this.font = Font.SansSerif;
             mechanicsEngine.debugWarning(e);
         }
     }
@@ -380,6 +406,15 @@ export class State {
     public updateTextSize(textSize: TextSize) {
         this.textSize = textSize;
         localStorage.setItem("textSize", TextSize[this.textSize]);
+    }
+
+    /**
+     * Update state to change the font family
+     * @param font 'sansSerif' or 'serif'
+     */
+    public updateFont(font: Font) {
+        this.font = font;
+        localStorage.setItem("font", Font[this.font]);
     }
 
     /**

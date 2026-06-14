@@ -15,7 +15,7 @@ export const aboutController = {
         }
 
         document.title = translations.text( "about" );
-        views.loadView("about.html")
+        views.loadPage("about.html", "book")
         .then(() => {
 
             // Get all metadata about the book:

@@ -1,4 +1,4 @@
-import { setupController, translations, views, settingsView, state, template, mechanicsEngine, Color, TextSize, saveGameDb, routing, mainMenuController, SAVEGAME_EXTENSION, MAX_SAVE_NAME_LENGTH } from "..";
+import { setupController, translations, views, settingsView, state, template, mechanicsEngine, Color, TextSize, Font, saveGameDb, routing, mainMenuController, SAVEGAME_EXTENSION, MAX_SAVE_NAME_LENGTH } from "..";
 import { saveSlotsView } from "../views/saveSlotsView";
 import { mainMenuView } from "../views/mainMenuView";
 
@@ -15,7 +15,7 @@ export const settingsController = {
 
         document.title = translations.text("settings");
 
-        views.loadView("settings.html")
+        views.loadPage("settings.html", "book")
         .then(() => {
             settingsView.setup();
         }, null);
@@ -31,11 +31,19 @@ export const settingsController = {
     },
 
     /**
-     * Change the current color theme
-     * @param color 'light' or 'dark'
+     * Change the current text size
+     * @param textSize 'normal' or 'large'
      */
     changeTextSize(textSize: TextSize): void {
         template.changeTextSize( textSize );
+    },
+
+    /**
+     * Change the current font family
+     * @param font 'sansSerif' or 'serif'
+     */
+    changeFont(font: Font): void {
+        template.changeFont( font );
     },
 
     /**

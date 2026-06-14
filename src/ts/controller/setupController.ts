@@ -32,7 +32,7 @@ export const setupController = {
         }
         template.translateMainMenu();
 
-        return views.loadView("setup.html")
+        return views.loadPage("setup.html", "app")
             .then(() => { setupController.runDownloads(); });
 
     },

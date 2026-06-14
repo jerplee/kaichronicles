@@ -328,7 +328,7 @@ export class GameDriver {
     }
 
     public async goToActionChart() {
-        const link = await this.getElementById("template-actionChart");
+        const link = await this.getElementById("sidebar-actionChart");
         await link.click();
         await this.waitForSectionReady();
     }

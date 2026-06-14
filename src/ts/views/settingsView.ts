@@ -1,4 +1,4 @@
-import { state, settingsController, translations, setupController, routing, Color, TextSize, template } from "..";
+import { state, settingsController, translations, setupController, routing, Color, TextSize, Font, template } from "..";
 
 /**
  * Settings view
@@ -29,6 +29,12 @@ export const settingsView = {
         $("#settings-textsize").val(TextSize[state.textSize]);
         $("#settings-textsize").on("change", function() {
             settingsController.changeTextSize(TextSize[<string> $(this).val()]);
+        });
+
+        // Font Family
+        $("#settings-font").val(Font[state.font]);
+        $("#settings-font").on("change", function() {
+            settingsController.changeFont(Font[<string> $(this).val()]);
         });
 
         // Restart book

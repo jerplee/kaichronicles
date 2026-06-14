@@ -14,7 +14,7 @@ export const actionChartController = {
             return;
         }
 
-        void views.loadView("actionChart.html")
+        void views.loadPage("actionChart.html", "book")
             .then(() => {
                 actionChartView.fill(state.actionChart);
                 template.addSectionReadyMarker();

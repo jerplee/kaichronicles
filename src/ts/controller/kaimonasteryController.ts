@@ -26,7 +26,7 @@ export class kaimonasteryController {
             return;
         }
 
-        views.loadView("kaimonastery.html")
+        views.loadPage("kaimonastery.html", "book")
         .then( () => {
             // Go back to the equipment section
             $("#monastery-goback").on("click", (e: JQuery.Event) => {

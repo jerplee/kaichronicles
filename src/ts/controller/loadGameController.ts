@@ -14,7 +14,7 @@ export class loadGameController {
         template.setNavTitle( translations.text("kaiChronicles"), "#mainMenu", true);
         template.showStatistics(false);
         template.showKaiName(false);
-        views.loadView("loadGame.html").then(() => {
+        views.loadPage("loadGame.html", "app").then(() => {
             // Prune excess autosaves, then render
             loadGameController.refreshSlots();
             // Web page environment:

@@ -12,7 +12,7 @@ export const mainMenuController = {
         template.setNavTitle( translations.text("kaiChronicles") , "#mainMenu", true);
         template.showStatistics(false);
         template.showKaiName(false);
-        views.loadView("mainMenu.html").then(() => {
+        views.loadPage("mainMenu.html", "app").then(() => {
             mainMenuView.setup();
             this.bindModalEvents();
             this.bindUploadEvents();
@@ -49,7 +49,8 @@ export const mainMenuController = {
             e.preventDefault();
             const name = $("#menu-newGameName").val() as string;
             const slotNum = $("#menu-newGameSlot").val() as string;
-            if (!name || !name.trim()) {
+            const bookNumber = parseInt($("#menu-newGameBook").val() as string, 10);
+            if (!name || !name.trim() || !bookNumber) {
                 return;
             }
             $("#menu-newGameModal").modal("hide");
@@ -60,13 +61,13 @@ export const mainMenuController = {
             state.activeSlotKey = "slot-" + slotNum;
             console.log("[DEBUG] Starting new game in slot:", state.activeSlotKey);
 
-            // Start new game (default book 1) with the chosen name
+            // Start new game with the chosen name and book
             state.reset(true);
-            state.setup(1, false);
+            state.setup(bookNumber, false);
             state.actionChart.kaiName = name.trim();
             state.persistState();
 
-            routing.redirect("setup", { bookNumber: 1 });
+            routing.redirect("setup", { bookNumber });
         });
     },
 

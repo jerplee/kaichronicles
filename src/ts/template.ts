@@ -1,4 +1,4 @@
-import { routing, state, Item, translations, randomTable, mechanicsEngine, App, DebugMode, Color, TextSize, BookSeriesId, KaiDiscipline, MgnDiscipline, GndDiscipline, NewOrderDiscipline, settingsController, ModalIds } from ".";
+import { routing, state, Item, translations, randomTable, mechanicsEngine, App, DebugMode, Color, TextSize, Font, BookSeriesId, KaiDiscipline, MgnDiscipline, GndDiscipline, NewOrderDiscipline, settingsController, ModalIds } from ".";
 
 /**
  * The HTML template API
@@ -45,87 +45,86 @@ export const template = {
     },
 
     /**
-     * Setup navigation bar
+     * Setup navigation bar, sidebar, and footer
      */
     setup() {
 
-        // Hide the bootstrap menu when some menu option is clicked, or when
-        // the content is clicked
-        $("#template-header a, #template-container").on("click", () => {
-            template.collapseMenu();
+        // Close sidebar when clicking outside of it (on the content area)
+        $("#template-container").on("click", () => {
+            template.closeSidebar();
         });
-        $("#template-statistics").on("click", () => {
-            routing.redirect("actionChart");
-        });
-        $("#template-combatTablesLink").on("click", (e) => {
+
+        // Sidebar hamburger toggle (mobile)
+        $("#template-menubutton").on("click", (e) => {
             e.preventDefault();
-            template.showCombatTables();
+            e.stopPropagation();
+            $("#game-sidebar").toggleClass("open");
         });
+
+        // Footer theme toggle
+        $("#footer-themeToggle").on("click", (e) => {
+            e.preventDefault();
+            settingsController.changeColorTheme(state.color === Color.Light ? Color.Dark : Color.Light);
+        });
+
+        // Sidebar nav items: close mobile drawer after click
+        $("#game-sidebar a").on("click", () => {
+            $("#game-sidebar").removeClass("open");
+        });
+
         template.updateStatistics(true);
         template.translateMainMenu();
         template.changeColorTheme(state.color);
         template.changeTextSize(state.textSize);
-
-        // Navbar theme toggle
-        $("#template-themeToggle").on("click", (e) => {
-            e.preventDefault();
-            settingsController.changeColorTheme(state.color === Color.Light ? Color.Dark : Color.Light);
-        });
+        template.changeFont(state.font);
     },
 
     /**
-     * Show / hide statistics on navigation bar
+     * Show / hide the in-game sidebar and footer
      */
     showStatistics(show: boolean) {
+        template.showSidebar(show);
         if ( show ) {
-            $("#navbar-content").show();
             $("#template-menubutton").removeClass( "hideImportant" );
             template.updateStatistics();
         } else {
-            $("#navbar-content").hide();
-            $("#template-statistics").hide();
             $("#template-menubutton").addClass( "hideImportant" );
         }
     },
 
     /**
-     * Show / hide Kai Name on navigation bar
+     * Show / hide Kai Name in sidebar
      */
     showKaiName(show: boolean) {
         if ( show ) {
             template.updateKaiName();
         } else {
-            $("#template-kaiName").hide();
+            $("#sidebar-kaiName").hide();
         }
     },
 
     /**
-     * Update player statistics
+     * Update player statistics in sidebar
      */
     updateStatistics(doNotAnimate: boolean = false) {
 
-        // Update statistics
         if ( !state.actionChart ||
             ( state.actionChart.combatSkill === 0 && state.actionChart.endurance === 0 ) ) {
-            $("#template-statistics").hide();
-            $("#template-map").hide();
-        } else {
-            $("#template-statistics").show();
-            $("#template-combatSkill").text( state.actionChart.getCurrentCombatSkill() );
-            template.animateValueChange( $("#template-endurance") ,
-            state.actionChart.currentEndurance , doNotAnimate ,
-            state.actionChart.currentEndurance > 0 ? null : "red" );
-
-            // Update map link
-            if ( state.actionChart.hasObject("map") ) {
-                $("#template-map").show();
-            } else {
-                $("#template-map").hide();
-            }
-
-            // Update hunting indicator
-            template.updateHuntingIndicator();
+            // Nothing to update
+            return;
         }
+
+        template.updateSidebarStats();
+
+        // Update map link visibility in sidebar
+        if ( state.actionChart.hasObject("map") ) {
+            $("#sidebar-map").show();
+        } else {
+            $("#sidebar-map").hide();
+        }
+
+        // Update hunting indicator
+        template.updateHuntingIndicator();
     },
 
     /**
@@ -176,16 +175,142 @@ export const template = {
     },
 
     /**
-     * Update Kai Name
+     * Update Kai Name in sidebar
      */
     updateKaiName(doNotAnimate: boolean = false) {
-        // Update Kai name
-        if ( !state.actionChart ||
-            ( state.actionChart.kaiName === "" ) ) {
-            $("#template-kaiName").hide();
+        if ( !state.actionChart || state.actionChart.kaiName === "" ) {
+            $("#sidebar-kaiName").hide();
         } else {
-            $("#template-kaiName").show();
-            $("#template-kaiName").text( state.actionChart.kaiName );
+            $("#sidebar-kaiName").show();
+            $("#sidebar-kaiName").text( state.actionChart.kaiName );
+        }
+    },
+
+    /**
+     * Render a page view wrapped in the shared .page-card layout
+     */
+    renderPage(viewHtml: any, options: { card?: boolean; footer?: "book" | "app" | null } = {}) {
+        const card = options.card !== false; // default true
+        const footer = options.footer ?? null;
+
+        if (card) {
+            // viewHtml may be a jQuery object from translateView
+            const $card = $('<div class="page-card"></div>');
+            $card.append(viewHtml);
+            template.setViewContent($card);
+        } else {
+            template.setViewContent(viewHtml);
+        }
+
+        template.updateFooter(footer);
+        template.showSidebar(footer === "book");
+        template.updateSidebarActive();
+    },
+
+    /**
+     * Update the unified app footer content
+     */
+    updateFooter(type: "book" | "app" | null = null) {
+        const $footer = $("#app-footer");
+        const $content = $("#app-footer-content");
+
+        if (!type) {
+            $footer.hide();
+            return;
+        }
+
+        $footer.show();
+
+        if (type === "book" && state.book) {
+            const copyrightHtml = state.book.getCopyrightHtml().replace(/<br\s*\/?>/gi, "  -  ");
+            $content.html(" - " + state.book.getBookTitle() + " - " + copyrightHtml);
+        } else {
+            $content.html('<a href="#aboutApp">About / FAQ / Privacy</a> — <a href="https://github.com/jerplee/kaichronicles" target="_blank">GitHub</a> — <a href="https://www.projectaon.org" target="_blank">Project Aon</a>');
+        }
+    },
+
+    /**
+     * Show / hide the game sidebar
+     */
+    showSidebar(show: boolean) {
+        if (show) {
+            $("body").addClass("sidebar-visible");
+        } else {
+            $("body").removeClass("sidebar-visible");
+            $("#game-sidebar").removeClass("open");
+        }
+    },
+
+    /**
+     * Close the mobile sidebar drawer
+     */
+    closeSidebar() {
+        $("#game-sidebar").removeClass("open");
+    },
+
+    /**
+     * Update sidebar character stats (combat, endurance, rank)
+     */
+    updateSidebarStats() {
+        if (!state.actionChart) {
+            return;
+        }
+
+        const cs = state.actionChart.getCurrentCombatSkill();
+        const currentEp = state.actionChart.currentEndurance;
+        const maxEp = state.actionChart.endurance;
+
+        // Combat bar (assume max ~30 for percentage)
+        const csPercent = Math.min(100, Math.max(0, (cs / 30) * 100));
+        $("#sidebar-combat-bar").css("width", csPercent + "%");
+        $("#sidebar-combat-value").text(cs.toString());
+
+        // Endurance bar
+        const epPercent = maxEp > 0 ? (currentEp / maxEp) * 100 : 0;
+        const $epBar = $("#sidebar-endurance-bar");
+        $epBar.css("width", epPercent + "%");
+        $("#sidebar-endurance-value").text(currentEp + " / " + maxEp);
+
+        // Color endurance bar red when low
+        if (currentEp <= 3) {
+            $epBar.removeClass("progress-bar-success progress-bar-info").addClass("progress-bar-danger");
+        } else if (currentEp <= maxEp * 0.3) {
+            $epBar.removeClass("progress-bar-success progress-bar-danger").addClass("progress-bar-warning");
+        } else {
+            $epBar.removeClass("progress-bar-warning progress-bar-danger").addClass("progress-bar-success");
+        }
+
+        // Rank
+        $("#sidebar-rank").text(template.getRankString());
+    },
+
+    /**
+     * Return the current player rank string based on book series
+     */
+    getRankString(): string {
+        if (!state.book || !state.actionChart) {
+            return "-";
+        }
+        const series = state.book.getBookSeries();
+        const names = ["Kai", "Magnakai", "Grand Master", "New Order"];
+        return names[series.id] || "-";
+    },
+
+    /**
+     * Highlight the active route in the sidebar
+     */
+    updateSidebarActive() {
+        $("#game-sidebar .sidebar-nav-item").removeClass("active");
+        const hash = routing.normalizeHash(location.hash);
+        const $active = $('#game-sidebar a[href="#' + hash + '"]');
+        $active.addClass("active");
+
+        // Update "Book" label to "Resume Book" when not on game
+        const $bookLink = $("#sidebar-book");
+        if (hash !== "game" && state.book) {
+            $bookLink.html('<span class="glyphicon glyphicon-book"></span> <span data-translation="resumeBook">Resume Book</span>');
+        } else {
+            $bookLink.html('<span class="glyphicon glyphicon-book"></span> <span data-translation="book">Book</span>');
         }
     },
 
@@ -197,9 +322,12 @@ export const template = {
     },
 
     /**
-     * Collapse the template menu
+     * Collapse the template menu and close sidebar
      */
-    collapseMenu() { $("#navbar").collapse("hide"); },
+    collapseMenu() {
+        $("#navbar").collapse("hide");
+        template.closeSidebar();
+    },
 
     /**
      * Show an HTML view
@@ -292,20 +420,10 @@ export const template = {
     },
 
     /**
-     * Show the dialog with the combat tables
+     * @deprecated Combat tables are now a route. Kept for backward compat.
      */
     showCombatTables() {
-        // Translate the dialog
-        translations.translateTags( $("#template-combatTables") );
-
-        // Hide toasts
-        toastr.clear();
-
-        // Set the translated images
-        const combatTablesUrls = state.book.getCombatTablesImagesUrls();
-        $("#template-ctimage0").attr("src", combatTablesUrls[0]);
-        $("#template-ctimage1").attr("src", combatTablesUrls[1]);
-        $("#template-combatTables").modal("show");
+        routing.redirect("combatTables");
     },
 
     /**
@@ -386,6 +504,23 @@ export const template = {
             default:
                 // we will default to "normal" text size, or no class
                 $("body").removeClass("largeText");
+                break;
+        }
+    },
+
+    /**
+     * Change the font family of the templates
+     * @param font 'sansSerif' or 'serif'
+     */
+    changeFont(font: Font) {
+        state.updateFont( font );
+
+        switch (font) {
+            case Font.Serif:
+                $("body").addClass("font-serif").removeClass("font-sans");
+                break;
+            default:
+                $("body").addClass("font-sans").removeClass("font-serif");
                 break;
         }
     },

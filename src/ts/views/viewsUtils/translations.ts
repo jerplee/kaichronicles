@@ -196,6 +196,7 @@ export class Translations {
         "restartBookSection1" : "Restart book {0} from section 1",
         "confirmRestart" : "Are you sure you want to restart the book?\r\nYou will restart with the Action Chart from the previous book.",
         "confirmRestartSection1" : "Are you sure you want to restart the book?\r\nYou will restart from the section 1.",
+        "deleteSaveConfirm" : 'Confirm delete of save "{0}"?',
         "close" : "Close",
 
         //////////////////////////////////////

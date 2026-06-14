@@ -15,7 +15,7 @@ export const gameRulesController = {
         }
 
         document.title = translations.text("gameRules");
-        views.loadView("gameRules.html")
+        views.loadPage("gameRules.html", "book")
         .then(() => {
 
             // Push game rules sections:

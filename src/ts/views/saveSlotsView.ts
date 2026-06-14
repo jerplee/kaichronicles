@@ -91,7 +91,7 @@ export const saveSlotsView = {
             const id = $(this).closest(".save-slot-card").data("id");
             const name = $(this).closest(".save-slot-card").find(".save-slot-name").text();
             template.showConfirm(
-                translations.text("deleteSaveConfirm") + " " + name || "Delete save? " + name,
+                translations.text("deleteSaveConfirm", [name]),
                 (confirmed) => {
                     if (confirmed) {
                         settingsController.deleteSlot(id);

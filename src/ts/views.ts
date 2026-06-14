@@ -77,6 +77,39 @@ export const views = {
     },
 
     /**
+     * Load a view wrapped in the shared .page-card layout
+     * @param viewPath The view path, relative to the "views" folder
+     * @param footer Footer type: 'book', 'app', or null
+     * @returns a jQuery deferred object
+     */
+    loadPage(viewPath: string, footer: "book" | "app" | null = null) {
+
+        if ( views.viewCache[viewPath] ) {
+            template.renderPage( translations.translateView(views.viewCache[viewPath]), { footer } );
+            const dfd = jQuery.Deferred();
+            void dfd.resolve();
+            return dfd.promise();
+        }
+
+        template.setViewContent('<img src="images/ajax-loader.gif" alt="Loading image" /> Loading view...');
+
+        return $.ajax({
+            dataType: "html",
+            url: "views/" + viewPath
+        })
+        .done( (data: HTMLElement) => {
+            views.viewCache[viewPath] = data;
+            template.renderPage( translations.translateView(data), { footer } );
+        })
+        .fail(function( jqXHR, textStatus, errorThrown ) {
+            const msg = "Error loading view " + viewPath + ", error: " +
+                ajaxErrorMsg(this, jqXHR, textStatus, errorThrown);
+            template.setErrorMessage( msg );
+            template.showAlert( msg );
+        });
+    },
+
+    /**
      * Returns a cached view. null if the view was not already loaded
      */
     getCachedView(viewPath: string): HTMLElement {

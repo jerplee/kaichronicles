@@ -90,6 +90,7 @@ export class App {
                     // Then do the real application setup
                     state.setupDefaultColorTheme();
                     state.setupDefaultTextSize();
+                    state.setupDefaultFont();
                     template.setup();
                     routing.setup();
 

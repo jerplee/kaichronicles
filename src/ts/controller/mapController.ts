@@ -20,7 +20,7 @@ export const mapController = {
             return;
         }
 
-        views.loadView("map.html")
+        views.loadPage("map.html", "book")
         .then(() => {
             if ( state.book.bookNumber === 11 ) {
                 // Special case

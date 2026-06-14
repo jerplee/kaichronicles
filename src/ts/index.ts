@@ -23,6 +23,7 @@ export * from "./controller/printActionChartController";
 export * from "./controller/aboutController";
 export * from "./controller/faqController";
 export * from "./controller/mapController";
+export * from "./controller/aboutAppController";
 export * from "./controller/projectAonLicenseController";
 export * from "./controller/setupController";
 export * from "./controller/newGameController";
@@ -56,6 +57,7 @@ export * from "./controller/mechanics/grandMasterUpgrade";
 export * from "./controller/mechanics/specialObjectsUse";
 export * from "./controller/kaimonasteryController";
 export * from "./controller/gameRulesController";
+export * from "./controller/combatTablesController";
 
 export * from "./views/setupView";
 export * from "./views/newGameView";

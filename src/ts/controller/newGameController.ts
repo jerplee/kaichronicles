@@ -17,7 +17,7 @@ export const newGameController = {
         
         state.manualRandomTable = state.actionChart && state.actionChart.manualRandomTable;
 
-        views.loadView("newGame.html")
+        views.loadPage("newGame.html", "app")
         .then(() => {
             newGameView.setup();
         }, null);

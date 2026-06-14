@@ -1,33 +1,23 @@
 <div id="main-menu">
-    <div class="menu-card">
-        <div class="menu-header">
+
+    <!-- Hero banner with a single random book cover -->
+    <div class="menu-hero">
+        <div class="menu-hero-carousel">
+            <img class="menu-hero-img active" src="" alt="Book 1" />
+            <img class="menu-hero-img" src="" alt="Book 6" />
+            <img class="menu-hero-img" src="" alt="Book 13" />
+            <img class="menu-hero-img" src="" alt="Book 21" />
+        </div>
+        <div class="menu-hero-overlay">
             <h1 data-translation="kaiChronicles">Kai Chronicles</h1>
-            <p data-translation="appInfo">
-                Lone Wolf Game Books 1 to 29. Have Fun!
-            </p>
-        </div>
-
-        <div id="menu-saveSlotsSection">
-            <div id="menu-saveSlotsGrid" class="save-slots-grid menu-slots-grid">
-            </div>
-        </div>
-
-        <div class="menu-actions" id="menu-actions-default">
-            <button class="large-button" type="button" id="menu-faq">
-                <img src="images/game-icons/help.png" alt="FAQ" />
-                <span data-translation="faq">FAQ</span>
-            </button>
-            <button class="large-button" type="button" id="menu-privacy">
-                <img src="images/game-icons/info.png" alt="Privacy" />
-                <span data-translation="privacy">Privacy policy</span>
-            </button>
+            <p class="menu-hero-subtitle">Books 1–29</p>
         </div>
     </div>
 
-    <div id="menu-footer" class="menu-footer">
-        <span class="menu-footer-inner">Kai Chronicles v1.18 — <a href="https://www.projectaon.org" target="_blank">Project Aon</a> — <a href="https://github.com/jerplee/kaichronicles" target="_blank">GitHub</a></span>
+    <div id="menu-saveSlotsSection">
+        <div id="menu-saveSlotsGrid" class="save-slots-grid menu-slots-grid">
+        </div>
     </div>
-
 </div>
 
 <!-- Hidden file inputs for slot upload -->
@@ -48,6 +38,12 @@
                     <div class="form-group">
                         <label for="menu-newGameName" data-translation="enterKaiName">Enter your Kai name:</label>
                         <input type="text" class="form-control" id="menu-newGameName" required maxlength="30" />
+                    </div>
+                    <div class="form-group">
+                        <label for="menu-newGameBook" data-translation="book">Book</label>
+                        <select class="form-control" id="menu-newGameBook">
+                            <!-- populated by JS -->
+                        </select>
                     </div>
                     <input type="hidden" id="menu-newGameSlot" />
                 </form>

@@ -45,6 +45,8 @@ export const gameController = {
         template.showStatistics(true);
         template.showKaiName(state.actionChart.kaiName !== "");
         template.setNavTitle(state.book.getBookTitle(), "#game", false);
+        template.updateFooter("book");
+        template.showSidebar(true);
     },
 
     /**
