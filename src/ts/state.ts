@@ -122,7 +122,7 @@ export class State {
     public setupDefaultColorTheme() {
         try {
             const savedColor = localStorage.getItem("color");
-            if (savedColor) {
+            if (savedColor && Color[savedColor] !== undefined) {
                 this.color = Color[savedColor];
             } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
                 this.color = Color.Dark;
