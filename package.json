@@ -18,6 +18,7 @@
         "@types/webpack-env": "^1.18.5",
         "@typescript-eslint/eslint-plugin": "^8.3.0",
         "@typescript-eslint/parser": "^8.3.0",
+        "baseline-browser-mapping": "^2.10.37",
         "dompurify": "^3.1.7",
         "eslint": "^9.9.1",
         "fs-extra": "^10.1.0",
@@ -40,6 +41,9 @@
         "webpack-dev-server": "^5.0.4",
         "workbox-webpack-plugin": "^7.1.0",
         "workbox-window": "^7.1.0"
+    },
+    "overrides": {
+        "uuid": "^11.1.1"
     },
     "scripts": {
         "predownloaddata": "tsc src/ts/scripts/downloadProjectAonData.ts --lib es5 --target es5 --outdir src/js",
