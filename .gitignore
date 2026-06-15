@@ -38,3 +38,7 @@ validation-output.txt
 validation-output2.txt
 validation-results.txt
 validation-report.json
+
+# GitHub Actions — upstream workflow is broken and deploys to their infra
+.github/workflows/
+

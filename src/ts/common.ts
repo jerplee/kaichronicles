@@ -133,6 +133,9 @@ export function declareCommonHelpers(declareJqueryPlugins: boolean = true) {
  * @returns {String} The error message for an AJAX error
  */
 export function ajaxErrorMsg(context, jqXHR:JQueryXHR, textStatus:string, errorThrown:string) {
+    if (jqXHR.status === 0) {
+        return context.url + " failed: Server unreachable. Is the dev server running? (Status: " + textStatus + ")";
+    }
     if ( !errorThrown ) {
         errorThrown = "Unknown error (Cross domain error?)";
     }
