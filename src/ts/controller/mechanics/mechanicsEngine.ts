@@ -95,6 +95,13 @@ export const mechanicsEngine = {
     /************************************************************/
 
     /**
+     * Check if an exception is the intentional section-jump control-flow signal.
+     */
+    isGotoException(e: any): boolean {
+        return typeof e === "string" && e.indexOf("rules execution interrupted") >= 0;
+    },
+
+    /**
      * Run the game mechanics of a section.
      * It updates the gameView, binds events, etc.
      * @param section The current game Section
@@ -123,7 +130,14 @@ export const mechanicsEngine = {
         mechanicsEngine.healingDiscipline();
 
         // Get and run section rules
-        mechanicsEngine.runSectionRules();
+        try {
+            mechanicsEngine.runSectionRules();
+        } catch (e) {
+            if (mechanicsEngine.isGotoException(e)) {
+                return; // Section changed, stop processing this section
+            }
+            throw e;
+        }
 
         // Render available / to sell objects on this section
         mechanicsEngine.fireInventoryEvents();
@@ -171,11 +185,25 @@ export const mechanicsEngine = {
                     }
                 });
             }
-            mechanicsEngine.runChildRules($sectionMechanics);
+            try {
+                mechanicsEngine.runChildRules($sectionMechanics);
+            } catch (e) {
+                if (mechanicsEngine.isGotoException(e)) {
+                    return; // Section changed, stop processing
+                }
+                throw e;
+            }
         }
 
         // Run global rules
-        mechanicsEngine.runGlobalRules();
+        try {
+            mechanicsEngine.runGlobalRules();
+        } catch (e) {
+            if (mechanicsEngine.isGotoException(e)) {
+                return; // Section changed, stop processing
+            }
+            throw e;
+        }
     },
 
     /**

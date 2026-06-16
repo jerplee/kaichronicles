@@ -130,7 +130,14 @@ export class MealMechanics {
             // Enable section choices, and re-execute section rules to disable not available
             // choices
             mechanicsEngine.setChoiceState("all", false);
-            mechanicsEngine.runSectionRules(true);
+            try {
+                mechanicsEngine.runSectionRules(true);
+            } catch (e) {
+                if (mechanicsEngine.isGotoException(e)) {
+                    return; // Section changed, stop processing
+                }
+                throw e;
+            }
 
             // Remove UI
             $(mealSelector).remove();

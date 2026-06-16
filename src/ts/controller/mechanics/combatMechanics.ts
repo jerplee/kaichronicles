@@ -359,13 +359,20 @@ export class CombatMechanics {
 
                 // Post combat rules execution:
                 const combatsResult = sectionState.areAllCombatsFinished(state.actionChart);
-                if ( combatsResult === "finished" && mechanicsEngine.onAfterCombatsRule ) {
-                    // Fire "afterCombats" rule
-                    mechanicsEngine.runChildRules( $(mechanicsEngine.onAfterCombatsRule) );
-                }
-                if ( combatsResult === "eluded" && mechanicsEngine.onEludeCombatsRule ) {
-                    // Fire "afterElude" rule
-                    mechanicsEngine.runChildRules( $(mechanicsEngine.onEludeCombatsRule) );
+                try {
+                    if ( combatsResult === "finished" && mechanicsEngine.onAfterCombatsRule ) {
+                        // Fire "afterCombats" rule
+                        mechanicsEngine.runChildRules( $(mechanicsEngine.onAfterCombatsRule) );
+                    }
+                    if ( combatsResult === "eluded" && mechanicsEngine.onEludeCombatsRule ) {
+                        // Fire "afterElude" rule
+                        mechanicsEngine.runChildRules( $(mechanicsEngine.onEludeCombatsRule) );
+                    }
+                } catch (e) {
+                    if (mechanicsEngine.isGotoException(e)) {
+                        return; // Section changed, stop processing
+                    }
+                    throw e;
                 }
 
                 if ( ( combatsResult === "finished" || combatsResult === "eluded" ) && combat.adganaUsed ) {
@@ -406,7 +413,12 @@ export class CombatMechanics {
 
             // For testing, add marker to notify to the test we are ready
             template.addSectionReadyMarker();
-        }, null);
+        }, null)
+        .fail((e) => {
+            if (!mechanicsEngine.isGotoException(e)) {
+                console.error("Combat turn error:", e);
+            }
+        });
 
     }
 

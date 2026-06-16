@@ -679,4 +679,130 @@ describe("Save Slot System", () => {
         expect(err.name).toBe("SaveDbError");
     });
 
+    test("debounced auto-save coalesces rapid persistState calls into one record", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        state.setup(1, false);
+        state.actionChart.kaiName = "DebounceTest";
+        state.activeSlotKey = SLOT_KEYS[0];
+        state.sectionStates.currentSection = "sect1";
+
+        // Fire persistState 5 times rapidly
+        for (let i = 0; i < 5; i++) {
+            state.persistState();
+        }
+
+        // Wait for the debounce window (500ms in scheduleIndexedDbSave) plus buffer
+        await new Promise((resolve) => setTimeout(resolve, 700));
+
+        const autoSaves = await (saveGameDb as any).getAutoSaves(SLOT_KEYS[0]);
+        expect(autoSaves.length).toBe(1);
+        expect(autoSaves[0].kaiName).toBe("DebounceTest");
+    });
+
+    test("restoreFromIndexedDb restores game state from auto-save", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        // Setup and save
+        state.setup(1, false);
+        state.actionChart.kaiName = "RestoreMe";
+        state.actionChart.combatSkill = 12;
+        state.actionChart.currentEndurance = 18;
+        state.sectionStates.currentSection = "sect42";
+        state.activeSlotKey = SLOT_KEYS[0];
+        state.persistState();
+
+        await new Promise((resolve) => setTimeout(resolve, 700));
+
+        // Reset state
+        state.setup(1, false);
+        expect(state.actionChart.kaiName).toBe("");
+
+        // Restore
+        const restored = await state.restoreFromIndexedDb();
+        expect(restored).toBe(true);
+        expect(state.actionChart.kaiName).toBe("RestoreMe");
+        expect(state.actionChart.combatSkill).toBe(12);
+        expect(state.actionChart.currentEndurance).toBe(18);
+        expect(state.sectionStates.currentSection).toBe("sect42");
+    });
+
+    test("restoreFromIndexedDb returns false when no auto-save exists", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        await saveGameDb.clearAll();
+        const restored = await state.restoreFromIndexedDb();
+        expect(restored).toBe(false);
+    });
+
+    test("auto-save record contains meaningful serialized state", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        state.setup(1, false);
+        state.actionChart.kaiName = "DeepState";
+        state.actionChart.combatSkill = 14;
+        state.actionChart.endurance = 25;
+        state.actionChart.currentEndurance = 20;
+        state.sectionStates.currentSection = "sect77";
+        state.activeSlotKey = SLOT_KEYS[0];
+        state.persistState();
+
+        await new Promise((resolve) => setTimeout(resolve, 700));
+
+        const autoSave = await saveGameDb.getAutoSave(SLOT_KEYS[0]);
+        expect(autoSave).toBeDefined();
+
+        const savedState = autoSave!.currentState as any;
+        expect(savedState).toBeDefined();
+        expect(savedState.bookNumber).toBe(1);
+        expect(savedState.actionChart).toBeDefined();
+        expect(savedState.actionChart.kaiName).toBe("DeepState");
+        expect(savedState.actionChart.combatSkill).toBe(14);
+        expect(savedState.sectionStates).toBeDefined();
+        expect(savedState.sectionStates.currentSection).toBe("sect77");
+    });
+
+    test("auto-save with null activeSlotKey uses empty parentSlotKey", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        state.setup(1, false);
+        state.actionChart.kaiName = "OrphanAuto";
+        state.activeSlotKey = null;
+        state.sectionStates.currentSection = "sect1";
+        state.persistState();
+
+        await new Promise((resolve) => setTimeout(resolve, 700));
+
+        // Should still create an auto-save but with empty parentSlotKey
+        const allAutos = await (saveGameDb as any).getAutoSaves();
+        const orphan = allAutos.find((a: SaveSlotRecord) => a.kaiName === "OrphanAuto");
+        expect(orphan).toBeDefined();
+        expect(orphan.parentSlotKey).toBe("");
+    });
+
+    test("getSlotByKey returns undefined for missing key", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        const slot = await saveGameDb.getSlotByKey("nonexistent-slot-key");
+        expect(slot).toBeUndefined();
+    });
+
 });

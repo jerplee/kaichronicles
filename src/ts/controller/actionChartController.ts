@@ -366,7 +366,14 @@ export const actionChartController = {
         }
 
         // Fire mechanics rules
-        mechanicsEngine.fireObjectUsed(objectId);
+        try {
+            mechanicsEngine.fireObjectUsed(objectId);
+        } catch (e) {
+            if (mechanicsEngine.isGotoException(e)) {
+                return; // Section changed, stop processing
+            }
+            throw e;
+        }
     },
 
     /**

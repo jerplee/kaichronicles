@@ -70,7 +70,14 @@ export const gameController = {
 
         // Fire choice events:
         if (choiceLinkClicked) {
-            mechanicsEngine.fireChoiceSelected(sectionId);
+            try {
+                mechanicsEngine.fireChoiceSelected(sectionId);
+            } catch (e) {
+                if (mechanicsEngine.isGotoException(e)) {
+                    return; // Section changed by choice event, stop processing
+                }
+                throw e;
+            }
         }
 
         // Store the current section id (must to be done BEFORE execute mechanicsEngine.run,
@@ -84,7 +91,14 @@ export const gameController = {
         gameView.updateNavigation(gameController.currentSection);
 
         // Run section mechanics
-        mechanicsEngine.run(gameController.currentSection);
+        try {
+            mechanicsEngine.run(gameController.currentSection);
+        } catch (e) {
+            if (mechanicsEngine.isGotoException(e)) {
+                return; // Section changed during rule execution, stop processing
+            }
+            throw e;
+        }
 
         // Bind choice links
         gameView.bindChoiceLinks();
