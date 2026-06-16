@@ -250,20 +250,18 @@ export class ActionChart {
     }
 
     /**
-     * Pick an object
-     * TODO: It's nonsense: It returns false ONLY if o is null. On all other cases, it throws an exception.
-     * TODO: If o is null, throw an exception too, and do not return any value
+     * Pick an object.
+     * Throws on any failure (null input, incompatible, full inventory, etc.).
      * @param aChartItem Object to pick
-     * @return True if the object was really picked
      */
-    public pick(aChartItem: ActionChartItem): boolean {
+    public pick(aChartItem: ActionChartItem): void {
 
         if (!aChartItem) {
-            return false;
+            throw new Error("No object to pick");
         }
         const item = aChartItem.getItem();
         if (!item) {
-            return false;
+            throw new Error("No object to pick");
         }
 
         // Check incompatibilities
@@ -284,7 +282,7 @@ export class ActionChart {
                 // console.log('Picked weapon ' + item.id);
                 this.weapons.push(aChartItem);
                 this.checkCurrentWeapon();
-                return true;
+                break;
 
             case Item.SPECIAL: {
 
@@ -316,8 +314,7 @@ export class ActionChart {
                     // The object is an Arrow. Drop a normal Arrow if needed
                     this.sanitizeArrowCount();
                 }
-
-                return true;
+                break;
             }
             case Item.OBJECT:
 
@@ -328,7 +325,7 @@ export class ActionChart {
                     }
 
                     this.hasBackpack = true;
-                    return true;
+                    break;
                 }
 
                 if ( !this.hasBackpack ) {
@@ -347,7 +344,7 @@ export class ActionChart {
                     this.checkCurrentWeapon();
                 }
                 console.log("Picked object " + aChartItem.id);
-                return true;
+                break;
 
             default: {
                 const msg = "Unknown object type: " + item.type;

@@ -1,6 +1,7 @@
 import { saveGameDb, SaveSlotRecord } from "../../model/saveGameDb";
 import { state } from "../../state";
 import { SLOT_KEYS } from "../../constants";
+import { Combat } from "../../model/combat";
 
 describe("Save Slot System", () => {
 
@@ -140,6 +141,42 @@ describe("Save Slot System", () => {
         expect(slot!.kaiName).toBe("TestPlayer");
         expect(slot!.sectionId).toBe("sect5");
         expect(slot!.isAutoSave).toBe(false);
+    });
+
+    test("persistState with active slot and combat objects does not throw DataCloneError", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        // Setup state with a combat in sectionStates (Combat has prototype methods like nextTurnAsync)
+        state.setup(1, false);
+        state.actionChart.kaiName = "CombatPlayer";
+        state.actionChart.combatSkill = 15;
+        state.actionChart.endurance = 25;
+        state.actionChart.currentEndurance = 20;
+        state.sectionStates.currentSection = "sect100";
+
+        const sectionState = state.sectionStates.getSectionState();
+        sectionState.combats.push(new Combat("Test Enemy", 10, 20, 20));
+
+        state.activeSlotKey = SLOT_KEYS[0];
+
+        // This should not throw DataCloneError when IndexedDB tries to clone the state
+        state.persistState();
+
+        // Give a small delay for the async IndexedDB write
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        const slot = await saveGameDb.getSlotByKey(SLOT_KEYS[0]);
+        expect(slot).toBeDefined();
+        expect(slot!.kaiName).toBe("CombatPlayer");
+        expect(slot!.sectionId).toBe("sect100");
+        expect(slot!.isAutoSave).toBe(false);
+        // Verify combat objects were stripped of methods and serialized as plain objects
+        const savedState = slot!.currentState as any;
+        expect(savedState.sectionStates.sectionStates.sect100.combats.length).toBe(1);
+        expect(savedState.sectionStates.sectionStates.sect100.combats[0].enemy).toBe("Test Enemy");
     });
 
     test("persistState without activeSlotKey does not write to slot", async () => {
@@ -320,17 +357,113 @@ describe("Save Slot System", () => {
         expect(mostRecent!.kaiName).toBe("Fourth");
     });
 
+    test("upsertAutoSave updates in place for same sectionId, preserving distinct visits", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        const makeRecord = (timestamp: number, kaiName: string, sectionId: string): SaveSlotRecord => ({
+            name: "Auto-Save",
+            timestamp,
+            bookNumber: 1,
+            sectionId,
+            kaiName,
+            endurance: 20,
+            maxEndurance: 20,
+            combatSkill: 15,
+            currentState: {},
+            previousBooksState: [],
+            isAutoSave: true
+        });
+
+        // Create auto-saves for 3 distinct sections
+        await saveGameDb.upsertAutoSave(makeRecord(1000, "PageA", "sectA"));
+        await saveGameDb.upsertAutoSave(makeRecord(2000, "PageB", "sectB"));
+        await saveGameDb.upsertAutoSave(makeRecord(3000, "PageC", "sectC"));
+
+        let autoSaves = await (saveGameDb as any).getAutoSaves();
+        expect(autoSaves.length).toBe(3);
+        expect(autoSaves[0].kaiName).toBe("PageA");
+        expect(autoSaves[1].kaiName).toBe("PageB");
+        expect(autoSaves[2].kaiName).toBe("PageC");
+
+        // Re-visiting sectB should update the existing slot, not consume a new one
+        await saveGameDb.upsertAutoSave(makeRecord(4000, "PageB-Updated", "sectB"));
+
+        autoSaves = await (saveGameDb as any).getAutoSaves();
+        expect(autoSaves.length).toBe(3);
+        // Updated record gets new timestamp (4000) and moves to end of ascending list
+        expect(autoSaves[0].kaiName).toBe("PageA");   // oldest, still present
+        expect(autoSaves[1].kaiName).toBe("PageC");
+        expect(autoSaves[2].kaiName).toBe("PageB-Updated"); // newest after update
+
+        // Now visit a brand new section D — should evict the oldest (PageA)
+        await saveGameDb.upsertAutoSave(makeRecord(5000, "PageD", "sectD"));
+
+        autoSaves = await (saveGameDb as any).getAutoSaves();
+        expect(autoSaves.length).toBe(3);
+        expect(autoSaves[0].kaiName).toBe("PageB-Updated"); // oldest now
+        expect(autoSaves[1].kaiName).toBe("PageC");
+        expect(autoSaves[2].kaiName).toBe("PageD");         // newest
+    });
+
+    test("upsertAutoSave isolates auto-saves per parentSlotKey", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        const makeRecord = (timestamp: number, sectionId: string, parentSlotKey: string): SaveSlotRecord => ({
+            name: "Auto-Save",
+            timestamp,
+            bookNumber: 1,
+            sectionId,
+            kaiName: parentSlotKey + "-" + sectionId,
+            endurance: 20,
+            maxEndurance: 20,
+            combatSkill: 15,
+            currentState: {},
+            previousBooksState: [],
+            isAutoSave: true,
+            parentSlotKey
+        });
+
+        // Fill slot-1 with 3 distinct sections
+        await saveGameDb.upsertAutoSave(makeRecord(1000, "s1", "slot-1"));
+        await saveGameDb.upsertAutoSave(makeRecord(2000, "s2", "slot-1"));
+        await saveGameDb.upsertAutoSave(makeRecord(3000, "s3", "slot-1"));
+
+        // Fill slot-2 with 3 distinct sections
+        await saveGameDb.upsertAutoSave(makeRecord(1000, "s4", "slot-2"));
+        await saveGameDb.upsertAutoSave(makeRecord(2000, "s5", "slot-2"));
+        await saveGameDb.upsertAutoSave(makeRecord(3000, "s6", "slot-2"));
+
+        // slot-1 gets a 4th section — should evict its own oldest, not slot-2's
+        await saveGameDb.upsertAutoSave(makeRecord(4000, "s7", "slot-1"));
+
+        const slot1Autos = await (saveGameDb as any).getAutoSaves("slot-1");
+        expect(slot1Autos.length).toBe(3);
+        expect(slot1Autos[0].sectionId).toBe("s2"); // oldest after s1 evicted
+        expect(slot1Autos[2].sectionId).toBe("s7");
+
+        const slot2Autos = await (saveGameDb as any).getAutoSaves("slot-2");
+        expect(slot2Autos.length).toBe(3);
+        expect(slot2Autos[0].sectionId).toBe("s4");
+        expect(slot2Autos[2].sectionId).toBe("s6"); // untouched
+    });
+
     test("pruneAutoSaves removes excess old autosaves", async () => {
         if (!saveGameDb.isAvailable()) {
             console.log("IndexedDB not available, skipping test");
             return;
         }
 
-        const makeRecord = (timestamp: number): SaveSlotRecord => ({
+        const makeRecord = (timestamp: number, sectionId: string): SaveSlotRecord => ({
             name: "Auto",
             timestamp,
             bookNumber: 1,
-            sectionId: "sect1",
+            sectionId,
             kaiName: "Kai",
             endurance: 20,
             maxEndurance: 20,
@@ -340,12 +473,12 @@ describe("Save Slot System", () => {
             isAutoSave: true
         });
 
-        // Create 5 autosaves
-        await saveGameDb.upsertAutoSave(makeRecord(1000));
-        await saveGameDb.upsertAutoSave(makeRecord(2000));
-        await saveGameDb.upsertAutoSave(makeRecord(3000));
-        await saveGameDb.upsertAutoSave(makeRecord(4000));
-        await saveGameDb.upsertAutoSave(makeRecord(5000));
+        // Create 5 autosaves for distinct sections
+        await saveGameDb.upsertAutoSave(makeRecord(1000, "s1"));
+        await saveGameDb.upsertAutoSave(makeRecord(2000, "s2"));
+        await saveGameDb.upsertAutoSave(makeRecord(3000, "s3"));
+        await saveGameDb.upsertAutoSave(makeRecord(4000, "s4"));
+        await saveGameDb.upsertAutoSave(makeRecord(5000, "s5"));
 
         const pruned = await (saveGameDb as any).pruneAutoSaves();
         expect(pruned).toBe(2);
@@ -401,6 +534,142 @@ describe("Save Slot System", () => {
         const manual = await saveGameDb.getSlotByKey(SLOT_KEYS[0]);
         expect(manual).toBeDefined();
         expect(manual!.name).toBe("Manual");
+    });
+
+    test("getAutoSave filters by parentSlotKey", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        const makeRecord = (timestamp: number, sectionId: string, parentSlotKey: string): SaveSlotRecord => ({
+            name: "Auto", timestamp, bookNumber: 1, sectionId,
+            kaiName: parentSlotKey, endurance: 20, maxEndurance: 20, combatSkill: 15,
+            currentState: {}, previousBooksState: [], isAutoSave: true, parentSlotKey
+        });
+
+        await saveGameDb.upsertAutoSave(makeRecord(1000, "s1", "slot-1"));
+        await saveGameDb.upsertAutoSave(makeRecord(2000, "s2", "slot-2"));
+
+        const slot1Auto = await saveGameDb.getAutoSave("slot-1");
+        expect(slot1Auto).toBeDefined();
+        expect(slot1Auto!.sectionId).toBe("s1");
+
+        const slot2Auto = await saveGameDb.getAutoSave("slot-2");
+        expect(slot2Auto).toBeDefined();
+        expect(slot2Auto!.sectionId).toBe("s2");
+
+        const missing = await saveGameDb.getAutoSave("slot-3");
+        expect(missing).toBeUndefined();
+    });
+
+    test("getAutoSaves filters by parentSlotKey", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        const makeRecord = (timestamp: number, sectionId: string, parentSlotKey: string): SaveSlotRecord => ({
+            name: "Auto", timestamp, bookNumber: 1, sectionId,
+            kaiName: parentSlotKey, endurance: 20, maxEndurance: 20, combatSkill: 15,
+            currentState: {}, previousBooksState: [], isAutoSave: true, parentSlotKey
+        });
+
+        await saveGameDb.upsertAutoSave(makeRecord(1000, "s1", "slot-1"));
+        await saveGameDb.upsertAutoSave(makeRecord(2000, "s2", "slot-1"));
+        await saveGameDb.upsertAutoSave(makeRecord(3000, "s3", "slot-2"));
+
+        const slot1Autos = await saveGameDb.getAutoSaves("slot-1");
+        expect(slot1Autos.length).toBe(2);
+
+        const slot2Autos = await saveGameDb.getAutoSaves("slot-2");
+        expect(slot2Autos.length).toBe(1);
+        expect(slot2Autos[0].sectionId).toBe("s3");
+
+        const slot3Autos = await saveGameDb.getAutoSaves("slot-3");
+        expect(slot3Autos.length).toBe(0);
+    });
+
+    test("clearAutoSaves scoped to parentSlotKey only clears that slot", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        const makeRecord = (timestamp: number, sectionId: string, parentSlotKey: string): SaveSlotRecord => ({
+            name: "Auto", timestamp, bookNumber: 1, sectionId,
+            kaiName: parentSlotKey, endurance: 20, maxEndurance: 20, combatSkill: 15,
+            currentState: {}, previousBooksState: [], isAutoSave: true, parentSlotKey
+        });
+
+        await saveGameDb.upsertAutoSave(makeRecord(1000, "s1", "slot-1"));
+        await saveGameDb.upsertAutoSave(makeRecord(2000, "s2", "slot-1"));
+        await saveGameDb.upsertAutoSave(makeRecord(3000, "s3", "slot-2"));
+
+        const deleted = await saveGameDb.clearAutoSaves("slot-1");
+        expect(deleted).toBe(2);
+
+        const slot1Autos = await saveGameDb.getAutoSaves("slot-1");
+        expect(slot1Autos.length).toBe(0);
+
+        const slot2Autos = await saveGameDb.getAutoSaves("slot-2");
+        expect(slot2Autos.length).toBe(1);
+    });
+
+    test("pruneAutoSaves prunes independently per parentSlotKey", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        const makeRecord = (timestamp: number, sectionId: string, parentSlotKey: string): SaveSlotRecord => ({
+            name: "Auto", timestamp, bookNumber: 1, sectionId,
+            kaiName: parentSlotKey, endurance: 20, maxEndurance: 20, combatSkill: 15,
+            currentState: {}, previousBooksState: [], isAutoSave: true, parentSlotKey
+        });
+
+        // slot-1: 4 autosaves (1 should be pruned)
+        await saveGameDb.upsertAutoSave(makeRecord(1000, "s1", "slot-1"));
+        await saveGameDb.upsertAutoSave(makeRecord(2000, "s2", "slot-1"));
+        await saveGameDb.upsertAutoSave(makeRecord(3000, "s3", "slot-1"));
+        await saveGameDb.upsertAutoSave(makeRecord(4000, "s4", "slot-1"));
+
+        // slot-2: 5 autosaves (2 should be pruned)
+        await saveGameDb.upsertAutoSave(makeRecord(1000, "s5", "slot-2"));
+        await saveGameDb.upsertAutoSave(makeRecord(2000, "s6", "slot-2"));
+        await saveGameDb.upsertAutoSave(makeRecord(3000, "s7", "slot-2"));
+        await saveGameDb.upsertAutoSave(makeRecord(4000, "s8", "slot-2"));
+        await saveGameDb.upsertAutoSave(makeRecord(5000, "s9", "slot-2"));
+
+        const pruned = await saveGameDb.pruneAutoSaves();
+        expect(pruned).toBe(3); // 1 from slot-1 + 2 from slot-2
+
+        const slot1Autos = await saveGameDb.getAutoSaves("slot-1");
+        expect(slot1Autos.length).toBe(3);
+
+        const slot2Autos = await saveGameDb.getAutoSaves("slot-2");
+        expect(slot2Autos.length).toBe(3);
+    });
+
+    test("buildAutoSaveRecord sets parentSlotKey from activeSlotKey", async () => {
+        if (!saveGameDb.isAvailable()) {
+            console.log("IndexedDB not available, skipping test");
+            return;
+        }
+
+        state.setup(1, false);
+        state.actionChart.kaiName = "ParentTest";
+        state.activeSlotKey = "slot-1";
+        state.sectionStates.currentSection = "sect99";
+
+        // Trigger persistState which calls buildAutoSaveRecord internally
+        state.persistState();
+        await new Promise((resolve) => setTimeout(resolve, 600)); // wait for debounce + buffer
+
+        const autoSave = await saveGameDb.getAutoSave("slot-1");
+        expect(autoSave).toBeDefined();
+        expect(autoSave!.parentSlotKey).toBe("slot-1");
+        expect(autoSave!.sectionId).toBe("sect99");
     });
 
     test("SaveDbError carries message", () => {

@@ -240,10 +240,12 @@ class Parser {
                 left = left * this.parseUnary();
             } else if (t === TokenType.Divide) {
                 this.eat(TokenType.Divide);
-                left = left / this.parseUnary();
+                const right = this.parseUnary();
+                left = right === 0 ? 0 : left / right;
             } else if (t === TokenType.Modulo) {
                 this.eat(TokenType.Modulo);
-                left = left % this.parseUnary();
+                const right = this.parseUnary();
+                left = right === 0 ? 0 : left % right;
             } else {
                 break;
             }

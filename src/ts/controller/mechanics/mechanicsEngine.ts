@@ -2031,7 +2031,8 @@ export const mechanicsEngine = {
             return;
         }
 
-        if (state.actionChart.currentEndurance <= 0 && $("#mechanics-death").length === 0) {
+        const endurance = state.actionChart.currentEndurance;
+        if ((endurance <= 0 || endurance === null || endurance === undefined || isNaN(endurance)) && $("#mechanics-death").length === 0) {
 
             emit("gameOver", {
                 bookNumber: state.book.bookNumber,

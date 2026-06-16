@@ -98,7 +98,7 @@ export class CombatMechanics {
 
             // Set player name if not Lone Wolf
             if (state.book.getBookSeries().id === BookSeriesId.NewOrder) {
-                $combatUI.find(".mechanics-playerName").html( state.actionChart.kaiName );
+                $combatUI.find(".mechanics-playerName").text( state.actionChart.kaiName );
             }
 
             // Set enemy name on table and status panel
@@ -820,7 +820,7 @@ export class CombatMechanics {
         }
         $("#game-ratioplayer").text( csPlayer );
         if (state.book.getBookSeries().id === BookSeriesId.NewOrder) {
-            $("#game-ratioplayername").html( state.actionChart.kaiName );
+            $("#game-ratioplayername").text( state.actionChart.kaiName );
         }
 
         // Enemy info:

@@ -26,15 +26,20 @@ export const loadGameView = {
 
     /**
      * Render save slots as a compact list in the load game view.
+     * Only shows auto-saves for the currently active slot.
      */
     renderSlots(slots: SaveSlotRecord[]) {
         const $grid = $("#loadGame-slotsGrid");
         $grid.empty();
 
-        const autoSaves = slots.filter((s) => s.isAutoSave);
+        const manualSlots = slots.filter((s) => !s.isAutoSave);
+        const activeSlotKey = state.activeSlotKey;
+        const autoSaves = activeSlotKey
+            ? slots.filter((s) => s.isAutoSave && s.parentSlotKey === activeSlotKey)
+            : [];
         const hasAutoSaves = autoSaves.length > 0;
 
-        // Render clear-autosaves button if any autosaves exist
+        // Render clear-autosaves button if any autosaves exist for the active slot
         if (hasAutoSaves) {
             $grid.append(
                 '<div class="loadgame-actions" style="margin-bottom: 8px;">' +
@@ -50,7 +55,9 @@ export const loadGameView = {
             });
         }
 
-        if (slots.length === 0) {
+        const displaySlots = [...manualSlots, ...autoSaves];
+
+        if (displaySlots.length === 0) {
             $grid.append('<p class="text-muted"><i>' + translations.text("noSaveSlots") + "</i></p>");
             return;
         }
@@ -72,7 +79,7 @@ export const loadGameView = {
         $grid.append(tableHtml);
         const $tbody = $grid.find("tbody");
 
-        for (const slot of slots) {
+        for (const slot of displaySlots) {
             const date = new Date(slot.timestamp).toLocaleDateString();
             const time = new Date(slot.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
             const seriesClass = this.getSeriesClass(slot.bookNumber);

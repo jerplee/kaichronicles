@@ -121,7 +121,8 @@ export class App {
                                         combatSkill: parsed.actionChart ? parsed.actionChart.combatSkill || 0 : 0,
                                         currentState: parsed,
                                         previousBooksState: [],
-                                        isAutoSave: true
+                                        isAutoSave: true,
+                                        parentSlotKey: state.activeSlotKey || ""
                                     };
                                     saveGameDb.upsertAutoSave(record).then(() => {
                                         console.log("Migrated localStorage save to IndexedDB auto-save");

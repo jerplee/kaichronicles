@@ -65,10 +65,8 @@ export const actionChartController = {
                 EquipmentSectionMechanics.checkMoreObjectsCanBePicked(aChartItem.id);
             }
 
-            // Try to pick the object
-            if (!state.actionChart.pick(aChartItem)) {
-                return false;
-            }
+            // Try to pick the object (throws on failure)
+            state.actionChart.pick(aChartItem);
 
             // Show toast
             actionChartView.showInventoryMsg("pick", o, translations.text("msgGetObject", [o.name]));

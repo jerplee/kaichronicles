@@ -12,6 +12,8 @@ const MAX_AUTOSAVES = 3;
 export interface SaveSlotRecord {
     id?: number;
     slotKey?: string;
+    /** For auto-saves: the manual slot key that owns this auto-save (e.g. "slot-1"). */
+    parentSlotKey?: string;
     name: string;
     timestamp: number;
     bookNumber: number;
@@ -225,9 +227,10 @@ export const saveGameDb = {
     },
 
     /**
-     * Get the auto-save slot, or undefined if none exists.
+     * Get the most recent auto-save slot, or undefined if none exists.
+     * @param parentSlotKey If provided, only consider auto-saves for this slot.
      */
-    async getAutoSave(): Promise<SaveSlotRecord | undefined> {
+    async getAutoSave(parentSlotKey?: string): Promise<SaveSlotRecord | undefined> {
         const db = await this.openDb();
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STORE_NAME, "readonly");
@@ -239,10 +242,13 @@ export const saveGameDb = {
                 const cursor = request.result;
                 if (cursor) {
                     if (cursor.value.isAutoSave) {
-                        resolve(cursor.value as SaveSlotRecord);
-                    } else {
-                        cursor.continue();
+                        const pk = cursor.value.parentSlotKey || "";
+                        if (!parentSlotKey || pk === parentSlotKey) {
+                            resolve(cursor.value as SaveSlotRecord);
+                            return;
+                        }
                     }
+                    cursor.continue();
                 } else {
                     resolve(undefined);
                 }
@@ -257,8 +263,9 @@ export const saveGameDb = {
 
     /**
      * Get all auto-save slots sorted by timestamp ascending (oldest first).
+     * @param parentSlotKey If provided, only return auto-saves for this slot.
      */
-    async getAutoSaves(): Promise<SaveSlotRecord[]> {
+    async getAutoSaves(parentSlotKey?: string): Promise<SaveSlotRecord[]> {
         const db = await this.openDb();
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STORE_NAME, "readonly");
@@ -271,7 +278,10 @@ export const saveGameDb = {
                 const cursor = request.result;
                 if (cursor) {
                     if (cursor.value.isAutoSave) {
-                        results.push(cursor.value as SaveSlotRecord);
+                        const pk = cursor.value.parentSlotKey || "";
+                        if (!parentSlotKey || pk === parentSlotKey) {
+                            results.push(cursor.value as SaveSlotRecord);
+                        }
                     }
                     cursor.continue();
                 } else {
@@ -306,11 +316,12 @@ export const saveGameDb = {
     },
 
     /**
-     * Delete all auto-save slots.
+     * Delete auto-save slots.
+     * @param parentSlotKey If provided, only delete auto-saves for this slot.
      * @returns Number of autosaves deleted.
      */
-    async clearAutoSaves(): Promise<number> {
-        const autoSaves = await this.getAutoSaves().catch(() => [] as SaveSlotRecord[]);
+    async clearAutoSaves(parentSlotKey?: string): Promise<number> {
+        const autoSaves = await this.getAutoSaves(parentSlotKey).catch(() => [] as SaveSlotRecord[]);
         for (const slot of autoSaves) {
             if (slot.id) {
                 await this.deleteSlot(slot.id).catch(() => { /* ignore */ });
@@ -320,21 +331,34 @@ export const saveGameDb = {
     },
 
     /**
-     * Prune auto-saves down to MAX_AUTOSAVES by deleting the oldest excess slots.
+     * Prune auto-saves down to MAX_AUTOSAVES per parent slot by deleting the oldest excess.
      * @returns Number of autosaves deleted.
      */
     async pruneAutoSaves(): Promise<number> {
-        const autoSaves = await this.getAutoSaves().catch(() => [] as SaveSlotRecord[]);
-        if (autoSaves.length <= MAX_AUTOSAVES) {
-            return 0;
+        const allAutoSaves = await this.getAutoSaves().catch(() => [] as SaveSlotRecord[]);
+        // Group by parentSlotKey and prune each group independently
+        const byParent: { [key: string]: SaveSlotRecord[] } = {};
+        for (const s of allAutoSaves) {
+            const pk = s.parentSlotKey || "";
+            if (!byParent[pk]) {
+                byParent[pk] = [];
+            }
+            byParent[pk].push(s);
         }
-        const toDelete = autoSaves.slice(0, autoSaves.length - MAX_AUTOSAVES);
-        for (const slot of toDelete) {
-            if (slot.id) {
-                await this.deleteSlot(slot.id).catch(() => { /* ignore */ });
+        let totalDeleted = 0;
+        for (const pk of Object.keys(byParent)) {
+            const group = byParent[pk];
+            if (group.length > MAX_AUTOSAVES) {
+                const toDelete = group.slice(0, group.length - MAX_AUTOSAVES);
+                for (const slot of toDelete) {
+                    if (slot.id) {
+                        await this.deleteSlot(slot.id).catch(() => { /* ignore */ });
+                        totalDeleted++;
+                    }
+                }
             }
         }
-        return toDelete.length;
+        return totalDeleted;
     },
 
     /**
@@ -346,18 +370,24 @@ export const saveGameDb = {
 
     /**
      * Upsert the auto-save slot.
-     * Maintains up to MAX_AUTOSAVES slots. If fewer exist, creates a new one.
-     * If at capacity, overwrites the oldest (earliest timestamp) slot.
+     * Scoped to the record's parentSlotKey so each manual slot gets its own auto-save budget.
+     * If an auto-save for the same sectionId already exists under this parent, update it in place.
+     * Otherwise, create a new auto-save. If the parent is at capacity, delete its oldest slot first.
      */
     async upsertAutoSave(record: SaveSlotRecord): Promise<number> {
-        const autoSaves = await this.getAutoSaves().catch(() => [] as SaveSlotRecord[]);
-        if (autoSaves.length >= MAX_AUTOSAVES) {
-            // Overwrite the oldest auto-save
-            const oldest = autoSaves[0];
-            await this.updateSlot(oldest.id!, { ...record, isAutoSave: true });
-            return oldest.id!;
-        } else {
-            return await this.createSlot({ ...record, isAutoSave: true });
+        const parentSlotKey = record.parentSlotKey || "";
+        const autoSaves = await this.getAutoSaves(parentSlotKey).catch(() => [] as SaveSlotRecord[]);
+        const existing = autoSaves.find((s) => s.sectionId === record.sectionId);
+        if (existing && existing.id) {
+            // Same section under same parent — update in place
+            await this.updateSlot(existing.id, { ...record, isAutoSave: true });
+            return existing.id;
         }
+        if (autoSaves.length >= MAX_AUTOSAVES) {
+            // New section for this parent — delete the oldest to make room
+            const oldest = autoSaves[0];
+            await this.deleteSlot(oldest.id!).catch(() => { /* ignore */ });
+        }
+        return await this.createSlot({ ...record, isAutoSave: true });
     }
 };

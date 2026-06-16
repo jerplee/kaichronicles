@@ -42,13 +42,14 @@ export class loadGameController {
     }
 
     /**
-     * Clear all auto-saves and refresh the view.
+     * Clear auto-saves for the active slot and refresh the view.
      */
     public static clearAutoSaves() {
         if (!saveGameDb.isAvailable()) {
             return;
         }
-        saveGameDb.clearAutoSaves().then((deleted) => {
+        const parentSlotKey = state.activeSlotKey || undefined;
+        saveGameDb.clearAutoSaves(parentSlotKey).then((deleted) => {
             if (deleted > 0) {
                 console.log("Cleared " + deleted + " auto-save(s)");
             }

@@ -92,6 +92,17 @@ export class State {
      */
     public activeSlotKey: string | null = null;
 
+    constructor() {
+        try {
+            const saved = localStorage.getItem("kaiActiveSlotKey");
+            if (saved) {
+                this.activeSlotKey = saved;
+            }
+        } catch (e) {
+            // ignore
+        }
+    }
+
     /**
      * Voice Mode enabled.
      * Stored at localStorage['voiceSettings'], not with the game state.
@@ -286,6 +297,17 @@ export class State {
             mechanicsEngine.debugWarning(e);
         }
 
+        // Persist active slot key so it survives page reloads
+        try {
+            if (this.activeSlotKey) {
+                localStorage.setItem("kaiActiveSlotKey", this.activeSlotKey);
+            } else {
+                localStorage.removeItem("kaiActiveSlotKey");
+            }
+        } catch (e) {
+            mechanicsEngine.debugWarning(e);
+        }
+
         // Save active slot immediately (not debounced)
         if (saveGameDb.isAvailable() && this.activeSlotKey) {
             console.log("[DEBUG] persistState saving to activeSlotKey:", this.activeSlotKey);
@@ -326,6 +348,9 @@ export class State {
      * Build a SaveSlotRecord from the current state for IndexedDB storage.
      */
     private buildAutoSaveRecord(): import("./model/saveGameDb").SaveSlotRecord {
+        // IndexedDB structured clone cannot serialize functions (e.g. Combat.prototype.nextTurnAsync).
+        // Round-trip through JSON to strip prototype methods and produce plain objects.
+        const plainState = JSON.parse(JSON.stringify(this.getCurrentState()));
         return {
             name: "Auto-Save",
             timestamp: Date.now(),
@@ -335,9 +360,10 @@ export class State {
             endurance: this.actionChart ? this.actionChart.currentEndurance || 0 : 0,
             maxEndurance: this.actionChart ? this.actionChart.endurance || 0 : 0,
             combatSkill: this.actionChart ? this.actionChart.combatSkill || 0 : 0,
-            currentState: this.getCurrentState(),
+            currentState: plainState,
             previousBooksState: this.getPreviousBooksState(),
-            isAutoSave: true
+            isAutoSave: true,
+            parentSlotKey: this.activeSlotKey || ""
         };
     }
 
@@ -345,6 +371,9 @@ export class State {
      * Build a SaveSlotRecord for the active manual slot.
      */
     private buildSlotSaveRecord(): import("./model/saveGameDb").SaveSlotRecord {
+        // IndexedDB structured clone cannot serialize functions (e.g. Combat.prototype.nextTurnAsync).
+        // Round-trip through JSON to strip prototype methods and produce plain objects.
+        const plainState = JSON.parse(JSON.stringify(this.getCurrentState()));
         return {
             name: this.actionChart && this.actionChart.kaiName ? this.actionChart.kaiName : "Save",
             timestamp: Date.now(),
@@ -354,7 +383,7 @@ export class State {
             endurance: this.actionChart ? this.actionChart.currentEndurance || 0 : 0,
             maxEndurance: this.actionChart ? this.actionChart.endurance || 0 : 0,
             combatSkill: this.actionChart ? this.actionChart.combatSkill || 0 : 0,
-            currentState: this.getCurrentState(),
+            currentState: plainState,
             previousBooksState: this.getPreviousBooksState(),
             isAutoSave: false
         };
