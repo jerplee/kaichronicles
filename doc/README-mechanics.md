@@ -604,6 +604,8 @@ Disables the discipline with the index indicated in the actionChart disciplines 
 ```
 Forces a jump to another section. "section" property specifies the section where to jump.
 
+> **Note:** When `<goToSection>` is triggered, any sibling rules that follow it in the same parent block are **not executed**. The engine immediately stops processing the current section and loads the target section. This is an intentional control-flow guarantee — mechanics authors do not need to worry about sibling rules leaking into the next section.
+
 ### currentWeapon
 ```xml
 <currentWeapon objectId="sommerswerd" />
