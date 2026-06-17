@@ -356,23 +356,25 @@ export class CombatMechanics {
 
                 // Fire turn events:
                 mechanicsEngine.fireAfterCombatTurn(combat);
+                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                    return; // Goto happened, stop processing
+                }
 
                 // Post combat rules execution:
                 const combatsResult = sectionState.areAllCombatsFinished(state.actionChart);
-                try {
-                    if ( combatsResult === "finished" && mechanicsEngine.onAfterCombatsRule ) {
-                        // Fire "afterCombats" rule
-                        mechanicsEngine.runChildRules( $(mechanicsEngine.onAfterCombatsRule) );
-                    }
-                    if ( combatsResult === "eluded" && mechanicsEngine.onEludeCombatsRule ) {
-                        // Fire "afterElude" rule
-                        mechanicsEngine.runChildRules( $(mechanicsEngine.onEludeCombatsRule) );
-                    }
-                } catch (e) {
-                    if (mechanicsEngine.isGotoException(e)) {
-                        return; // Section changed, stop processing
-                    }
-                    throw e;
+                if ( combatsResult === "finished" && mechanicsEngine.onAfterCombatsRule ) {
+                    // Fire "afterCombats" rule
+                    mechanicsEngine.runChildRules( $(mechanicsEngine.onAfterCombatsRule) );
+                }
+                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                    return; // Goto happened, stop processing
+                }
+                if ( combatsResult === "eluded" && mechanicsEngine.onEludeCombatsRule ) {
+                    // Fire "afterElude" rule
+                    mechanicsEngine.runChildRules( $(mechanicsEngine.onEludeCombatsRule) );
+                }
+                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                    return; // Goto happened, stop processing
                 }
 
                 if ( ( combatsResult === "finished" || combatsResult === "eluded" ) && combat.adganaUsed ) {
@@ -395,6 +397,9 @@ export class CombatMechanics {
 
                 // Fire turn events:
                 mechanicsEngine.fireAfterCombatTurn(combat);
+                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                    return; // Goto happened, stop processing
+                }
 
                 // Update combat ratio (it can be changed by combat turn rules):
                 CombatMechanics.updateCombatRatio( $combatUI , combat );
@@ -415,9 +420,8 @@ export class CombatMechanics {
             template.addSectionReadyMarker();
         }, null)
         .fail((e) => {
-            if (!mechanicsEngine.isGotoException(e)) {
-                console.error("Combat turn error:", e);
-            }
+            // Real error (goto is now caught internally by fireAfterCombatTurn / runChildRules)
+            console.error("Combat turn error:", e);
         });
 
     }
