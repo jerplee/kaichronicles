@@ -44,6 +44,9 @@ export const mechanicsEngine = {
 
     /** The rule to execute when the action button of a discipline picker is clicked */
     onDisciplinePickerChoosed: <Element>null,
+
+    /** Expected section id during rule execution. Used to detect goto aborts. */
+    _expectedSection: null as string|null,
     
     /************************************************************/
     /**************** MAIN FUNCTIONS ****************************/
@@ -95,10 +98,20 @@ export const mechanicsEngine = {
     /************************************************************/
 
     /**
+     * Typed error for section-jump control flow. Not a real error.
+     */
+    SectionJumpError: class SectionJumpError extends Error {
+        constructor(public targetSectionId: string) {
+            super("Jumped to a new section, rules execution interrupted (not an error)");
+            this.name = "SectionJumpError";
+        }
+    },
+
+    /**
      * Check if an exception is the intentional section-jump control-flow signal.
      */
     isGotoException(e: any): boolean {
-        return typeof e === "string" && e.indexOf("rules execution interrupted") >= 0;
+        return e instanceof mechanicsEngine.SectionJumpError || (e && e.name === "SectionJumpError");
     },
 
     /**
@@ -108,55 +121,63 @@ export const mechanicsEngine = {
      */
     run(section: Section) {
 
-        // Defaults:
-        gameView.enableNextLink(section.sectionId !== state.mechanics.getLastSectionId());
-        mechanicsEngine.onAfterCombatsRule = null;
-        mechanicsEngine.onEludeCombatsRule = null;
-        mechanicsEngine.onInventoryEventRule = null;
-        mechanicsEngine.onAfterCombatTurns = [];
-        mechanicsEngine.onChoiceSelected = [];
-        mechanicsEngine.onObjectUsedRule = null;
-        mechanicsEngine.onNumberPickerChoosed = null;
-        mechanicsEngine.onDisciplinePickerChoosed = null;
+        // Track expected section to detect goto aborts
+        const prevExpectedSection = mechanicsEngine._expectedSection;
+        mechanicsEngine._expectedSection = section.sectionId;
 
-        // Disable previous link if we are on "The story so far" section
-        gameView.enablePreviousLink(section.sectionId !== "tssf");
-
-        // Retrieve or store combat states
-        state.sectionStates.setupCombats(section);
-
-        // Run healing (execute BEFORE the rules, they can decrease the endurance of the
-        // player)
-        mechanicsEngine.healingDiscipline();
-
-        // Get and run section rules
         try {
+            // Defaults:
+            gameView.enableNextLink(section.sectionId !== state.mechanics.getLastSectionId());
+            mechanicsEngine.onAfterCombatsRule = null;
+            mechanicsEngine.onEludeCombatsRule = null;
+            mechanicsEngine.onInventoryEventRule = null;
+            mechanicsEngine.onAfterCombatTurns = [];
+            mechanicsEngine.onChoiceSelected = [];
+            mechanicsEngine.onObjectUsedRule = null;
+            mechanicsEngine.onNumberPickerChoosed = null;
+            mechanicsEngine.onDisciplinePickerChoosed = null;
+
+            // Disable previous link if we are on "The story so far" section
+            gameView.enablePreviousLink(section.sectionId !== "tssf");
+
+            // Retrieve or store combat states
+            state.sectionStates.setupCombats(section);
+
+            // Run healing (execute BEFORE the rules, they can decrease the endurance of the
+            // player)
+            mechanicsEngine.healingDiscipline();
+
+            // Get and run section rules
             mechanicsEngine.runSectionRules();
-        } catch (e) {
-            if (mechanicsEngine.isGotoException(e)) {
-                return; // Section changed, stop processing this section
+            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                return; // Section changed via goto, stop processing
             }
-            throw e;
+
+            // Render available / to sell objects on this section
+            mechanicsEngine.fireInventoryEvents();
+            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                return;
+            }
+
+            // Fire combat turns events (for restored combats)
+            mechanicsEngine.fireAfterCombatTurn(null);
+
+            // Render combats
+            CombatMechanics.renderCombats();
+
+            // Test if the player is already death
+            mechanicsEngine.testDeath();
+
+            // Be sure the section state is stored (to keep track of visited sections)
+            state.sectionStates.getSectionState();
+
+            // If this is the last section of the book, put a link to continue to
+            // the next book
+            mechanicsEngine.checkLastSection(section);
+
+        } finally {
+            mechanicsEngine._expectedSection = prevExpectedSection;
         }
-
-        // Render available / to sell objects on this section
-        mechanicsEngine.fireInventoryEvents();
-
-        // Fire combat turns events (for restored combats)
-        mechanicsEngine.fireAfterCombatTurn(null);
-
-        // Render combats
-        CombatMechanics.renderCombats();
-
-        // Test if the player is already death
-        mechanicsEngine.testDeath();
-
-        // Be sure the section state is stored (to keep track of visited sections)
-        state.sectionStates.getSectionState();
-
-        // If this is the last section of the book, put a link to continue to
-        // the next book
-        mechanicsEngine.checkLastSection(section);
 
     },
 
@@ -185,25 +206,14 @@ export const mechanicsEngine = {
                     }
                 });
             }
-            try {
-                mechanicsEngine.runChildRules($sectionMechanics);
-            } catch (e) {
-                if (mechanicsEngine.isGotoException(e)) {
-                    return; // Section changed, stop processing
-                }
-                throw e;
+            mechanicsEngine.runChildRules($sectionMechanics);
+            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                return; // Section changed via goto, stop processing
             }
         }
 
         // Run global rules
-        try {
-            mechanicsEngine.runGlobalRules();
-        } catch (e) {
-            if (mechanicsEngine.isGotoException(e)) {
-                return; // Section changed, stop processing
-            }
-            throw e;
-        }
+        mechanicsEngine.runGlobalRules();
     },
 
     /**
@@ -213,6 +223,9 @@ export const mechanicsEngine = {
      */
     runGlobalRules(onlyCombatRules: boolean = false, combatToApply: Combat = null) {
         for (const id of state.sectionStates.globalRulesIds) {
+            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                return; // Section changed via goto, stop processing remaining globals
+            }
             const $globalRule = state.mechanics.getGlobalRule(id);
 
             if (onlyCombatRules) {
@@ -223,6 +236,9 @@ export const mechanicsEngine = {
                 }
             } else {
                 mechanicsEngine.runChildRules($globalRule);
+                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                    return;
+                }
             }
         }
     },
@@ -234,7 +250,17 @@ export const mechanicsEngine = {
     runChildRules($rule: JQuery<Element>) {
         const childrenRules = $rule.children();
         for (const rule of childrenRules.toArray()) {
-            mechanicsEngine.runRule(rule);
+            try {
+                mechanicsEngine.runRule(rule);
+            } catch (e) {
+                if (mechanicsEngine.isGotoException(e)) {
+                    return; // Stop processing sibling rules after goto
+                }
+                throw e; // Real error — propagate
+            }
+            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                return; // Nested goto detected via state change
+            }
         }
     },
 
@@ -1667,10 +1693,10 @@ export const mechanicsEngine = {
      * Move to other book section
      */
     goToSection(rule: Element) {
-        gameController.loadSection($(rule).attr("section"), true);
-        // To avoid continuing executing rules, throw an exception
-        throw "Jumped to a new section, rules execution interrupted " +
-            "(This exception is not really an error)";
+        const sectionId = $(rule).attr("section");
+        gameController.loadSection(sectionId, true);
+        // To avoid continuing executing rules, throw an abort signal
+        throw new mechanicsEngine.SectionJumpError(sectionId);
     },
 
     /**
