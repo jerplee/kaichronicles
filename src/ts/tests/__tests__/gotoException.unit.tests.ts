@@ -13,6 +13,8 @@ import { gameView } from "../../views/gameView";
 import { BookSectionStates } from "../../model/bookSectionStates";
 import { BookSeriesId } from "../../model/bookSeries";
 import { CombatMechanics } from "../../controller/mechanics/combatMechanics";
+import { numberPickerMechanics } from "../../controller/mechanics/numberPickerMechanics";
+import { disciplinePickerMechanics } from "../../controller/mechanics/disciplinePickerMechanics";
 
 describe("goto exception regression", () => {
 
@@ -105,16 +107,11 @@ describe("goto exception regression", () => {
         }
 
         expect(siblingRan).toBe(false);
-        // After Phase 1 refactor, this should be false (no throw):
-        if (threw) {
-            expect(mechanicsEngine.isGotoException(thrownValue)).toBe(true);
-        }
+        // After Phase 1: runChildRules catches goto internally, no throw
+        expect(threw).toBe(false);
     });
 
-    test("run post-rule work continues after goto (current behavior)", () => {
-        // CURRENT BEHAVIOR: runSectionRules catches the goto internally and returns
-        // normally, so run() continues to fireInventoryEvents. This will change
-        // after Phase 1 refactor.
+    test("run skips post-rule work after goto", () => {
         const section = {
             sectionId: "sect1",
             hasNavigation: () => false,
@@ -138,19 +135,11 @@ describe("goto exception regression", () => {
             fireInventoryCalled = true;
         };
 
-        try {
-            mechanicsEngine.run(section);
-        } catch (e) {
-            if (!mechanicsEngine.isGotoException(e)) {
-                throw e;
-            }
-        } finally {
-            mechanicsEngine.fireInventoryEvents = origFireInventory;
-        }
+        mechanicsEngine.run(section);
+        mechanicsEngine.fireInventoryEvents = origFireInventory;
 
-        // CURRENT BEHAVIOR: fireInventoryEvents IS called because runSectionRules
-        // catches the goto and returns normally.
-        expect(fireInventoryCalled).toBe(true);
+        // After Phase 1: run() detects currentSection changed and returns early
+        expect(fireInventoryCalled).toBe(false);
     });
 
     test("runChildRules propagates real TypeError", () => {
@@ -173,11 +162,7 @@ describe("goto exception regression", () => {
         }
     });
 
-    test("nested goto: outer post-rule work continues (current behavior)", () => {
-        // CURRENT BEHAVIOR: runSectionRules catches goto and returns normally,
-        // so outer run() continues. After Phase 1 refactor, run() will check
-        // currentSection !== _expectedSection and return early.
-
+    test("nested goto: outer run returns early after goto", () => {
         const section = {
             sectionId: "sect1",
             hasNavigation: () => false,
@@ -201,17 +186,158 @@ describe("goto exception regression", () => {
             fireInventoryCalled = true;
         };
 
+        mechanicsEngine.run(section);
+        mechanicsEngine.fireInventoryEvents = origFireInventory;
+
+        // After Phase 1: run() detects currentSection changed and returns early
+        expect(fireInventoryCalled).toBe(false);
+    });
+
+    test("SectionJumpError stores target section id", () => {
+        const err = new mechanicsEngine.SectionJumpError("sect200");
+        expect(err.targetSectionId).toBe("sect200");
+        expect(err.name).toBe("SectionJumpError");
+        expect(mechanicsEngine.isGotoException(err)).toBe(true);
+    });
+
+    test("_expectedSection is restored via finally after run", () => {
+        mechanicsEngine._expectedSection = "previous";
+
+        const section = {
+            sectionId: "sect1",
+            hasNavigation: () => false,
+            getTitleText: () => "Test",
+            getHtml: () => "",
+            getCombats: () => [],
+            getFirstIllustrationHtml: () => "",
+            book: state.book,
+        } as any;
+
+        const xmlDoc = document.implementation.createDocument(null, "section", null);
+        const gotoRule = xmlDoc.createElement("goToSection");
+        gotoRule.setAttribute("section", "sect99");
+        xmlDoc.documentElement.appendChild(gotoRule);
+        (state.mechanics as any).getSection = () => $(xmlDoc.documentElement);
+
+        mechanicsEngine.run(section);
+
+        // _expectedSection should be restored to its previous value
+        expect(mechanicsEngine._expectedSection).toBe("previous");
+    });
+
+    test("fireChoiceSelected catches goto internally", () => {
+        mechanicsEngine.onChoiceSelected = [
+            document.createElementNS(null, "choiceSelected")
+        ];
+        // Temporarily override runChildRules to throw goto
+        const origRunChildRules = mechanicsEngine.runChildRules;
+        mechanicsEngine.runChildRules = () => {
+            throw new mechanicsEngine.SectionJumpError("sectX");
+        };
+
+        let threw = false;
         try {
-            mechanicsEngine.run(section);
+            mechanicsEngine.fireChoiceSelected("sect1");
         } catch (e) {
-            if (!mechanicsEngine.isGotoException(e)) {
-                throw e;
-            }
+            threw = true;
         } finally {
-            mechanicsEngine.fireInventoryEvents = origFireInventory;
+            mechanicsEngine.runChildRules = origRunChildRules;
         }
 
-        // CURRENT BEHAVIOR: fireInventoryEvents IS called
-        expect(fireInventoryCalled).toBe(true);
+        expect(threw).toBe(false);
+    });
+
+    test("fireInventoryEvents catches goto internally", () => {
+        mechanicsEngine.onInventoryEventRule = document.createElementNS(null, "inventoryEvent");
+        const origRunChildRules = mechanicsEngine.runChildRules;
+        mechanicsEngine.runChildRules = () => {
+            throw new mechanicsEngine.SectionJumpError("sectX");
+        };
+
+        let threw = false;
+        try {
+            mechanicsEngine.fireInventoryEvents();
+        } catch (e) {
+            threw = true;
+        } finally {
+            mechanicsEngine.runChildRules = origRunChildRules;
+        }
+
+        expect(threw).toBe(false);
+    });
+
+    test("fireNumberPickerChoosed catches goto internally", () => {
+        mechanicsEngine.onNumberPickerChoosed = document.createElementNS(null, "numberPickerChoosed");
+        jest.spyOn(numberPickerMechanics, "isValid").mockReturnValue(true);
+        const origRunChildRules = mechanicsEngine.runChildRules;
+        mechanicsEngine.runChildRules = () => {
+            throw new mechanicsEngine.SectionJumpError("sectX");
+        };
+
+        let threw = false;
+        let result = false;
+        try {
+            result = mechanicsEngine.fireNumberPickerChoosed();
+        } catch (e) {
+            threw = true;
+        } finally {
+            mechanicsEngine.runChildRules = origRunChildRules;
+        }
+
+        expect(threw).toBe(false);
+        expect(result).toBe(true);
+    });
+
+    test("fireDisciplinePickerChoosed catches goto internally", () => {
+        mechanicsEngine.onDisciplinePickerChoosed = document.createElementNS(null, "disciplinePickerChoosed");
+        jest.spyOn(disciplinePickerMechanics, "isValid").mockReturnValue(true);
+        const origRunChildRules = mechanicsEngine.runChildRules;
+        mechanicsEngine.runChildRules = () => {
+            throw new mechanicsEngine.SectionJumpError("sectX");
+        };
+
+        let threw = false;
+        let result = false;
+        try {
+            result = mechanicsEngine.fireDisciplinePickerChoosed();
+        } catch (e) {
+            threw = true;
+        } finally {
+            mechanicsEngine.runChildRules = origRunChildRules;
+        }
+
+        expect(threw).toBe(false);
+        expect(result).toBe(true);
+    });
+
+    test("fireObjectUsed catches goto internally", () => {
+        mechanicsEngine.onObjectUsedRule = document.createElementNS(null, "objectUsed");
+        $(mechanicsEngine.onObjectUsedRule).attr("objectId", "obj1");
+        const origRunChildRules = mechanicsEngine.runChildRules;
+        mechanicsEngine.runChildRules = () => {
+            throw new mechanicsEngine.SectionJumpError("sectX");
+        };
+
+        let threw = false;
+        try {
+            mechanicsEngine.fireObjectUsed("obj1");
+        } catch (e) {
+            threw = true;
+        } finally {
+            mechanicsEngine.runChildRules = origRunChildRules;
+        }
+
+        expect(threw).toBe(false);
+    });
+
+    test("gameController.loadSection outer try-catch still works", () => {
+        // Simulate the old outer try-catch path in loadSection
+        const err = new mechanicsEngine.SectionJumpError("sect99");
+
+        try {
+            throw err;
+        } catch (e) {
+            expect(mechanicsEngine.isGotoException(e)).toBe(true);
+        }
     });
 });
