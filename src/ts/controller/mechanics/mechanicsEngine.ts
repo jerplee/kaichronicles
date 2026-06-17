@@ -294,7 +294,17 @@ export const mechanicsEngine = {
         mechanicsEngine.showSellObjects();
 
         if (mechanicsEngine.onInventoryEventRule) {
-            mechanicsEngine.runChildRules($(mechanicsEngine.onInventoryEventRule));
+            try {
+                mechanicsEngine.runChildRules($(mechanicsEngine.onInventoryEventRule));
+            } catch (e) {
+                if (mechanicsEngine.isGotoException(e)) {
+                    return;
+                }
+                throw e;
+            }
+        }
+        if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+            return; // Section changed via goto, skip re-render
         }
 
         // Update combat ratio on combats  (have we picked a weapon?)
@@ -304,10 +314,13 @@ export const mechanicsEngine = {
             // Check if we must to re-render the section. This may be needed if the
             // picked / dropped object affects to the rules
             if (mechanicsEngine.checkReRenderAfterInventoryEvent(o)) {
-                // Re-render the section
-                console.log("Re-rendering the section due to rules re-execution");
-                gameController.loadSection(state.sectionStates.currentSection, false,
-                    window.scrollY);
+                // Only re-render if section hasn't changed
+                if (state.sectionStates.currentSection === mechanicsEngine._expectedSection) {
+                    // Re-render the section
+                    console.log("Re-rendering the section due to rules re-execution");
+                    gameController.loadSection(state.sectionStates.currentSection, false,
+                        window.scrollY);
+                }
             }
         }
 
@@ -416,6 +429,9 @@ export const mechanicsEngine = {
             // Fire all combats
             $.each(sectionState.combats, (index, turnCombat: Combat) => {
                 mechanicsEngine.fireAfterCombatTurn(turnCombat);
+                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                    return false; // Break .each loop on goto
+                }
             });
             return;
         }
@@ -428,7 +444,17 @@ export const mechanicsEngine = {
 
             // We reapply all rules accumulatively
             if (txtRuleTurn === "any" || combat.turns.length >= ruleTurn) {
-                mechanicsEngine.runChildRules($(rule));
+                try {
+                    mechanicsEngine.runChildRules($(rule));
+                } catch (e) {
+                    if (mechanicsEngine.isGotoException(e)) {
+                        return;
+                    }
+                    throw e;
+                }
+                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                    return;
+                }
             }
         }
     },
@@ -441,7 +467,17 @@ export const mechanicsEngine = {
         $.each(mechanicsEngine.onChoiceSelected, (index, rule) => {
             const ruleSectionId = $(rule).attr("section");
             if (ruleSectionId === "all" || ruleSectionId === sectionId) {
-                mechanicsEngine.runChildRules($(rule));
+                try {
+                    mechanicsEngine.runChildRules($(rule));
+                } catch (e) {
+                    if (mechanicsEngine.isGotoException(e)) {
+                        return false; // break jQuery .each loop
+                    }
+                    throw e;
+                }
+            }
+            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                return false; // break jQuery .each loop
             }
         });
     },
@@ -458,7 +494,14 @@ export const mechanicsEngine = {
         const $eventRule = $(mechanicsEngine.onObjectUsedRule);
         const objectIds = mechanicsEngine.getArrayProperty($eventRule, "objectId");
         if (objectIds.includes(objectId)) {
-            mechanicsEngine.runChildRules($eventRule);
+            try {
+                mechanicsEngine.runChildRules($eventRule);
+            } catch (e) {
+                if (mechanicsEngine.isGotoException(e)) {
+                    return;
+                }
+                throw e;
+            }
         }
     },
 
@@ -473,7 +516,14 @@ export const mechanicsEngine = {
         }
 
         if (mechanicsEngine.onNumberPickerChoosed) {
-            mechanicsEngine.runChildRules($(mechanicsEngine.onNumberPickerChoosed));
+            try {
+                mechanicsEngine.runChildRules($(mechanicsEngine.onNumberPickerChoosed));
+            } catch (e) {
+                if (mechanicsEngine.isGotoException(e)) {
+                    return true; // Action was fired, goto will navigate
+                }
+                throw e;
+            }
         }
 
         return true;
@@ -490,7 +540,14 @@ export const mechanicsEngine = {
         }
 
         if (mechanicsEngine.onDisciplinePickerChoosed) {
-            mechanicsEngine.runChildRules($(mechanicsEngine.onDisciplinePickerChoosed));
+            try {
+                mechanicsEngine.runChildRules($(mechanicsEngine.onDisciplinePickerChoosed));
+            } catch (e) {
+                if (mechanicsEngine.isGotoException(e)) {
+                    return true; // Action was fired, goto will navigate
+                }
+                throw e;
+            }
         }
 
         return true;
