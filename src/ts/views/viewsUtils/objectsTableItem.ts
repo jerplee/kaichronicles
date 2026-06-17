@@ -485,7 +485,14 @@ export class ObjectsTableItem {
             }
 
             // Refresh the table of available objects
-            mechanicsEngine.fireInventoryEvents(true, this.item);
+            try {
+                mechanicsEngine.fireInventoryEvents(true, this.item);
+            } catch (e) {
+                if (mechanicsEngine.isGotoException(e)) {
+                    return; // Section changed, stop processing
+                }
+                throw e;
+            }
         }
 
         template.addSectionReadyMarker();
@@ -514,7 +521,14 @@ export class ObjectsTableItem {
         const sectionState = state.sectionStates.getSectionState();
         sectionState.soldObject = true;
 
-        mechanicsEngine.fireInventoryEvents(true, this.item);
+        try {
+            mechanicsEngine.fireInventoryEvents(true, this.item);
+        } catch (e) {
+            if (mechanicsEngine.isGotoException(e)) {
+                return; // Section changed, stop processing
+            }
+            throw e;
+        }
     }
 
     /** Use object operation */
@@ -547,7 +561,14 @@ export class ObjectsTableItem {
                 sectionState.removeObjectFromSection(this.item.id , this.objectInfo.price);
             }
             // Refresh the table of available objects
-            mechanicsEngine.fireInventoryEvents(true, this.item);
+            try {
+                mechanicsEngine.fireInventoryEvents(true, this.item);
+            } catch (e) {
+                if (mechanicsEngine.isGotoException(e)) {
+                    return; // Section changed, stop processing
+                }
+                throw e;
+            }
         }
     }
 

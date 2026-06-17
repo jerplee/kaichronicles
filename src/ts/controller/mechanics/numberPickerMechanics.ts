@@ -36,10 +36,17 @@ export const numberPickerMechanics = {
             const $pickNumberButton = $ui.find("#mechanics-picknumber");
             $pickNumberButton.show().text(actionButtonTitle);
             numberPickerMechanics.bindButtonActionEvent($pickNumberButton, () => {
-                if (mechanicsEngine.fireNumberPickerChoosed()) {
-                    // Store that the picker action has been fired
-                    const sectionState = state.sectionStates.getSectionState();
-                    sectionState.numberPickersState.actionFired = true;
+                try {
+                    if (mechanicsEngine.fireNumberPickerChoosed()) {
+                        // Store that the picker action has been fired
+                        const sectionState = state.sectionStates.getSectionState();
+                        sectionState.numberPickersState.actionFired = true;
+                    }
+                } catch (e) {
+                    if (mechanicsEngine.isGotoException(e)) {
+                        return; // Section changed, stop processing
+                    }
+                    throw e;
                 }
             });
 

@@ -225,7 +225,14 @@ export const actionChartController = {
                 sectionState.addActionChartItemToSection(droppedItem, dropCount);
 
                 // Render available objects on this section (game view)
-                mechanicsEngine.fireInventoryEvents(fromUI, item);
+                try {
+                    mechanicsEngine.fireInventoryEvents(fromUI, item);
+                } catch (e) {
+                    if (mechanicsEngine.isGotoException(e)) {
+                        return droppedItem; // Section changed, stop processing
+                    }
+                    throw e;
+                }
             }
             return droppedItem;
         } else {

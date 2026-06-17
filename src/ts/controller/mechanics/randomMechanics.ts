@@ -238,14 +238,21 @@ export const randomMechanics = {
 
         // Process rule children. It can be a single action, and/or a set of "case" rules
         $(rule).children().each((index, childRule) => {
-            if (childRule.nodeName === "case") {
-                // Evaluate the case rule
-                if (randomMechanics.evaluateCaseRule(childRule, randomValue + increment)) {
-                    mechanicsEngine.runChildRules($(childRule));
+            try {
+                if (childRule.nodeName === "case") {
+                    // Evaluate the case rule
+                    if (randomMechanics.evaluateCaseRule(childRule, randomValue + increment)) {
+                        mechanicsEngine.runChildRules($(childRule));
+                    }
+                } else {
+                    // Run unconditional rule
+                    mechanicsEngine.runRule(childRule);
                 }
-            } else {
-                // Run unconditional rule
-                mechanicsEngine.runRule(childRule);
+            } catch (e) {
+                if (mechanicsEngine.isGotoException(e)) {
+                    return false; // Section changed, stop processing (jQuery .each return false breaks loop)
+                }
+                throw e;
             }
         });
 

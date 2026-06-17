@@ -54,11 +54,18 @@ export const disciplinePickerMechanics = {
                         if (!confirmed) {
                             return;
                         }
+                        try {
                         if (mechanicsEngine.fireDisciplinePickerChoosed()) {
                             // Store that the picker action has been fired
                             const sectionState = state.sectionStates.getSectionState();
                             sectionState.disciplinePickersState.actionFired = true;
                         }
+                    } catch (e) {
+                        if (mechanicsEngine.isGotoException(e)) {
+                            return; // Section changed, stop processing
+                        }
+                        throw e;
+                    }
                     }
                 );
             });
