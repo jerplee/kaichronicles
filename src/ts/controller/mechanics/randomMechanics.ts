@@ -254,15 +254,21 @@ export const randomMechanics = {
                 }
                 throw e;
             }
+            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                return false; // Nested goto detected, break .each loop
+            }
         });
 
-        // Ugly hack: If we are on the 'equipment' section, check if all link has been clicked
-        if (state.sectionStates.currentSection === "equipmnt") {
-            EquipmentSectionMechanics.checkExitEquipmentSection();
-        }
+        // Only execute post-processing if section didn't change
+        if (state.sectionStates.currentSection === mechanicsEngine._expectedSection) {
+            // Ugly hack: If we are on the 'equipment' section, check if all link has been clicked
+            if (state.sectionStates.currentSection === "equipmnt") {
+                EquipmentSectionMechanics.checkExitEquipmentSection();
+            }
 
-        // Mark the rule as executed
-        state.sectionStates.markRuleAsExecuted(rule, { randomValue, increment });
+            // Mark the rule as executed
+            state.sectionStates.markRuleAsExecuted(rule, { randomValue, increment });
+        }
     },
 
     getCaseRuleBounds($rule: JQuery<Element>): number[] {
