@@ -1,4 +1,5 @@
 import { ActionChart, translations, ObjectsTable, ObjectsTableType, actionChartController, state, GndDiscipline, MoneyDialog, BookSeriesId, Item, CurrencyName, template } from "..";
+import DOMPurify from "dompurify";
 
 /**
  * The action chart view API
@@ -126,7 +127,7 @@ export const actionChartView = {
                 for ( const c of actionChart.getLoreCircles() ) {
                     circlesNames.push( c.getDescription() );
                 }
-                $("#achart-currentCircles").html( circlesNames.join( ", ") );
+                $("#achart-currentCircles").html( DOMPurify.sanitize(circlesNames.join( ", ")) );
             }
         } else {
             $("#achart-circles").hide();
@@ -165,7 +166,7 @@ export const actionChartView = {
                 }
 
                 // Unescape the HTML description:
-                const descriptionHtml = $("<div />").html(dInfo.description).text();
+                const descriptionHtml = $("<div />").html(DOMPurify.sanitize(dInfo.description)).text();
                 const td = $("<td>");
                 td[0].innerHTML = '<button class="btn btn-default table-op" type="button" title="' +
                     translations.text("disciplineDescription") +
@@ -183,7 +184,7 @@ export const actionChartView = {
                 small[0].innerText = descriptionHtml;
 
                 const i = $("<i>").prop("style", "display:none").append(small);
-                td.append(b).append(`<br/>${dInfo.imageHtml}`).append(i);
+                td.append(b).append(`<br/>${DOMPurify.sanitize(dInfo.imageHtml)}`).append(i);
 
                 const tr = $("<tr>").append(td);
 

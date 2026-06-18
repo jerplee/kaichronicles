@@ -1,4 +1,5 @@
 import { setupController, translations, views, state, Book, Section, SectionRenderer, mechanicsEngine } from "..";
+import DOMPurify from "dompurify";
 
 /**
  * About the book controller
@@ -20,7 +21,7 @@ export const aboutController = {
 
             // Get all metadata about the book:
             $("#about-title").text( state.book.getBookTitle() );
-            $("#about-copyright").append( state.book.getCopyrightHtml() );
+            $("#about-copyright").append( DOMPurify.sanitize(state.book.getCopyrightHtml()) );
             aboutController.appendSection( "dedicate" , "#about-dedication" );
             aboutController.appendSection( "acknwldg" , "#about-content" );
             $("#about-cover").attr("src" , state.book.getCoverURL() );
@@ -55,13 +56,13 @@ export const aboutController = {
         // Append the author biography
         const fakeSection = Section.createFromXml( state.book , $(authorInfoXml) );
         const renderer = new SectionRenderer(fakeSection);
-        $authorsWrapper.append( renderer.renderSection() );
+        $authorsWrapper.append( DOMPurify.sanitize(renderer.renderSection()) );
     },
 
     appendSection(sectionId: string, containerId: string) {
         const section = new Section( state.book , sectionId , state.mechanics );
         const renderer = new SectionRenderer( section );
-        $(containerId).append( renderer.renderSection() );
+        $(containerId).append( DOMPurify.sanitize(renderer.renderSection()) );
     },
 
     /** Return page */

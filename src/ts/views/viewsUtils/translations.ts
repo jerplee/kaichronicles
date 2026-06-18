@@ -1,4 +1,5 @@
 import { mechanicsEngine } from "../..";
+import DOMPurify from "dompurify";
 
 /**
  * Translations table
@@ -275,7 +276,7 @@ export class Translations {
             const translationId = $t.attr("data-translation");
             const html = table[ translationId ];
             if ( html ) {
-                $t.html( html );
+                $t.html( DOMPurify.sanitize(html) );
             }
         }
     }

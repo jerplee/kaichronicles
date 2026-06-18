@@ -5,6 +5,7 @@
  */
 
 import { Section, translations, mechanicsEngine } from "..";
+import DOMPurify from "dompurify";
 
  /**
   * Tool to transform the book XML to HTML
@@ -72,7 +73,7 @@ export class SectionRenderer {
             html += "</div>";
         }
 
-        return html;
+        return DOMPurify.sanitize(html);
     }
 
     /**
@@ -207,7 +208,7 @@ export class SectionRenderer {
         // Note HTML
         let noteHtml = this.renderNodeChildren( $footNote , level );
         // Add the note index to the HTML
-        const $html = $("<div>").html( noteHtml );
+        const $html = $("<div>").html( DOMPurify.sanitize(noteHtml) );
         $html.find(">:first-child").prepend(`[${(this.footNotes.length + 1)}] `);
         noteHtml = $html.html();
         // Store the note

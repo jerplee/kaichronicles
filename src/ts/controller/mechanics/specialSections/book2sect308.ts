@@ -1,4 +1,5 @@
 import { mechanicsEngine, gameView, template, state, translations, actionChartController, randomTable, CurrencyName, SpecialSectionRegistry } from "../../..";
+import DOMPurify from "dompurify";
 
 interface GameResult {
     dice1: number,
@@ -53,7 +54,7 @@ export const book2sect308 = {
             actionChartController.increaseMoney(-3);
         }
 
-        $("#mechanics-gameStatus").html( status );
+        $("#mechanics-gameStatus").html( DOMPurify.sanitize(status) );
         book2sect308.updateUI(false);
     },
 

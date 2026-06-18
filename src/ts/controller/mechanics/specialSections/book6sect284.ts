@@ -1,4 +1,5 @@
 import { numberPickerMechanics, state, randomTable, actionChartController, translations, mechanicsEngine, SpecialSectionRegistry } from "../../..";
+import DOMPurify from "dompurify";
 
 /** Bet */
 export const book6sect284 = {
@@ -68,7 +69,7 @@ export const book6sect284 = {
             html += translations.text( "number" , [1] ) + ": " + bet[1].toFixed() +
             ", " + translations.text( "number" , [2] ) + ": " + bet[2].toFixed() + " + 3 = " + ( bet[2] + 3 ).toFixed() + "<br/>";
         }
-        $betsPlaceholder.html( html );
+        $betsPlaceholder.html( DOMPurify.sanitize(html) );
     },
 
     updateUIState() {

@@ -495,7 +495,7 @@ export const template = {
             }
             html += "</tr>";
         }
-        $("#template-randomcontent").html( html );
+        $("#template-randomcontent").html( DOMPurify.sanitize(html) );
 
         // Add click event handlers:
         $("#template-randomcontent td").on("mousedown", function(e) {

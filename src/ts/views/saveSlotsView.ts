@@ -1,4 +1,5 @@
 import { translations, settingsController, template } from "..";
+import DOMPurify from "dompurify";
 import { SaveSlotRecord } from "../model/saveGameDb";
 
 /**
@@ -14,7 +15,7 @@ export const saveSlotsView = {
         $grid.empty();
 
         if (slots.length === 0) {
-            $grid.html('<p class="text-muted"><i>' + translations.text("noSaveSlots") + "</i></p>");
+            $grid.html(DOMPurify.sanitize('<p class="text-muted"><i>' + translations.text("noSaveSlots") + "</i></p>"));
             return;
         }
 

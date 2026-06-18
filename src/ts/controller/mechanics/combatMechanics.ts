@@ -992,7 +992,7 @@ export class CombatMechanics {
             html += `</p>`;
         }
 
-        $("#game-combatauditbody").html(html);
+        $("#game-combatauditbody").html(DOMPurify.sanitize(html));
         $("#game-combataudit").modal();
     }
 

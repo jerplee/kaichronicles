@@ -1,5 +1,6 @@
 import { state, KaiDiscipline, projectAon, Section, MgnDiscipline, GndDiscipline, BookSeriesId, SectionRenderer, BookSeries, mechanicsEngine } from "..";
 import he from 'he';
+import DOMPurify from "dompurify";
 
 /** Book disciplines table */
 export interface DisciplinesTable {
@@ -360,7 +361,7 @@ export class Book {
             this.bookCopyrightHtml = renderer.renderNodeChildren( $(this.bookXml).find(selector) , 0 );
         }
 
-        return this.bookCopyrightHtml;
+        return DOMPurify.sanitize(this.bookCopyrightHtml);
     }
 
     /**
