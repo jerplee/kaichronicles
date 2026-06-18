@@ -250,7 +250,7 @@ export const template = {
         const $footer = $("#app-footer");
         const $content = $("#app-footer-content");
 
-        if (!type) {
+        if (!type || App.debugMode === DebugMode.TEST) {
             $footer.hide();
             return;
         }
@@ -570,11 +570,16 @@ export const template = {
     },
 
     /**
-     * Hides the copyright footer.
+     * Hides fixed footers.
      *  Needed for testing with selenium (the fixed footer blocks clicks on bottom elements)
      */
     hideCopyrightsForTests() {
         $("#game-copyrights-wrapper").hide();
+        $("#app-footer").hide();
+        // Prevent body.sidebar-visible CSS from re-showing the footer
+        if ($("#test-hide-footer").length === 0) {
+            $("head").append('<style id="test-hide-footer">body.sidebar-visible .app-footer { display: none !important; }</style>');
+        }
     },
 
     addSectionReadyMarker() {

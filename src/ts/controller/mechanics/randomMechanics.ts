@@ -254,13 +254,13 @@ export const randomMechanics = {
                 }
                 throw e;
             }
-            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+            if (mechanicsEngine.hasSectionChanged()) {
                 return false; // Nested goto detected, break .each loop
             }
         });
 
         // Only execute post-processing if section didn't change
-        if (state.sectionStates.currentSection === mechanicsEngine._expectedSection) {
+        if (!mechanicsEngine.hasSectionChanged()) {
             // Ugly hack: If we are on the 'equipment' section, check if all link has been clicked
             if (state.sectionStates.currentSection === "equipmnt") {
                 EquipmentSectionMechanics.checkExitEquipmentSection();

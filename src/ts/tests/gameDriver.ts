@@ -199,8 +199,9 @@ export class GameDriver {
 
         // Go to new game page
         await this.driver.get(this.newGameUrl);
-        // Hide fixed copyright footer to prevent Selenium click interception
+        // Hide fixed footers to prevent Selenium click interception
         await this.driver.executeScript('var el = document.getElementById("game-copyrights-wrapper"); if (el) el.style.display = "none";');
+        await this.driver.executeScript('var el = document.getElementById("app-footer"); if (el) el.style.display = "none";');
         // Select new book
         await( await this.driver.wait( until.elementLocated( By.css(`#newgame-book > option[value='${bookNumber}']`) ) , 10000) ).click();
 
@@ -239,6 +240,8 @@ export class GameDriver {
 
     public async cleanClickAndWait(element: WebElement) {
         await this.cleanSectionReady();
+        // Remove any toasts/toastr containers to prevent click interception
+        await this.driver.executeScript('document.querySelectorAll(".toast, #toast-container").forEach(el => el.remove())');
         await element.click();
         await this.waitForSectionReady();
     }

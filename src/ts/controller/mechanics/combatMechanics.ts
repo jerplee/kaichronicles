@@ -356,7 +356,7 @@ export class CombatMechanics {
 
                 // Fire turn events:
                 mechanicsEngine.fireAfterCombatTurn(combat);
-                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                if (mechanicsEngine.hasSectionChanged()) {
                     return; // Goto happened, stop processing
                 }
 
@@ -366,14 +366,14 @@ export class CombatMechanics {
                     // Fire "afterCombats" rule
                     mechanicsEngine.runChildRules( $(mechanicsEngine.onAfterCombatsRule) );
                 }
-                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                if (mechanicsEngine.hasSectionChanged()) {
                     return; // Goto happened, stop processing
                 }
                 if ( combatsResult === "eluded" && mechanicsEngine.onEludeCombatsRule ) {
                     // Fire "afterElude" rule
                     mechanicsEngine.runChildRules( $(mechanicsEngine.onEludeCombatsRule) );
                 }
-                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                if (mechanicsEngine.hasSectionChanged()) {
                     return; // Goto happened, stop processing
                 }
 
@@ -397,7 +397,7 @@ export class CombatMechanics {
 
                 // Fire turn events:
                 mechanicsEngine.fireAfterCombatTurn(combat);
-                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                if (mechanicsEngine.hasSectionChanged()) {
                     return; // Goto happened, stop processing
                 }
 

@@ -47,7 +47,16 @@ export const mechanicsEngine = {
 
     /** Expected section id during rule execution. Used to detect goto aborts. */
     _expectedSection: null as string|null,
-    
+
+    /**
+     * Check if the current section has changed from the expected section.
+     * Returns false if _expectedSection is null (outside of run() context).
+     */
+    hasSectionChanged(): boolean {
+        return mechanicsEngine._expectedSection !== null &&
+            state.sectionStates.currentSection !== mechanicsEngine._expectedSection;
+    },
+
     /************************************************************/
     /**************** MAIN FUNCTIONS ****************************/
     /************************************************************/
@@ -149,13 +158,13 @@ export const mechanicsEngine = {
 
             // Get and run section rules
             mechanicsEngine.runSectionRules();
-            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+            if (mechanicsEngine.hasSectionChanged()) {
                 return; // Section changed via goto, stop processing
             }
 
             // Render available / to sell objects on this section
             mechanicsEngine.fireInventoryEvents();
-            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+            if (mechanicsEngine.hasSectionChanged()) {
                 return;
             }
 
@@ -207,7 +216,7 @@ export const mechanicsEngine = {
                 });
             }
             mechanicsEngine.runChildRules($sectionMechanics);
-            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+            if (mechanicsEngine.hasSectionChanged()) {
                 return; // Section changed via goto, stop processing
             }
         }
@@ -223,7 +232,7 @@ export const mechanicsEngine = {
      */
     runGlobalRules(onlyCombatRules: boolean = false, combatToApply: Combat = null) {
         for (const id of state.sectionStates.globalRulesIds) {
-            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+            if (mechanicsEngine.hasSectionChanged()) {
                 return; // Section changed via goto, stop processing remaining globals
             }
             const $globalRule = state.mechanics.getGlobalRule(id);
@@ -236,7 +245,7 @@ export const mechanicsEngine = {
                 }
             } else {
                 mechanicsEngine.runChildRules($globalRule);
-                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                if (mechanicsEngine.hasSectionChanged()) {
                     return;
                 }
             }
@@ -258,7 +267,7 @@ export const mechanicsEngine = {
                 }
                 throw e; // Real error — propagate
             }
-            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+            if (mechanicsEngine.hasSectionChanged()) {
                 return; // Nested goto detected via state change
             }
         }
@@ -303,7 +312,7 @@ export const mechanicsEngine = {
                 throw e;
             }
         }
-        if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+        if (mechanicsEngine.hasSectionChanged()) {
             return; // Section changed via goto, skip re-render
         }
 
@@ -315,7 +324,7 @@ export const mechanicsEngine = {
             // picked / dropped object affects to the rules
             if (mechanicsEngine.checkReRenderAfterInventoryEvent(o)) {
                 // Only re-render if section hasn't changed
-                if (state.sectionStates.currentSection === mechanicsEngine._expectedSection) {
+                if (!mechanicsEngine.hasSectionChanged()) {
                     // Re-render the section
                     console.log("Re-rendering the section due to rules re-execution");
                     gameController.loadSection(state.sectionStates.currentSection, false,
@@ -429,7 +438,7 @@ export const mechanicsEngine = {
             // Fire all combats
             $.each(sectionState.combats, (index, turnCombat: Combat) => {
                 mechanicsEngine.fireAfterCombatTurn(turnCombat);
-                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                if (mechanicsEngine.hasSectionChanged()) {
                     return false; // Break .each loop on goto
                 }
             });
@@ -452,7 +461,7 @@ export const mechanicsEngine = {
                     }
                     throw e;
                 }
-                if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+                if (mechanicsEngine.hasSectionChanged()) {
                     return;
                 }
             }
@@ -476,7 +485,7 @@ export const mechanicsEngine = {
                     throw e;
                 }
             }
-            if (state.sectionStates.currentSection !== mechanicsEngine._expectedSection) {
+            if (mechanicsEngine.hasSectionChanged()) {
                 return false; // break jQuery .each loop
             }
         });
