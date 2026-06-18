@@ -1,4 +1,5 @@
 import { Section, App, gameController, state, randomTable, Book, template, numberPickerMechanics, DebugMode, voiceManager } from "..";
+import DOMPurify from "dompurify";
 import { VOICE_FEATURE_ENABLED } from "../voice/voiceTypes";
 
 /**
@@ -46,8 +47,10 @@ export const gameView = {
             section.getTitleText();
         $("#game-section-title").hide();
         $("#game-section").html(
-            '<div class="section-number">— ' + section.getTitleText() + ' —</div>' +
-            section.getHtml()
+            DOMPurify.sanitize(
+                '<div class="section-number">— ' + section.getTitleText() + ' —</div>' +
+                section.getHtml()
+            )
         );
     },
 
@@ -71,7 +74,7 @@ export const gameView = {
 
         // Show book copyright
         const copyrightHtml = state.book.getCopyrightHtml().replace(/<br\s*\/?>/gi, "  -  ");
-        $("#game-copyrights").html(" - " + state.book.getBookTitle() + " - " + copyrightHtml);
+        $("#game-copyrights").html(DOMPurify.sanitize(" - " + state.book.getBookTitle() + " - " + copyrightHtml));
 
         // Update voice indicator visibility (feature-gated)
         if (VOICE_FEATURE_ENABLED) {

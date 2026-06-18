@@ -1,5 +1,6 @@
 import { state, mechanicsEngine, Combat, template, SpecialObjectsUse, CombatTurn, GndDiscipline, translations, BookSeriesId, NewOrderDiscipline, BookSeries, COMBATTABLE_DEATH, emit } from "../..";
 import striptags from 'striptags';
+import DOMPurify from "dompurify";
 
 /**
  * Combats mechanics
@@ -102,7 +103,7 @@ export class CombatMechanics {
             }
 
             // Set enemy name on table and status panel
-            $combatUI.find(".mechanics-enemyName").html( combat.enemy );
+            $combatUI.find(".mechanics-enemyName").html( DOMPurify.sanitize(combat.enemy) );
             // Set combat ratio:
             CombatMechanics.updateCombatRatio( $combatUI, combat );
 
@@ -850,7 +851,7 @@ export class CombatMechanics {
         if ( bonuses.filter((b) => b.enemy).length > 0 ) {
             csEnemy += " = " + finalCSEnemy.toString();
         }
-        $("#game-ratioenemyname").html( combat.enemy );
+        $("#game-ratioenemyname").html( DOMPurify.sanitize(combat.enemy) );
         $("#game-ratioenemy").text( csEnemy );
 
         // Combat ratio result:

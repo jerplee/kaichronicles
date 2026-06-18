@@ -1,4 +1,5 @@
 import { routing, state, Item, translations, randomTable, mechanicsEngine, App, DebugMode, Color, TextSize, Font, BookSeriesId, KaiDiscipline, MgnDiscipline, GndDiscipline, NewOrderDiscipline, settingsController, ModalIds, voiceManager } from ".";
+import DOMPurify from "dompurify";
 import { VOICE_FEATURE_ENABLED } from "./voice/voiceTypes";
 
 /**
@@ -259,7 +260,7 @@ export const template = {
 
         if (type === "book" && state.book) {
             const copyrightHtml = state.book.getCopyrightHtml().replace(/<br\s*\/?>/gi, "  -  ");
-            $content.html(" - " + state.book.getBookTitle() + " - " + copyrightHtml);
+            $content.html(DOMPurify.sanitize(" - " + state.book.getBookTitle() + " - " + copyrightHtml));
         } else {
             $content.html('<a href="#aboutApp">About / FAQ / Privacy</a> — <a href="https://github.com/jerplee/kaichronicles" target="_blank">GitHub</a> — <a href="https://www.projectaon.org" target="_blank">Project Aon</a>');
         }
@@ -636,7 +637,7 @@ export const template = {
      */
     showAlertHtml(html: string, title?: string) {
         const $modal = $("#" + ModalIds.ALERT_MODAL);
-        $("#" + ModalIds.ALERT_MESSAGE).html(html);
+        $("#" + ModalIds.ALERT_MESSAGE).html(DOMPurify.sanitize(html));
         if (title) {
             $("#template-alertTitle").text(title);
         }

@@ -1,4 +1,5 @@
 import { Section, state, Item } from "..";
+import DOMPurify from "dompurify";
 
 export const mapView = {
 
@@ -31,7 +32,7 @@ export const mapView = {
         document.title = titleText;
         $("#map-title").text( titleText );
         // Render the map, with the illustrations text. On books 5 and 29, there is a textual map description
-        $("#map-section").html( mapSectionHtml );
+        $("#map-section").html( DOMPurify.sanitize(mapSectionHtml) );
     },
 
     /**
