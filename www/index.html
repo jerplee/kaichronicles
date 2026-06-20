@@ -30,28 +30,12 @@
 
   <body>
 
-    <!-- Navigation bar -->
-    <nav id="template-header" class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-
-        <div class="navbar-header">
-
-          <button type="button" class="navbar-toggle collapsed"
-            id="template-menubutton" title="Toggle sidebar">
-            <span class="sr-only">Toggle sidebar</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-
-          <a class="navbar-brand" href="#mainMenu" id="template-title">
-            Kai Chronicles
-          </a>
-
-        </div>
-
-      </div>
-    </nav>
+    <!-- Mobile sidebar toggle (visible only on small screens) -->
+    <button id="sidebar-mobile-toggle" class="sidebar-mobile-toggle" title="Menu">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
 
     <div id="template-offline" class="alert alert-warning text-center" style="display:none; margin-bottom:0; border-radius:0;">
         <span class="glyphicon glyphicon-signal"></span> <span data-translation="offline">You are offline</span>
@@ -124,6 +108,25 @@
         </a>
       </nav>
 
+      <!-- Copyright (bottom-left of sidebar) -->
+      <div class="sidebar-copyright" id="sidebar-copyright"></div>
+
+      <!-- Theme selector (bottom of sidebar) -->
+      <div class="sidebar-theme">
+        <div class="footer-theme-toggle" id="footer-themeToggle" title="Theme: Light">
+          <span class="theme-current-swatch" id="theme-current-swatch"></span>
+          <span class="theme-current-name" id="theme-current-name">Light</span>
+          <span class="glyphicon glyphicon-chevron-up theme-arrow" id="theme-arrow"></span>
+        </div>
+        <div class="theme-popup" id="theme-popup" style="display:none;">
+          <div class="theme-option" data-theme="Light"><span class="theme-swatch light"></span><span class="theme-name">Light</span></div>
+          <div class="theme-option" data-theme="Dark"><span class="theme-swatch dark"></span><span class="theme-name">Dark</span></div>
+          <div class="theme-option" data-theme="Paper"><span class="theme-swatch paper"></span><span class="theme-name">Parchment</span></div>
+          <div class="theme-option" data-theme="Ember"><span class="theme-swatch ember"></span><span class="theme-name">Ember</span></div>
+          <div class="theme-option" data-theme="Moss"><span class="theme-swatch moss"></span><span class="theme-name">Moss</span></div>
+        </div>
+      </div>
+
     </div><!-- /#game-sidebar -->
 
     <div class="container" id="template-container">
@@ -137,23 +140,6 @@
       </div>
 
     </div><!-- /.container -->
-
-    <!-- Unified App Footer -->
-    <div class="app-footer" id="app-footer">
-      <span id="app-footer-content"></span>
-      <div class="footer-theme-toggle" id="footer-themeToggle" title="Theme: Light">
-        <span class="theme-current-swatch" id="theme-current-swatch"></span>
-        <span class="theme-current-name" id="theme-current-name">Light</span>
-        <span class="glyphicon glyphicon-chevron-up theme-arrow" id="theme-arrow"></span>
-      </div>
-      <div class="theme-popup" id="theme-popup" style="display:none;">
-        <div class="theme-option" data-theme="Light"><span class="theme-swatch light"></span><span class="theme-name">Light</span></div>
-        <div class="theme-option" data-theme="Dark"><span class="theme-swatch dark"></span><span class="theme-name">Dark</span></div>
-        <div class="theme-option" data-theme="Paper"><span class="theme-swatch paper"></span><span class="theme-name">Parchment</span></div>
-        <div class="theme-option" data-theme="Ember"><span class="theme-swatch ember"></span><span class="theme-name">Ember</span></div>
-        <div class="theme-option" data-theme="Moss"><span class="theme-swatch moss"></span><span class="theme-name">Moss</span></div>
-      </div>
-    </div>
 
     <!-- Reusable Alert Modal -->
     <div class="modal fade" id="template-alertModal" tabindex="-1" role="dialog" aria-labelledby="template-alertTitle">

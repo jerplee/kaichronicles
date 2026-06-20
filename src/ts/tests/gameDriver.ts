@@ -245,7 +245,7 @@ export class GameDriver {
         `);
         // Hide fixed footers to prevent Selenium click interception
         await this.driver.executeScript('var el = document.getElementById("game-copyrights-wrapper"); if (el) el.style.display = "none";');
-        await this.driver.executeScript('var el = document.getElementById("app-footer"); if (el) el.style.display = "none";');
+        await this.driver.executeScript('var el = document.getElementById("sidebar-copyright"); if (el) el.style.display = "none";');
         // Select new book
         await( await this.driver.wait( until.elementLocated( By.css(`#newgame-book > option[value='${bookNumber}']`) ) , 10000) ).click();
 

@@ -14,17 +14,14 @@ describe("Template UI manipulation", () => {
         document.body.className = "";
         document.body.innerHTML = `
             <div id="body"></div>
-            <div id="app-footer" style="display:none">
-                <div id="app-footer-content"></div>
-            </div>
             <div id="game-sidebar">
                 <div class="sidebar-hud" style="display:none"></div>
                 <nav class="sidebar-nav">
                     <a href="#mainMenu" class="sidebar-nav-item">Main</a>
                     <a href="#settings" class="sidebar-nav-item">Settings</a>
                 </nav>
+                <div class="sidebar-copyright" id="sidebar-copyright" style="display:none"></div>
             </div>
-            <nav id="template-header"></nav>
         `;
         // jsdom does not implement scrollTo
         window.scrollTo = jest.fn();
@@ -104,18 +101,18 @@ describe("Template UI manipulation", () => {
     });
 
     describe("updateFooter", () => {
-        test("hides footer when type is null", () => {
+        test("hides copyright when type is null", () => {
             template.updateFooter(null);
-            const footer = document.getElementById("app-footer");
-            expect(footer!.style.display).toBe("none");
+            const copyright = document.getElementById("sidebar-copyright");
+            expect(copyright!.style.display).toBe("none");
         });
 
-        test("shows footer with app links for app type", () => {
+        test("shows copyright with app links for app type", () => {
             template.updateFooter("app");
-            const content = document.getElementById("app-footer-content");
-            expect(content!.innerHTML).toContain("About / FAQ / Privacy");
-            expect(content!.innerHTML).toContain("GitHub");
-            expect(content!.innerHTML).toContain("Project Aon");
+            const copyright = document.getElementById("sidebar-copyright");
+            expect(copyright!.innerHTML).toContain("About / FAQ / Privacy");
+            expect(copyright!.innerHTML).toContain("GitHub");
+            expect(copyright!.innerHTML).toContain("Project Aon");
         });
     });
 

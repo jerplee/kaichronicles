@@ -8,42 +8,25 @@ import { VOICE_FEATURE_ENABLED } from "./voice/voiceTypes";
 export const template = {
 
     /**
-     * Set the navbar title and target URL
-     * @param title The title to put on the navigation bar
-     * @param url The target URL for the title on the nav. bar
-     * @param showTitleOnSmallDevs True if the main title should be shown on
-     * small devices.
+     * Set the page title and document title
+     * @param title The title to display
+     * @param url The target URL (unused, kept for compat)
+     * @param showTitleOnSmallDevs Unused, kept for compat
      */
     setNavTitle(title: string, url: string, showTitleOnSmallDevs: boolean ) {
-        // Update the title
-        const $title = $("#template-title");
-        
-        $title.text(title);
-        $title.attr("href", url);
-        $("#template-img-logo").attr("href", url);
-
-        if ( showTitleOnSmallDevs ) {
-            $title.removeClass("hidden-xs hidden-sm");
-        } else {
-            $title.addClass("hidden-xs hidden-sm");
+        document.title = title;
+        const $bookTitle = $("#game-book-title");
+        if ($bookTitle.length > 0) {
+            $bookTitle.text(title);
         }
-
     },
 
     /**
      * Hightlight the active navigation bar link
+     * (Navbar removed; now a no-op)
      */
     highlightActiveLink() {
-        $("#template-header a, #template-header li").removeClass("active");
-        const $actives = $('#template-header a[href="#' +
-            routing.normalizeHash(location.hash) + '"]');
-        $actives.each((index, link) => {
-            const $link = $(link);
-            // Bootstrap puts the class 'active' on the parent of the link
-            // But I want to remark the "brand" link too, so put it on both
-            $link.parent().filter("li").addClass("active");
-            $link.addClass("active");
-        });
+        // Navbar was removed; active state is managed on sidebar-nav-item directly
     },
 
     /**
@@ -56,8 +39,8 @@ export const template = {
             template.closeSidebar();
         });
 
-        // Sidebar hamburger toggle (mobile)
-        $("#template-menubutton").on("click", (e) => {
+        // Mobile sidebar toggle
+        $("#sidebar-mobile-toggle").on("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
             $("#game-sidebar").toggleClass("open");
@@ -125,10 +108,10 @@ export const template = {
     showStatistics(show: boolean) {
         template.showSidebar(show);
         if ( show ) {
-            $("#template-menubutton").removeClass( "hideImportant" );
+            $("#sidebar-mobile-toggle").removeClass( "hideImportant" );
             template.updateStatistics();
         } else {
-            $("#template-menubutton").addClass( "hideImportant" );
+            $("#sidebar-mobile-toggle").addClass( "hideImportant" );
         }
     },
 
@@ -259,24 +242,23 @@ export const template = {
     },
 
     /**
-     * Update the unified app footer content
+     * Update the sidebar copyright text
      */
     updateFooter(type: "book" | "app" | null = null) {
-        const $footer = $("#app-footer");
-        const $content = $("#app-footer-content");
+        const $copyright = $("#sidebar-copyright");
 
         if (!type || App.debugMode === DebugMode.TEST) {
-            $footer.hide();
+            $copyright.hide();
             return;
         }
 
-        $footer.show();
+        $copyright.show();
 
         if (type === "book" && state.book) {
             const copyrightHtml = state.book.getCopyrightHtml().replace(/<br\s*\/?>/gi, "  -  ");
-            $content.html(DOMPurify.sanitize(" - " + state.book.getBookTitle() + " - " + copyrightHtml));
+            $copyright.html(DOMPurify.sanitize(copyrightHtml));
         } else {
-            $content.html('<a href="#aboutApp">About / FAQ / Privacy</a> — <a href="https://github.com/jerplee/kaichronicles" target="_blank">GitHub</a> — <a href="https://www.projectaon.org" target="_blank">Project Aon</a>');
+            $copyright.html('<a href="#aboutApp">About / FAQ / Privacy</a> — <a href="https://github.com/jerplee/kaichronicles" target="_blank">GitHub</a> — <a href="https://www.projectaon.org" target="_blank">Project Aon</a>');
         }
     },
 
@@ -369,14 +351,13 @@ export const template = {
      * Return true if the template menu is expanded
      */
     isMenuExpanded(): boolean {
-        return $("#template-menubutton").attr("aria-expanded") === "true";
+        return false;
     },
 
     /**
      * Collapse the template menu and close sidebar
      */
     collapseMenu() {
-        $("#navbar").collapse("hide");
         template.closeSidebar();
     },
 
@@ -467,7 +448,7 @@ export const template = {
     },
 
     translateMainMenu() {
-        translations.translateTags( $("#template-header") );
+        translations.translateTags( $("#game-sidebar") );
     },
 
     /**
@@ -600,10 +581,10 @@ export const template = {
 
     /**
      * Fixes the navbar to page top.
-     *  Needed for testing with selenium (sometimes the navbar blocks clicks of some elements)
+     *  (Navbar removed; now a no-op)
      */
     fixedNavbarTop() {
-        $("#template-header").removeClass("navbar-fixed-top");
+        // Navbar was removed
     },
 
     /**
@@ -612,10 +593,10 @@ export const template = {
      */
     hideCopyrightsForTests() {
         $("#game-copyrights-wrapper").hide();
-        $("#app-footer").hide();
+        $("#sidebar-copyright").hide();
         // Prevent body.sidebar-visible CSS from re-showing the footer
         if ($("#test-hide-footer").length === 0) {
-            $("head").append('<style id="test-hide-footer">body.sidebar-visible .app-footer { display: none !important; }</style>');
+            $("head").append('<style id="test-hide-footer">#sidebar-copyright { display: none !important; }</style>');
         }
     },
 

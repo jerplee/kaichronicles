@@ -730,11 +730,7 @@ html:has(body.dark) {
     background: #222;
 }
 
-/* Dark mode: navbar */
-body.dark .navbar-inverse {
-    background-color: #111;
-    border-color: #333;
-}
+/* Dark mode: navbar removed */
 
 /* Dark mode: links */
 body.dark a {
@@ -1462,10 +1458,10 @@ body.dark .loadgame-table tr:hover td {
    SIDEBAR + PAGE CARD + FOOTER REDESIGN
    ============================================================ */
 
-/* ── Game Sidebar (fixed left panel) ── */
+/* ── Game Sidebar (fixed left panel, full height) ── */
 #game-sidebar {
     position: fixed;
-    top: 50px;
+    top: 0;
     left: 0;
     width: 200px;
     bottom: 0;
@@ -1584,38 +1580,44 @@ body.dark .loadgame-table tr:hover td {
     margin-bottom: 20px;
 }
 
-/* ── App Footer (unified footer bar) ── */
-.app-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 0.85em;
-    color: #777;
-    padding: 10px 15px;
-    border-top: 1px solid #ddd;
-    background: #f8f8f8;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    z-index: 10;
-    display: none;
+/* ── Sidebar bottom area (no footer bar) ── */
+.sidebar-copyright {
+    margin-top: auto;
+    padding: 8px 15px;
+    font-size: 0.75em;
+    color: #999;
+    text-align: left;
+    line-height: 1.4;
+    flex-shrink: 0;
 }
 
-.app-footer a {
-    color: #777;
+.sidebar-copyright a {
+    color: #999;
     text-decoration: underline;
 }
 
-.app-footer a:hover {
+.sidebar-copyright a:hover {
     color: #333;
 }
 
-.app-footer .footer-theme-toggle {
-    float: right;
+.sidebar-theme {
+    padding: 0 15px 10px;
+    text-align: left;
+    flex-shrink: 0;
+}
+
+.sidebar-theme .footer-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     cursor: pointer;
-    margin-left: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+
+.sidebar-theme .footer-theme-toggle:hover {
+    background: rgba(128,128,128,0.15);
 }
 
 /* ── Layout: sidebar visible shifts content ── */
@@ -1625,41 +1627,6 @@ body.sidebar-visible #game-sidebar {
 
 body.sidebar-visible #content {
     margin-left: 200px;
-}
-
-body.sidebar-visible .app-footer {
-    display: block;
-    padding-left: 215px;
-}
-
-/* Navbar title always centered */
-#template-header .navbar-header {
-    text-align: center;
-    float: none;
-    position: relative;
-}
-
-#template-header .navbar-brand {
-    float: none;
-    display: inline-block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Hamburger stays on the left */
-#template-header .navbar-toggle {
-    position: absolute;
-    left: 0;
-    top: 8px;
-    margin-left: 15px;
-    float: none;
-}
-
-body.sidebar-visible #template-title {
-    float: none;
-    display: inline-block !important;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 /* ── Mobile sidebar drawer ── */
@@ -1677,10 +1644,61 @@ body.sidebar-visible #template-title {
     body.sidebar-visible #content {
         margin-left: 0;
     }
+}
 
-    body.sidebar-visible .app-footer {
-        padding-left: 15px;
+/* ── Mobile sidebar toggle button ── */
+.sidebar-mobile-toggle {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 20;
+    background: rgba(60,60,60,0.7);
+    border: none;
+    border-radius: 4px;
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.sidebar-mobile-toggle .icon-bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #fff;
+    margin: 4px 0;
+    border-radius: 1px;
+}
+
+@media (max-width: 767px) {
+    .sidebar-mobile-toggle {
+        display: block;
     }
+}
+
+/* ── Book title banner (moved from navbar) ── */
+.book-title-banner {
+    font-size: 1.4em;
+    font-weight: bold;
+    text-align: center;
+    margin: 15px 0 5px;
+    color: #555;
+    letter-spacing: 0.5px;
+}
+
+body.dark .book-title-banner {
+    color: #ccc;
+}
+
+body.paper .book-title-banner {
+    color: #5a4a3a;
+}
+
+body.ember .book-title-banner {
+    color: #b09070;
+}
+
+body.moss .book-title-banner {
+    color: #90b080;
 }
 
 /* ── Dark mode variants ── */
@@ -1923,17 +1941,13 @@ body.dark .page-card {
     box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
-body.dark .app-footer {
-    background: #2a2a2a;
-    border-top-color: #444;
+body.dark .sidebar-copyright {
     color: #999;
 }
-
-body.dark .app-footer a {
+body.dark .sidebar-copyright a {
     color: #999;
 }
-
-body.dark .app-footer a:hover {
+body.dark .sidebar-copyright a:hover {
     color: #ccc;
 }
 
@@ -2219,11 +2233,7 @@ body.paper #action-chart-view h3 {
     border-bottom-color: #c4b9a8;
 }
 
-/* Paper: navbar */
-body.paper .navbar-inverse {
-    background-color: #2d241e;
-    border-color: #1a1512;
-}
+/* Paper: navbar removed */
 
 /* Paper: links */
 body.paper a {
@@ -2407,15 +2417,13 @@ body.paper .page-card {
     border-color: #c4b9a8;
     box-shadow: 0 1px 4px rgba(61,43,31,0.1);
 }
-body.paper .app-footer {
-    background: #2d241e;
-    border-top-color: #1a1512;
+body.paper .sidebar-copyright {
     color: #b0a090;
 }
-body.paper .app-footer a {
+body.paper .sidebar-copyright a {
     color: #d8c8b0;
 }
-body.paper .app-footer a:hover {
+body.paper .sidebar-copyright a:hover {
     color: #f4f1e8;
 }
 
@@ -2689,10 +2697,7 @@ body.ember #achart-endurance {
 }
 body.ember #action-chart-view h3 { border-bottom-color: #3d2e24; }
 
-body.ember .navbar-inverse {
-    background-color: #0f0a08;
-    border-color: #1a1210;
-}
+/* Ember: navbar removed */
 
 body.ember a { color: #e09040; }
 body.ember a:hover,
@@ -2859,13 +2864,11 @@ body.ember .page-card {
     border-color: #3d2e24;
     box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
-body.ember .app-footer {
-    background: #0f0a08;
-    border-top-color: #1a1210;
+body.ember .sidebar-copyright {
     color: #8a7a6a;
 }
-body.ember .app-footer a { color: #b0a090; }
-body.ember .app-footer a:hover { color: #e8d8c8; }
+body.ember .sidebar-copyright a { color: #b0a090; }
+body.ember .sidebar-copyright a:hover { color: #e8d8c8; }
 
 body.ember .action.random {
     background: #3d2e24;
@@ -3066,10 +3069,7 @@ body.moss #achart-endurance {
 }
 body.moss #action-chart-view h3 { border-bottom-color: #2a382a; }
 
-body.moss .navbar-inverse {
-    background-color: #0a0f0a;
-    border-color: #141a14;
-}
+/* Moss: navbar removed */
 
 body.moss a { color: #78c078; }
 body.moss a:hover,
@@ -3236,13 +3236,11 @@ body.moss .page-card {
     border-color: #2a382a;
     box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
-body.moss .app-footer {
-    background: #0a0f0a;
-    border-top-color: #141a14;
+body.moss .sidebar-copyright {
     color: #809880;
 }
-body.moss .app-footer a { color: #a0b8a0; }
-body.moss .app-footer a:hover { color: #d0e0c8; }
+body.moss .sidebar-copyright a { color: #a0b8a0; }
+body.moss .sidebar-copyright a:hover { color: #d0e0c8; }
 
 body.moss .action.random {
     background: #2a382a;
@@ -3259,9 +3257,7 @@ body.moss .action.random.picked {
    Theme Popup
    ============================================================ */
 .footer-theme-toggle {
-    float: right;
     cursor: pointer;
-    margin-left: 10px;
     padding: 2px 8px;
     border-radius: 4px;
     transition: background 0.15s;
@@ -3302,8 +3298,8 @@ body.moss .action.random.picked {
 
 .theme-popup {
     position: fixed;
-    bottom: 48px;
-    right: 15px;
+    bottom: 60px;
+    left: 10px;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 6px;
