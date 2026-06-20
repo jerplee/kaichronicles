@@ -1,5 +1,5 @@
 import { GameDriver } from "../gameDriver";
-import { KaiDiscipline, GndDiscipline, NewOrderDiscipline } from "../../model/disciplinesDefinitions";
+import { KaiDiscipline, MgnDiscipline, GndDiscipline, NewOrderDiscipline } from "../../model/disciplinesDefinitions";
 import { Book, Item, state, BookSeriesId } from "../..";
 
 // Selenium web driver
@@ -116,8 +116,7 @@ describe("carryover", () => {
     });
 
     // ─── CB02: Kai Monastery objects persist ───
-    // SKIPPED: kaiMonasterySafekeeping property is not implemented
-    describe.skip("CB02 - Kai Monastery safekeeping", () => {
+    describe("CB02 - Kai Monastery safekeeping", () => {
 
         test("Kai Monastery objects restored on next book", async () => {
             await driver.setupBookState(6);
@@ -137,8 +136,7 @@ describe("carryover", () => {
     });
 
     // ─── CB03: Book 21 starts new character ───
-    // SKIPPED: New character reset logic for Book 21 is not implemented
-    describe.skip("CB03 - Book 21 new character", () => {
+    describe("CB03 - Book 21 new character", () => {
 
         test("Book 21 creates fresh ActionChart", async () => {
             await driver.setupBookState(20);
@@ -153,7 +151,13 @@ describe("carryover", () => {
             const currentBook = await driver.executeScript("return kai.state.book.bookNumber") as number;
             expect(currentBook).toBe(21);
             const combatSkill = await driver.getCombatSkill();
-            expect(combatSkill).toBe(0);
+            // New Order debug default is 30
+            expect(combatSkill).toBe(30);
+            // Verify items were not carried over
+            const hasMeal = await driver.executeScript(
+                `return kai.state.actionChart.backpackItems.some(i => i.id === "meal")`
+            ) as boolean;
+            expect(hasMeal).toBe(false);
         });
     });
 
@@ -203,8 +207,7 @@ describe("carryover", () => {
     });
 
     // ─── CB06: Deliverance use counter resets ───
-    // SKIPPED: use20EPRestore / restore20EPUsed are not implemented in actionChart
-    describe.skip("CB06 - Deliverance reset per book", () => {
+    describe("CB06 - Deliverance reset per book", () => {
 
         test("restore20EPUsed reset on next book", async () => {
             await driver.setupBookState(13);
@@ -218,8 +221,7 @@ describe("carryover", () => {
     });
 
     // ─── CB07: New Order curing EP restored counter resets ───
-    // SKIPPED: newOrderCuringEPRestored property is not implemented
-    describe.skip("CB07 - New Order curing reset", () => {
+    describe("CB07 - New Order curing reset", () => {
 
         test("newOrderCuringEPRestored reset on next book", async () => {
             await driver.setupBookState(21);
@@ -233,8 +235,7 @@ describe("carryover", () => {
     });
 
     // ─── CB08: Disabled disciplines reset ───
-    // SKIPPED: disabledDisciplines / newOrderDisciplines are not implemented
-    describe.skip("CB08 - Disabled disciplines reset", () => {
+    describe("CB08 - Disabled disciplines reset", () => {
 
         test("disabledDisciplines cleared on next book", async () => {
             await driver.setupBookState(21);
@@ -251,8 +252,7 @@ describe("carryover", () => {
     });
 
     // ─── CB09: Grand Master transition ───
-    // SKIPPED: removeSpecialGrandMaster / ALLOWED_GRAND_MASTER are not implemented
-    describe.skip("CB09 - Grand Master transition", () => {
+    describe("CB09 - Grand Master transition", () => {
 
         test("Non-allowed special items removed", async () => {
             await driver.setupBookState(12);
@@ -272,6 +272,141 @@ describe("carryover", () => {
                 `return kai.state.actionChart.specialItems.some(i => i.id === "sommerswerd")`
             ) as boolean;
             expect(hasItemAfter).toBe(true);
+        });
+    });
+
+    // ─── CB10: Cross-series discipline and weapon carryover ───
+    describe("CB10 - Cross-series carryover", () => {
+
+        test("Magnakai to Grand Master disciplines and weapons carry over", async () => {
+            await driver.setupBookState(12);
+
+            // Set Magnakai disciplines and weapons
+            await driver.executeScript(`
+                kai.state.actionChart.setDisciplines([
+                    "${MgnDiscipline.Weaponmastery}",
+                    "${MgnDiscipline.Curing}",
+                    "${MgnDiscipline.Huntmastery}"
+                ], ${BookSeriesId.Magnakai});
+                kai.state.actionChart.setWeaponSkill(["axe", "sword", "bow"], ${BookSeriesId.Magnakai});
+            `);
+
+            await goToNextBook();
+
+            // Verify Grand Master book loaded
+            const currentBook = await driver.executeScript("return kai.state.book.bookNumber") as number;
+            expect(currentBook).toBe(13);
+
+            // Verify previous Magnakai disciplines are preserved for loyalty bonus
+            const magnakaiDisciplines = await driver.executeScript(
+                `return kai.state.actionChart.getDisciplines(${BookSeriesId.Magnakai})`
+            ) as string[];
+            expect(magnakaiDisciplines.length).toBeGreaterThan(0);
+            expect(magnakaiDisciplines).toContain(MgnDiscipline.Weaponmastery);
+
+            // Verify previous Magnakai weapons are preserved
+            const magnakaiWeapons = await driver.executeScript(
+                `return kai.state.actionChart.getWeaponSkill(${BookSeriesId.Magnakai})`
+            ) as string[];
+            expect(magnakaiWeapons.length).toBeGreaterThan(0);
+        });
+
+        test("Grand Master to New Order starts fresh character", async () => {
+            await driver.setupBookState(20);
+
+            // Set Grand Master disciplines and items
+            await driver.executeScript(`
+                kai.state.actionChart.setDisciplines([
+                    "${GndDiscipline.GrandWeaponmastery}",
+                    "${GndDiscipline.Deliverance}"
+                ], ${BookSeriesId.GrandMaster});
+            `);
+            await driver.executeScript(`kai.actionChartController.pick("meal")`);
+            await driver.executeScript(`kai.actionChartController.pick("healingpotion")`);
+
+            await goToNextBook();
+
+            // Verify New Order book loaded
+            const currentBook = await driver.executeScript("return kai.state.book.bookNumber") as number;
+            expect(currentBook).toBe(21);
+
+            // Verify Grand Master items were not carried over (new character)
+            const hasMeal = await driver.executeScript(
+                `return kai.state.actionChart.backpackItems.some(i => i.id === "meal")`
+            ) as boolean;
+            expect(hasMeal).toBe(false);
+            const hasPotion = await driver.executeScript(
+                `return kai.state.actionChart.backpackItems.some(i => i.id === "healingpotion")`
+            ) as boolean;
+            expect(hasPotion).toBe(false);
+        });
+    });
+
+    // ─── CB11: Save after transition preserves per-book resets ───
+    describe("CB11 - Save after transition", () => {
+
+        test("Per-book reset flags survive save and restore", async () => {
+            await driver.setupBookState(1);
+
+            // Simulate per-book flags set in Book 1
+            await driver.executeScript(`
+                kai.state.actionChart.restore20EPUsed = true;
+                kai.state.actionChart.newOrderCuringEPRestored = 5;
+                kai.state.actionChart.newOrderDisciplines.disabledDisciplines = ["huntmastery"];
+            `);
+
+            await goToNextBook();
+
+            // Verify resets were applied during transition
+            const restore20EPUsed = await driver.executeScript(
+                `return kai.state.actionChart.restore20EPUsed`
+            ) as boolean;
+            expect(restore20EPUsed).toBe(false);
+
+            const newOrderCuringEPRestored = await driver.executeScript(
+                `return kai.state.actionChart.newOrderCuringEPRestored`
+            ) as number;
+            expect(newOrderCuringEPRestored).toBe(0);
+
+            const disabledDisciplines = await driver.executeScript(
+                `return kai.state.actionChart.newOrderDisciplines.disabledDisciplines`
+            ) as string[];
+            expect(disabledDisciplines.length).toBe(0);
+
+            // Save the game (persistState schedules debounced IndexedDB write)
+            await driver.executeScript(`
+                kai.state.persistState();
+                return new Promise(resolve => setTimeout(resolve, 800));
+            `);
+
+            // Corrupt the state to prove restore actually loads from save
+            await driver.executeScript(`
+                kai.state.actionChart.restore20EPUsed = true;
+                kai.state.actionChart.newOrderCuringEPRestored = 99;
+                kai.state.actionChart.newOrderDisciplines.disabledDisciplines = ["huntmastery"];
+            `);
+
+            // Restore from auto-save
+            const restored = await driver.executeScript(
+                `return kai.state.restoreFromIndexedDb();`
+            ) as boolean;
+            expect(restored).toBe(true);
+
+            // Verify restored state still has the reset values
+            const restoredRestore20EPUsed = await driver.executeScript(
+                `return kai.state.actionChart.restore20EPUsed`
+            ) as boolean;
+            expect(restoredRestore20EPUsed).toBe(false);
+
+            const restoredCuring = await driver.executeScript(
+                `return kai.state.actionChart.newOrderCuringEPRestored`
+            ) as number;
+            expect(restoredCuring).toBe(0);
+
+            const restoredDisabled = await driver.executeScript(
+                `return kai.state.actionChart.newOrderDisciplines.disabledDisciplines`
+            ) as string[];
+            expect(restoredDisabled.length).toBe(0);
         });
     });
 

@@ -87,6 +87,40 @@ export class GameDriver {
         }
     }
 
+    public async isAlertModalVisible(): Promise<boolean> {
+        try {
+            const modal = await this.driver.findElement(By.id("template-alertModal"));
+            return await modal.isDisplayed();
+        } catch (e) {
+            return false;
+        }
+    }
+
+    public async waitForAlertModal(timeout: number = 2000): Promise<boolean> {
+        try {
+            await this.driver.wait(async () => {
+                try {
+                    const modal = await this.driver.findElement(By.id("template-alertModal"));
+                    return await modal.isDisplayed();
+                } catch {
+                    return false;
+                }
+            }, timeout);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    public async dismissAlertModal() {
+        await this.driver.executeScript(`
+            $("#template-alertModal").modal("hide");
+            $(".modal-backdrop").remove();
+            $("body").removeClass("modal-open");
+            $("#template-alertModal").hide();
+        `);
+    }
+
     public async getTextByCss(selector: string): Promise<string> {
         return await (await this.getElementByCss(selector)).getText();
     }
@@ -120,6 +154,8 @@ export class GameDriver {
     }
 
     public async goToSection(sectionId: string) {
+        // Clear any stale section-ready marker from previous loads
+        await this.cleanSectionReady();
         // Load section
         await this.driver.executeScript(`kai.gameController.loadSection("${sectionId}")`);
 
@@ -199,6 +235,14 @@ export class GameDriver {
 
         // Go to new game page
         await this.driver.get(this.newGameUrl);
+        // Dismiss any lingering modals from previous tests (SPA hash nav may not reload page)
+        await this.dismissAlertModal();
+        // Force clear any lingering browser SPA state
+        await this.driver.executeScript(`
+            if (window.kai && kai.state) {
+                kai.state.reset(true);
+            }
+        `);
         // Hide fixed footers to prevent Selenium click interception
         await this.driver.executeScript('var el = document.getElementById("game-copyrights-wrapper"); if (el) el.style.display = "none";');
         await this.driver.executeScript('var el = document.getElementById("app-footer"); if (el) el.style.display = "none";');

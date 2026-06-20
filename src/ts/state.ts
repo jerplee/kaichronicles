@@ -535,6 +535,13 @@ export class State {
             // Restore Kai monastery objects
             this.restoreKaiMonasterySectionObjects();
 
+            // Reset per-book counters and flags
+            if (this.actionChart) {
+                this.actionChart.reset20EPRestoreUsed();
+                this.actionChart.resetNewOrderCuringEPRestoredUsed();
+                this.actionChart.resetDisabledDisciplines();
+            }
+
             this.persistState();
         } else {
             // Start a new character for the New Order series

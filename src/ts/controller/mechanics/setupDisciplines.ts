@@ -26,7 +26,7 @@ export class SetupDisciplines {
     /**
      * Weapons table for Weaponmastery discipline in Grand Master books
      */
-    private static readonly grandMasterWeapons = ["spear", "bow", "dagger", "quarterstaff", "mace", "broadsword",
+    public static readonly grandMasterWeapons = ["spear", "bow", "dagger", "quarterstaff", "mace", "broadsword",
         "shortsword", "axe", "warhammer", "sword"];
 
     /**

@@ -166,8 +166,9 @@ describe("test", () => {
         expect( await driver.choiceIsEnabled("sect199") ).toBe(false);
         expect( await driver.choiceIsEnabled("sect316") ).toBe(true);
 
-        // Pick object from section, expect allow to go to section right now
-        await driver.pick("sommerswerd", true);
+        // Pick object and re-visit section to re-evaluate mechanics
+        await driver.pick("sommerswerd");
+        await driver.goToSection("sect290");
         expect( await driver.choiceIsEnabled("sect199") ).toBe(true);
         expect( await driver.choiceIsEnabled("sect316") ).toBe(false);
     });
@@ -191,11 +192,12 @@ describe("test", () => {
         await driver.goToSection("sect96");
         expect( await driver.choiceIsEnabled("sect225") ).toBe(true);
 
-        // If you pick the bow from the section, expect to shoot immediately
+        // Pick bow and re-visit section to re-evaluate mechanics
         await driver.drop(Item.BOW, true);
         await driver.goToSection("sect96");
         expect( await driver.choiceIsEnabled("sect225") ).toBe(false);
-        await driver.pick(Item.BOW, true);
+        await driver.pick(Item.BOW);
+        await driver.goToSection("sect96");
         expect( await driver.choiceIsEnabled("sect225") ).toBe(true);
     });
 });
