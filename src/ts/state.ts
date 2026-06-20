@@ -16,7 +16,10 @@ interface SaveGameObject {
 
 export enum Color {
     Light,
-    Dark
+    Dark,
+    Paper,
+    Ember,
+    Moss
 }
 
 export enum TextSize {

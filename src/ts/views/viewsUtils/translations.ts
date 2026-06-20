@@ -192,6 +192,11 @@ export class Translations {
         //////////////////////////////////////
 
         "settings" : "Settings",
+        "settings-light" : "Light",
+        "settings-dark" : "Dark",
+        "settings-parchment" : "Parchment",
+        "settings-ember" : "Ember",
+        "settings-moss" : "Moss",
         "gameSaved" : "Game saved",
         "restartBook" : "Restart book {0} from scratch",
         "restartBookSection1" : "Restart book {0} from section 1",

@@ -63,10 +63,24 @@ export const template = {
             $("#game-sidebar").toggleClass("open");
         });
 
-        // Footer theme toggle
+        // Footer theme popup
         $("#footer-themeToggle").on("click", (e) => {
             e.preventDefault();
-            settingsController.changeColorTheme(state.color === Color.Light ? Color.Dark : Color.Light);
+            e.stopPropagation();
+            $("#theme-popup").toggle();
+        });
+        $(document).on("click", () => {
+            $("#theme-popup").hide();
+        });
+        $("#theme-popup").on("click", (e) => {
+            e.stopPropagation();
+        });
+        $("#theme-popup .theme-option").on("click", function(e) {
+            e.preventDefault();
+            const themeName = $(this).attr("data-theme");
+            const theme = Color[themeName as keyof typeof Color];
+            settingsController.changeColorTheme(theme);
+            $("#theme-popup").hide();
         });
 
         // Voice mode sidebar toggle (feature-gated)
@@ -511,20 +525,42 @@ export const template = {
 
     /**
      * Change the color theme of the templates
-     * @param theme 'light' or 'dark'
+     * @param theme Color enum value
      */
     changeColorTheme(theme: Color) {
         state.updateColorTheme( theme );
 
+        $("body").removeClass("dark paper ember moss");
         switch (theme) {
             case Color.Dark:
                 $("body").addClass("dark");
                 break;
+            case Color.Paper:
+                $("body").addClass("paper");
+                break;
+            case Color.Ember:
+                $("body").addClass("ember");
+                break;
+            case Color.Moss:
+                $("body").addClass("moss");
+                break;
             default:
-                // we will default to "light" theme, or no class
-                $("body").removeClass("dark");
+                // light theme has no class
                 break;
         }
+
+        // Update footer popup current display
+        const themeNames: Record<string, string> = {
+            Light: "Light",
+            Dark: "Dark",
+            Paper: "Parchment",
+            Ember: "Ember",
+            Moss: "Moss"
+        };
+        const name = themeNames[Color[theme]] || "Light";
+        $("#theme-current-name").text(name);
+        $("#footer-themeToggle").attr("title", "Theme: " + name);
+        $("#theme-current-swatch").attr("class", "theme-current-swatch " + Color[theme].toLowerCase());
     },
 
     /**

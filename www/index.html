@@ -141,9 +141,18 @@
     <!-- Unified App Footer -->
     <div class="app-footer" id="app-footer">
       <span id="app-footer-content"></span>
-      <span class="footer-theme-toggle" id="footer-themeToggle" title="Toggle dark mode">
-        <span class="glyphicon glyphicon-adjust"></span>
-      </span>
+      <div class="footer-theme-toggle" id="footer-themeToggle" title="Theme: Light">
+        <span class="theme-current-swatch" id="theme-current-swatch"></span>
+        <span class="theme-current-name" id="theme-current-name">Light</span>
+        <span class="glyphicon glyphicon-chevron-up theme-arrow" id="theme-arrow"></span>
+      </div>
+      <div class="theme-popup" id="theme-popup" style="display:none;">
+        <div class="theme-option" data-theme="Light"><span class="theme-swatch light"></span><span class="theme-name">Light</span></div>
+        <div class="theme-option" data-theme="Dark"><span class="theme-swatch dark"></span><span class="theme-name">Dark</span></div>
+        <div class="theme-option" data-theme="Paper"><span class="theme-swatch paper"></span><span class="theme-name">Parchment</span></div>
+        <div class="theme-option" data-theme="Ember"><span class="theme-swatch ember"></span><span class="theme-name">Ember</span></div>
+        <div class="theme-option" data-theme="Moss"><span class="theme-swatch moss"></span><span class="theme-name">Moss</span></div>
+      </div>
     </div>
 
     <!-- Reusable Alert Modal -->

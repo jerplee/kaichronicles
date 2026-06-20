@@ -1937,6 +1937,1462 @@ body.dark .app-footer a:hover {
     color: #ccc;
 }
 
+/* ============================================================
+   Paper Theme coloring
+   ============================================================ */
+body.paper {
+    background: #e8e0d0;
+    color: #3d2b1f;
+}
+
+body.paper,
+html:has(body.paper) {
+    background: #e8e0d0;
+}
+
+/* Paper: reading card */
+body.paper #game-section {
+    background: #f4f1e8;
+    border-color: #c4b9a8;
+    box-shadow: 0 2px 8px rgba(61,43,31,0.1);
+}
+body.paper .section-number {
+    color: #8a7a6a;
+}
+body.paper #game-section p {
+    color: #3d2b1f;
+}
+
+/* Paper: choices */
+body.paper .choice {
+    background: #f4f1e8;
+    border-color: #c4b9a8;
+    border-left-color: #8b5a2b;
+}
+body.paper .choice:hover {
+    box-shadow: 0 2px 5px rgba(61,43,31,0.1);
+}
+body.paper .choice-link:hover {
+    background: #eae5d8;
+}
+body.paper .choice-link:active {
+    background: #f4f1e8;
+}
+body.paper .choice.disabled {
+    border-left-color: #b0a898;
+    background: #f4f1e8;
+    opacity: 0.5;
+}
+body.paper .choice.disabled .choice-link:hover,
+body.paper .choice.disabled .choice-link:active {
+    background: transparent;
+}
+body.paper .choice:first-of-type::before {
+    background: linear-gradient(to right, transparent, #c4b9a8, transparent);
+}
+body.paper .choice-section-num {
+    color: #8a7a6a;
+    background: #e8e0d0;
+}
+
+/* Paper: available cards */
+body.paper .available-card {
+    background: #fff;
+    border-color: #c4b9a8;
+    box-shadow: 0 1px 3px rgba(61,43,31,0.08);
+}
+body.paper .available-card:hover {
+    background: #f0ece0;
+    box-shadow: 0 2px 6px rgba(61,43,31,0.12);
+}
+body.paper .available-card:active {
+    background: #e8e0d0;
+}
+body.paper .available-card .available-name {
+    color: #3d2b1f;
+}
+body.paper .available-card .available-desc {
+    color: #6b5d4f;
+}
+body.paper .available-zoom {
+    color: #8a7a6a;
+}
+body.paper .available-zoom:hover {
+    color: #3d2b1f;
+}
+
+/* Paper: copyright wrapper */
+body.paper #game-copyrights-wrapper {
+    background: #f4f1e8;
+    border-top-color: #c4b9a8;
+    color: #8a7a6a;
+}
+
+/* Paper: menu cards */
+body.paper .menu-card {
+    background: #f4f1e8;
+    border-color: #c4b9a8;
+    box-shadow: 0 2px 8px rgba(61,43,31,0.1);
+}
+body.paper .menu-header p {
+    color: #8a7a6a;
+}
+body.paper .menu-version {
+    color: #8a7a6a;
+}
+body.paper .menu-warnings {
+    background: #f4f1e8;
+    border-color: #c4b9a8;
+    color: #8a7a6a;
+}
+body.paper .large-button {
+    background: #f4f1e8;
+    border-color: #c4b9a8;
+    border-left-color: #8b5a2b;
+    color: #3d2b1f;
+}
+body.paper .large-button:hover {
+    background: #eae5d8;
+    box-shadow: 0 2px 5px rgba(61,43,31,0.1);
+}
+body.paper .large-button:active {
+    background: #f4f1e8;
+}
+body.paper .menu-footer {
+    color: #8a7a6a;
+}
+body.paper .equipment-op {
+    background: #e8e0d0;
+    border-left-color: #5cb85c;
+    color: #3d2b1f;
+}
+body.paper .equipment-op:hover {
+    background: #ddd5c5;
+}
+body.paper .equipment-op.disabled {
+    border-left-color: #b0a898;
+}
+
+/* Paper: save slots */
+body.paper .save-slot-card {
+    background: #f4f1e8;
+    border-color: #c4b9a8;
+}
+body.paper .save-slot-name {
+    color: #3d2b1f;
+}
+body.paper .save-slot-book,
+body.paper .save-slot-meta,
+body.paper .save-slot-stats {
+    color: #8a7a6a;
+}
+body.paper .menu-saveinfo {
+    color: #8a7a6a;
+}
+body.paper .save-slot-card.action-card:hover {
+    background: #eae5d8;
+}
+
+/* Paper: load game table */
+body.paper .loadgame-table th {
+    background: #e8e0d0;
+    border-bottom-color: #c4b9a8;
+    color: #3d2b1f;
+}
+body.paper .loadgame-table td {
+    border-top-color: #c4b9a8;
+}
+body.paper .loadgame-table .lg-date small {
+    color: #8a7a6a;
+}
+body.paper .loadgame-table tr:hover td {
+    background: #eae5d8;
+}
+
+/* Paper: sidebar */
+body.paper #game-sidebar {
+    background: #2d241e;
+    border-right-color: #1a1512;
+}
+body.paper .sidebar-section {
+    border-bottom-color: #3d3228;
+}
+body.paper .sidebar-portrait {
+    border-color: #5a4d42;
+    background: #3d3228;
+}
+body.paper .sidebar-kai-name {
+    color: #e8d8c0;
+}
+body.paper .sidebar-rank {
+    color: #b0a090;
+}
+body.paper .sidebar-stat-label {
+    color: #b0a090;
+}
+body.paper .sidebar-stat .progress {
+    background: #3d3228;
+}
+body.paper .sidebar-stat-value {
+    color: #d8c8b0;
+}
+body.paper .sidebar-nav-item {
+    color: #c8b8a0;
+    border-bottom-color: #3d3228;
+}
+body.paper .sidebar-nav-item:hover,
+body.paper .sidebar-nav-item:focus {
+    background: #3d3228;
+    color: #f4f1e8;
+}
+body.paper .sidebar-nav-item.active {
+    background: #8b5a2b;
+    color: #f4f1e8;
+    border-bottom-color: #8b5a2b;
+}
+body.paper .sidebar-nav-secondary {
+    border-top-color: #3d3228;
+}
+body.paper .sidebar-nav-voice {
+    border-top-color: #3d3228;
+}
+body.paper #sidebar-voiceMode.voice-active {
+    color: #5cb85c;
+}
+body.paper .sidebar-voice-help {
+    color: #d8a86b;
+}
+body.paper .sidebar-voice-help:hover,
+body.paper .sidebar-voice-help:focus {
+    background: rgba(216,168,107,0.15);
+    color: #f4d4a0;
+}
+
+/* Paper: combat UI */
+body.paper .mechanics-combatUI {
+    background: #f4f1e8;
+    border-color: #c4b9a8;
+    box-shadow: 0 2px 5px rgba(61,43,31,0.1);
+}
+body.paper .mechanics-combat-status {
+    background-color: #e8e0d0;
+    border-color: #c4b9a8;
+}
+body.paper .fighter-stat {
+    color: #6b5d4f;
+}
+body.paper .combat-divider {
+    border-left-color: #c4b9a8;
+    border-right-color: #c4b9a8;
+}
+body.paper .cr-box {
+    background: #e8e0d0;
+    border-color: #c4b9a8;
+    box-shadow: inset 0 1px 1px rgba(61,43,31,0.05);
+}
+body.paper .cr-box .cr-label {
+    color: #8a7a6a;
+}
+body.paper .cr-box .cr-value {
+    color: #3d2b1f;
+}
+body.paper .cr-box .crlink:hover .cr-value {
+    color: #8b5a2b;
+}
+body.paper .mechanics-combatUI.combat-finished .fighter-name::after {
+    color: #5cb85c;
+}
+body.paper .combat.well {
+    background-color: #e8e0d0;
+    border-color: #c4b9a8;
+    color: #3d2b1f;
+}
+
+/* Paper: action chart */
+body.paper #achart-combatSkills,
+body.paper #achart-endurance {
+    background: #e8e0d0;
+    border-color: #c4b9a8;
+    color: #3d2b1f;
+}
+body.paper #action-chart-view h3 {
+    border-bottom-color: #c4b9a8;
+}
+
+/* Paper: navbar */
+body.paper .navbar-inverse {
+    background-color: #2d241e;
+    border-color: #1a1512;
+}
+
+/* Paper: links */
+body.paper a {
+    color: #8b5a2b;
+}
+body.paper a:hover,
+body.paper a:focus {
+    color: #b0703a;
+}
+body.paper a.disabled {
+    color: #a09080;
+}
+
+/* Paper: wells, modals, panels */
+body.paper .well,
+body.paper .modal-content {
+    background: #e8e0d0;
+}
+body.paper .panel {
+    background-color: #e8e0d0;
+    border-color: #c4b9a8;
+}
+body.paper .panel-default > .panel-heading {
+    background-color: #ddd5c5;
+    border-color: #c4b9a8;
+    color: #3d2b1f;
+}
+
+/* Paper: buttons */
+body.paper .btn img {
+    filter: sepia(30%);
+}
+body.paper .btn-default,
+body.paper .form-control[disabled],
+body.paper .form-control[readonly],
+body.paper fieldset[disabled],
+body.paper .form-control {
+    color: #3d2b1f;
+    background-color: #e8e0d0;
+    border-color: #c4b9a8;
+}
+body.paper .btn-primary {
+    background-color: #8b5a2b;
+    border-color: #6b4520;
+}
+body.paper .btn-primary:hover {
+    background-color: #7a4f26;
+    border-color: #5c3a1a;
+}
+
+/* Paper: lists and tables */
+body.paper .list-table {
+    border-color: #c4b9a8;
+}
+body.paper .list-table li {
+    color: #3d2b1f;
+    border-color: #c4b9a8;
+}
+body.paper .list-table > li:nth-of-type(odd),
+body.paper .table-striped>tbody>tr:nth-of-type(odd) {
+    background-color: #e8e0d0;
+}
+body.paper #template-containertable tbody tr:nth-child(odd) td:nth-child(odd),
+body.paper #template-containertable tbody tr:nth-child(even) td:nth-child(even) {
+    background-color: #e8e0d0;
+}
+body.paper #template-containertable {
+    border-color: #c4b9a8 !important;
+}
+body.paper #wwbooks-list tr.success > td {
+    background-color: #5a7a3a;
+}
+
+/* Paper: alerts */
+body.paper .alert-warning {
+    background-color: #e8d8b8;
+    border-color: #d4c0a0;
+    color: #7a5a2a;
+}
+body.paper .alert-success {
+    background-color: #d8e8d0;
+    border-color: #b8d4a8;
+    color: #3a5a2a;
+}
+body.paper .alert-info {
+    background-color: #d8e0e8;
+    border-color: #b8c8d8;
+    color: #2a4a6a;
+}
+body.paper .alert-danger {
+    background-color: #e8d0d0;
+    border-color: #d4b0b0;
+    color: #7a2a2a;
+}
+
+/* Paper: toasts */
+body.paper #toast-container > .toast {
+    background-color: #f4f1e8;
+    color: #3d2b1f;
+    box-shadow: 0 2px 8px rgba(61,43,31,0.2) !important;
+}
+
+/* Paper: dropdowns */
+body.paper .dropdown-menu {
+    background-color: #f4f1e8;
+    border-color: #c4b9a8;
+}
+body.paper .dropdown-menu > li > a {
+    color: #3d2b1f;
+}
+body.paper .dropdown-menu > li > a:hover {
+    background-color: #e8e0d0;
+    color: #3d2b1f;
+}
+
+/* Paper: pagination */
+body.paper .pagination > li > a,
+body.paper .pagination > li > span {
+    background-color: #e8e0d0;
+    border-color: #c4b9a8;
+    color: #3d2b1f;
+}
+body.paper .pagination > li > a:hover {
+    background-color: #ddd5c5;
+    border-color: #b0a090;
+    color: #3d2b1f;
+}
+
+/* Paper: labels */
+body.paper .label-default {
+    background-color: #b0a090;
+}
+body.paper .label-success {
+    background-color: #6a8a5a;
+}
+body.paper .label-warning {
+    background-color: #b09050;
+}
+body.paper .label-danger {
+    background-color: #b06050;
+}
+body.paper .label-info {
+    background-color: #5a8090;
+}
+
+/* Paper: hr and blockquote */
+body.paper hr {
+    border-color: #c4b9a8;
+}
+body.paper blockquote {
+    border-color: #c4b9a8;
+    color: #6b5d4f;
+}
+
+/* Paper: voice indicator */
+body.paper #voice-indicator {
+    background: #f4f1e8;
+    border-color: #c4b9a8;
+    color: #6b5d4f;
+}
+
+/* Paper: voice help */
+body.paper .voice-help-content h5 {
+    color: #3d2b1f;
+}
+body.paper .voice-help-note {
+    background: #f0e8d8;
+    border-left-color: #8b5a2b;
+}
+body.paper .voice-help-link {
+    color: #8b5a2b;
+}
+body.paper .voice-help-link:hover,
+body.paper .voice-help-link:focus {
+    color: #b0703a;
+}
+
+/* Paper: page card and footer */
+body.paper .page-card {
+    background: #f4f1e8;
+    border-color: #c4b9a8;
+    box-shadow: 0 1px 4px rgba(61,43,31,0.1);
+}
+body.paper .app-footer {
+    background: #2d241e;
+    border-top-color: #1a1512;
+    color: #b0a090;
+}
+body.paper .app-footer a {
+    color: #d8c8b0;
+}
+body.paper .app-footer a:hover {
+    color: #f4f1e8;
+}
+
+/* Paper: random action */
+body.paper .action.random {
+    background: #e0d8c8;
+    border-bottom-color: #8b5a2b;
+}
+body.paper .action.random:hover {
+    background: #d8d0c0;
+}
+body.paper .action.random.picked {
+    color: #3d2b1f;
+    background: transparent;
+    border-bottom: none;
+}
+
+/* ── Missing button variants for Dark ── */
+body.dark .btn-success {
+    background-color: #3d7a3d;
+    border-color: #2b662b;
+}
+body.dark .btn-success:hover {
+    background-color: #2f5f2f;
+    border-color: #244d24;
+}
+body.dark .btn-warning {
+    background-color: #8a6d3b;
+    border-color: #66522b;
+}
+body.dark .btn-warning:hover {
+    background-color: #6d542d;
+    border-color: #4d3b1a;
+}
+body.dark .btn-info {
+    background-color: #31708f;
+    border-color: #2b4d66;
+}
+body.dark .btn-info:hover {
+    background-color: #245a73;
+    border-color: #1a3a4d;
+}
+body.dark .btn-danger {
+    background-color: #a94442;
+    border-color: #662b2b;
+}
+body.dark .btn-danger:hover {
+    background-color: #8a3533;
+    border-color: #4d1a1a;
+}
+
+/* ── Missing button variants for Paper ── */
+body.paper .btn-success {
+    background-color: #5a7a4a;
+    border-color: #4a6a3a;
+}
+body.paper .btn-success:hover {
+    background-color: #4a6a3a;
+    border-color: #3a5a2a;
+}
+body.paper .btn-warning {
+    background-color: #a08040;
+    border-color: #907030;
+}
+body.paper .btn-warning:hover {
+    background-color: #907030;
+    border-color: #806020;
+}
+body.paper .btn-info {
+    background-color: #4a7080;
+    border-color: #3a6070;
+}
+body.paper .btn-info:hover {
+    background-color: #3a6070;
+    border-color: #2a5060;
+}
+body.paper .btn-danger {
+    background-color: #a05040;
+    border-color: #904030;
+}
+body.paper .btn-danger:hover {
+    background-color: #904030;
+    border-color: #803020;
+}
+
+/* ============================================================
+   Ember Theme coloring
+   ============================================================ */
+body.ember {
+    background: #1a1210;
+    color: #e8d8c8;
+}
+body.ember,
+html:has(body.ember) {
+    background: #1a1210;
+}
+
+body.ember #game-section {
+    background: #2a1e18;
+    border-color: #3d2e24;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+body.ember .section-number { color: #b09070; }
+body.ember #game-section p { color: #e8d8c8; }
+
+body.ember .choice {
+    background: #2a1e18;
+    border-color: #3d2e24;
+    border-left-color: #e09040;
+}
+body.ember .choice:hover { box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+body.ember .choice-link:hover { background: #3d2e24; }
+body.ember .choice-link:active { background: #2a1e18; }
+body.ember .choice.disabled {
+    border-left-color: #5a4a3a;
+    background: #2a1e18;
+    opacity: 0.5;
+}
+body.ember .choice.disabled .choice-link:hover,
+body.ember .choice.disabled .choice-link:active { background: transparent; }
+body.ember .choice:first-of-type::before {
+    background: linear-gradient(to right, transparent, #3d2e24, transparent);
+}
+body.ember .choice-section-num { color: #b09070; background: #3d2e24; }
+
+body.ember .available-card {
+    background: #33241c;
+    border-color: #3d2e24;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+body.ember .available-card:hover {
+    background: #3d2e24;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+body.ember .available-card:active { background: #2a1e18; }
+body.ember .available-card .available-name { color: #e8d8c8; }
+body.ember .available-card .available-desc { color: #b0a090; }
+body.ember .available-zoom { color: #8a7a6a; }
+body.ember .available-zoom:hover { color: #e8d8c8; }
+
+body.ember #game-copyrights-wrapper {
+    background: #2a1e18;
+    border-top-color: #3d2e24;
+    color: #8a7a6a;
+}
+
+body.ember .menu-card {
+    background: #2a1e18;
+    border-color: #3d2e24;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+body.ember .menu-header p { color: #b09070; }
+body.ember .menu-version { color: #8a7a6a; }
+body.ember .menu-warnings {
+    background: #2a1e18;
+    border-color: #3d2e24;
+    color: #8a7a6a;
+}
+body.ember .large-button {
+    background: #2a1e18;
+    border-color: #3d2e24;
+    border-left-color: #e09040;
+    color: #e8d8c8;
+}
+body.ember .large-button:hover {
+    background: #3d2e24;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+body.ember .large-button:active { background: #2a1e18; }
+body.ember .menu-footer { color: #8a7a6a; }
+body.ember .equipment-op {
+    background: #3d2e24;
+    border-left-color: #5cb85c;
+    color: #e8d8c8;
+}
+body.ember .equipment-op:hover { background: #4a3a2a; }
+body.ember .equipment-op.disabled { border-left-color: #5a4a3a; }
+
+body.ember .save-slot-card {
+    background: #2a1e18;
+    border-color: #3d2e24;
+}
+body.ember .save-slot-name { color: #e8d8c8; }
+body.ember .save-slot-book,
+body.ember .save-slot-meta,
+body.ember .save-slot-stats { color: #8a7a6a; }
+body.ember .menu-saveinfo { color: #8a7a6a; }
+body.ember .save-slot-card.action-card:hover { background: #3d2e24; }
+
+body.ember .loadgame-table th {
+    background: #3d2e24;
+    border-bottom-color: #3d2e24;
+    color: #e8d8c8;
+}
+body.ember .loadgame-table td { border-top-color: #3d2e24; }
+body.ember .loadgame-table .lg-date small { color: #8a7a6a; }
+body.ember .loadgame-table tr:hover td { background: #3d2e24; }
+
+body.ember #game-sidebar {
+    background: #0f0a08;
+    border-right-color: #1a1210;
+}
+body.ember .sidebar-section { border-bottom-color: #1a1210; }
+body.ember .sidebar-portrait {
+    border-color: #3d2e24;
+    background: #1a1210;
+}
+body.ember .sidebar-kai-name { color: #e8d8c8; }
+body.ember .sidebar-rank { color: #8a7a6a; }
+body.ember .sidebar-stat-label { color: #8a7a6a; }
+body.ember .sidebar-stat .progress { background: #1a1210; }
+body.ember .sidebar-stat-value { color: #d0c0b0; }
+body.ember .sidebar-nav-item {
+    color: #b0a090;
+    border-bottom-color: #1a1210;
+}
+body.ember .sidebar-nav-item:hover,
+body.ember .sidebar-nav-item:focus {
+    background: #1a1210;
+    color: #f4f1e8;
+}
+body.ember .sidebar-nav-item.active {
+    background: #e09040;
+    color: #1a1210;
+    border-bottom-color: #e09040;
+}
+body.ember .sidebar-nav-secondary { border-top-color: #1a1210; }
+body.ember .sidebar-nav-voice { border-top-color: #1a1210; }
+body.ember #sidebar-voiceMode.voice-active { color: #5cb85c; }
+body.ember .sidebar-voice-help { color: #e09040; }
+body.ember .sidebar-voice-help:hover,
+body.ember .sidebar-voice-help:focus {
+    background: rgba(224,144,64,0.15);
+    color: #f0b070;
+}
+
+body.ember .mechanics-combatUI {
+    background: #2a1e18;
+    border-color: #3d2e24;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+body.ember .mechanics-combat-status {
+    background-color: #3d2e24;
+    border-color: #3d2e24;
+}
+body.ember .fighter-stat { color: #b0a090; }
+body.ember .combat-divider {
+    border-left-color: #3d2e24;
+    border-right-color: #3d2e24;
+}
+body.ember .cr-box {
+    background: #3d2e24;
+    border-color: #4a3a2a;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.1);
+}
+body.ember .cr-box .cr-label { color: #8a7a6a; }
+body.ember .cr-box .cr-value { color: #e8d8c8; }
+body.ember .cr-box .crlink:hover .cr-value { color: #e09040; }
+body.ember .mechanics-combatUI.combat-finished .fighter-name::after { color: #5cb85c; }
+body.ember .combat.well {
+    background-color: #3d2e24;
+    border-color: #3d2e24;
+    color: #e8d8c8;
+}
+
+body.ember #achart-combatSkills,
+body.ember #achart-endurance {
+    background: #3d2e24;
+    border-color: #3d2e24;
+    color: #e8d8c8;
+}
+body.ember #action-chart-view h3 { border-bottom-color: #3d2e24; }
+
+body.ember .navbar-inverse {
+    background-color: #0f0a08;
+    border-color: #1a1210;
+}
+
+body.ember a { color: #e09040; }
+body.ember a:hover,
+body.ember a:focus { color: #f0b070; }
+body.ember a.disabled { color: #6a5a4a; }
+
+body.ember .well,
+body.ember .modal-content { background: #3d2e24; }
+body.ember .panel {
+    background-color: #3d2e24;
+    border-color: #3d2e24;
+}
+body.ember .panel-default > .panel-heading {
+    background-color: #4a3a2a;
+    border-color: #3d2e24;
+    color: #e8d8c8;
+}
+
+body.ember .btn img { filter: sepia(40%) brightness(0.9); }
+body.ember .btn-default,
+body.ember .form-control[disabled],
+body.ember .form-control[readonly],
+body.ember fieldset[disabled],
+body.ember .form-control {
+    color: #e8d8c8;
+    background-color: #3d2e24;
+    border-color: #5a4a3a;
+}
+body.ember .btn-primary {
+    background-color: #c07030;
+    border-color: #a06028;
+}
+body.ember .btn-primary:hover {
+    background-color: #d08040;
+    border-color: #b07030;
+}
+body.ember .btn-success {
+    background-color: #5a8a4a;
+    border-color: #4a7a3a;
+}
+body.ember .btn-success:hover {
+    background-color: #4a7a3a;
+    border-color: #3a6a2a;
+}
+body.ember .btn-warning {
+    background-color: #b09040;
+    border-color: #a08030;
+}
+body.ember .btn-warning:hover {
+    background-color: #c0a050;
+    border-color: #b09040;
+}
+body.ember .btn-info {
+    background-color: #4a8090;
+    border-color: #3a7080;
+}
+body.ember .btn-info:hover {
+    background-color: #3a7080;
+    border-color: #2a6070;
+}
+body.ember .btn-danger {
+    background-color: #b05040;
+    border-color: #a04030;
+}
+body.ember .btn-danger:hover {
+    background-color: #c06050;
+    border-color: #b05040;
+}
+
+body.ember .list-table { border-color: #3d2e24; }
+body.ember .list-table li {
+    color: #e8d8c8;
+    border-color: #3d2e24;
+}
+body.ember .list-table > li:nth-of-type(odd),
+body.ember .table-striped>tbody>tr:nth-of-type(odd) {
+    background-color: #3d2e24;
+}
+body.ember #template-containertable tbody tr:nth-child(odd) td:nth-child(odd),
+body.ember #template-containertable tbody tr:nth-child(even) td:nth-child(even) {
+    background-color: #1a1210;
+}
+body.ember #template-containertable { border-color: #3d2e24 !important; }
+body.ember #wwbooks-list tr.success > td { background-color: #3a6a2a; }
+
+body.ember .alert-warning {
+    background-color: #4a3a1a;
+    border-color: #5a4a2a;
+    color: #f0d0a0;
+}
+body.ember .alert-success {
+    background-color: #1a4a1a;
+    border-color: #2a5a2a;
+    color: #a0f0a0;
+}
+body.ember .alert-info {
+    background-color: #1a3a4a;
+    border-color: #2a4a5a;
+    color: #a0d0f0;
+}
+body.ember .alert-danger {
+    background-color: #4a1a1a;
+    border-color: #5a2a2a;
+    color: #f0a0a0;
+}
+
+body.ember #toast-container > .toast {
+    background-color: #2a1e18;
+    color: #e8d8c8;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+}
+
+body.ember .dropdown-menu {
+    background-color: #2a1e18;
+    border-color: #3d2e24;
+}
+body.ember .dropdown-menu > li > a { color: #e8d8c8; }
+body.ember .dropdown-menu > li > a:hover {
+    background-color: #3d2e24;
+    color: #f4f1e8;
+}
+
+body.ember .pagination > li > a,
+body.ember .pagination > li > span {
+    background-color: #2a1e18;
+    border-color: #3d2e24;
+    color: #e8d8c8;
+}
+body.ember .pagination > li > a:hover {
+    background-color: #3d2e24;
+    border-color: #4a3a2a;
+    color: #f4f1e8;
+}
+
+body.ember .label-default { background-color: #5a4a3a; }
+body.ember .label-success { background-color: #3d7a3d; }
+body.ember .label-warning { background-color: #8a6d3b; }
+body.ember .label-danger { background-color: #a94442; }
+body.ember .label-info { background-color: #31708f; }
+
+body.ember hr { border-color: #3d2e24; }
+body.ember blockquote {
+    border-color: #3d2e24;
+    color: #b0a090;
+}
+
+body.ember #voice-indicator {
+    background: #2a1e18;
+    border-color: #3d2e24;
+    color: #b0a090;
+}
+
+body.ember .voice-help-content h5 { color: #e8d8c8; }
+body.ember .voice-help-note {
+    background: #3d2e24;
+    border-left-color: #e09040;
+}
+body.ember .voice-help-link { color: #e09040; }
+body.ember .voice-help-link:hover,
+body.ember .voice-help-link:focus { color: #f0b070; }
+
+body.ember .page-card {
+    background: #2a1e18;
+    border-color: #3d2e24;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+body.ember .app-footer {
+    background: #0f0a08;
+    border-top-color: #1a1210;
+    color: #8a7a6a;
+}
+body.ember .app-footer a { color: #b0a090; }
+body.ember .app-footer a:hover { color: #e8d8c8; }
+
+body.ember .action.random {
+    background: #3d2e24;
+    border-bottom-color: #e09040;
+}
+body.ember .action.random:hover { background: #4a3a2a; }
+body.ember .action.random.picked {
+    color: #e8d8c8;
+    background: transparent;
+    border-bottom: none;
+}
+
+/* ============================================================
+   Moss Theme coloring
+   ============================================================ */
+body.moss {
+    background: #141a14;
+    color: #d0e0c8;
+}
+body.moss,
+html:has(body.moss) {
+    background: #141a14;
+}
+
+body.moss #game-section {
+    background: #1e281e;
+    border-color: #2a382a;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+body.moss .section-number { color: #90b080; }
+body.moss #game-section p { color: #d0e0c8; }
+
+body.moss .choice {
+    background: #1e281e;
+    border-color: #2a382a;
+    border-left-color: #5a9a5a;
+}
+body.moss .choice:hover { box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+body.moss .choice-link:hover { background: #2a382a; }
+body.moss .choice-link:active { background: #1e281e; }
+body.moss .choice.disabled {
+    border-left-color: #4a5a4a;
+    background: #1e281e;
+    opacity: 0.5;
+}
+body.moss .choice.disabled .choice-link:hover,
+body.moss .choice.disabled .choice-link:active { background: transparent; }
+body.moss .choice:first-of-type::before {
+    background: linear-gradient(to right, transparent, #2a382a, transparent);
+}
+body.moss .choice-section-num { color: #90b080; background: #2a382a; }
+
+body.moss .available-card {
+    background: #243024;
+    border-color: #2a382a;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+body.moss .available-card:hover {
+    background: #2a382a;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+body.moss .available-card:active { background: #1e281e; }
+body.moss .available-card .available-name { color: #d0e0c8; }
+body.moss .available-card .available-desc { color: #a0b8a0; }
+body.moss .available-zoom { color: #809880; }
+body.moss .available-zoom:hover { color: #d0e0c8; }
+
+body.moss #game-copyrights-wrapper {
+    background: #1e281e;
+    border-top-color: #2a382a;
+    color: #809880;
+}
+
+body.moss .menu-card {
+    background: #1e281e;
+    border-color: #2a382a;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+body.moss .menu-header p { color: #90b080; }
+body.moss .menu-version { color: #809880; }
+body.moss .menu-warnings {
+    background: #1e281e;
+    border-color: #2a382a;
+    color: #809880;
+}
+body.moss .large-button {
+    background: #1e281e;
+    border-color: #2a382a;
+    border-left-color: #5a9a5a;
+    color: #d0e0c8;
+}
+body.moss .large-button:hover {
+    background: #2a382a;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+body.moss .large-button:active { background: #1e281e; }
+body.moss .menu-footer { color: #809880; }
+body.moss .equipment-op {
+    background: #2a382a;
+    border-left-color: #5cb85c;
+    color: #d0e0c8;
+}
+body.moss .equipment-op:hover { background: #344838; }
+body.moss .equipment-op.disabled { border-left-color: #4a5a4a; }
+
+body.moss .save-slot-card {
+    background: #1e281e;
+    border-color: #2a382a;
+}
+body.moss .save-slot-name { color: #d0e0c8; }
+body.moss .save-slot-book,
+body.moss .save-slot-meta,
+body.moss .save-slot-stats { color: #809880; }
+body.moss .menu-saveinfo { color: #809880; }
+body.moss .save-slot-card.action-card:hover { background: #2a382a; }
+
+body.moss .loadgame-table th {
+    background: #2a382a;
+    border-bottom-color: #2a382a;
+    color: #d0e0c8;
+}
+body.moss .loadgame-table td { border-top-color: #2a382a; }
+body.moss .loadgame-table .lg-date small { color: #809880; }
+body.moss .loadgame-table tr:hover td { background: #2a382a; }
+
+body.moss #game-sidebar {
+    background: #0a0f0a;
+    border-right-color: #141a14;
+}
+body.moss .sidebar-section { border-bottom-color: #141a14; }
+body.moss .sidebar-portrait {
+    border-color: #2a382a;
+    background: #141a14;
+}
+body.moss .sidebar-kai-name { color: #d0e0c8; }
+body.moss .sidebar-rank { color: #809880; }
+body.moss .sidebar-stat-label { color: #809880; }
+body.moss .sidebar-stat .progress { background: #141a14; }
+body.moss .sidebar-stat-value { color: #b0d0a8; }
+body.moss .sidebar-nav-item {
+    color: #a0b8a0;
+    border-bottom-color: #141a14;
+}
+body.moss .sidebar-nav-item:hover,
+body.moss .sidebar-nav-item:focus {
+    background: #141a14;
+    color: #e8f0e0;
+}
+body.moss .sidebar-nav-item.active {
+    background: #5a9a5a;
+    color: #141a14;
+    border-bottom-color: #5a9a5a;
+}
+body.moss .sidebar-nav-secondary { border-top-color: #141a14; }
+body.moss .sidebar-nav-voice { border-top-color: #141a14; }
+body.moss #sidebar-voiceMode.voice-active { color: #5cb85c; }
+body.moss .sidebar-voice-help { color: #78c078; }
+body.moss .sidebar-voice-help:hover,
+body.moss .sidebar-voice-help:focus {
+    background: rgba(120,192,120,0.15);
+    color: #a0e0a0;
+}
+
+body.moss .mechanics-combatUI {
+    background: #1e281e;
+    border-color: #2a382a;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+body.moss .mechanics-combat-status {
+    background-color: #2a382a;
+    border-color: #2a382a;
+}
+body.moss .fighter-stat { color: #a0b8a0; }
+body.moss .combat-divider {
+    border-left-color: #2a382a;
+    border-right-color: #2a382a;
+}
+body.moss .cr-box {
+    background: #2a382a;
+    border-color: #344838;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.1);
+}
+body.moss .cr-box .cr-label { color: #809880; }
+body.moss .cr-box .cr-value { color: #d0e0c8; }
+body.moss .cr-box .crlink:hover .cr-value { color: #78c078; }
+body.moss .mechanics-combatUI.combat-finished .fighter-name::after { color: #5cb85c; }
+body.moss .combat.well {
+    background-color: #2a382a;
+    border-color: #2a382a;
+    color: #d0e0c8;
+}
+
+body.moss #achart-combatSkills,
+body.moss #achart-endurance {
+    background: #2a382a;
+    border-color: #2a382a;
+    color: #d0e0c8;
+}
+body.moss #action-chart-view h3 { border-bottom-color: #2a382a; }
+
+body.moss .navbar-inverse {
+    background-color: #0a0f0a;
+    border-color: #141a14;
+}
+
+body.moss a { color: #78c078; }
+body.moss a:hover,
+body.moss a:focus { color: #a0e0a0; }
+body.moss a.disabled { color: #5a6a5a; }
+
+body.moss .well,
+body.moss .modal-content { background: #2a382a; }
+body.moss .panel {
+    background-color: #2a382a;
+    border-color: #2a382a;
+}
+body.moss .panel-default > .panel-heading {
+    background-color: #344838;
+    border-color: #2a382a;
+    color: #d0e0c8;
+}
+
+body.moss .btn img { filter: sepia(20%) hue-rotate(60deg) brightness(0.9); }
+body.moss .btn-default,
+body.moss .form-control[disabled],
+body.moss .form-control[readonly],
+body.moss fieldset[disabled],
+body.moss .form-control {
+    color: #d0e0c8;
+    background-color: #2a382a;
+    border-color: #4a5a4a;
+}
+body.moss .btn-primary {
+    background-color: #4a8a4a;
+    border-color: #3a7a3a;
+}
+body.moss .btn-primary:hover {
+    background-color: #5a9a5a;
+    border-color: #4a8a4a;
+}
+body.moss .btn-success {
+    background-color: #4a8a4a;
+    border-color: #3a7a3a;
+}
+body.moss .btn-success:hover {
+    background-color: #3a7a3a;
+    border-color: #2a6a2a;
+}
+body.moss .btn-warning {
+    background-color: #9a8a3a;
+    border-color: #8a7a2a;
+}
+body.moss .btn-warning:hover {
+    background-color: #8a7a2a;
+    border-color: #7a6a1a;
+}
+body.moss .btn-info {
+    background-color: #3a7a8a;
+    border-color: #2a6a7a;
+}
+body.moss .btn-info:hover {
+    background-color: #2a6a7a;
+    border-color: #1a5a6a;
+}
+body.moss .btn-danger {
+    background-color: #9a4a4a;
+    border-color: #8a3a3a;
+}
+body.moss .btn-danger:hover {
+    background-color: #8a3a3a;
+    border-color: #7a2a2a;
+}
+
+body.moss .list-table { border-color: #2a382a; }
+body.moss .list-table li {
+    color: #d0e0c8;
+    border-color: #2a382a;
+}
+body.moss .list-table > li:nth-of-type(odd),
+body.moss .table-striped>tbody>tr:nth-of-type(odd) {
+    background-color: #2a382a;
+}
+body.moss #template-containertable tbody tr:nth-child(odd) td:nth-child(odd),
+body.moss #template-containertable tbody tr:nth-child(even) td:nth-child(even) {
+    background-color: #141a14;
+}
+body.moss #template-containertable { border-color: #2a382a !important; }
+body.moss #wwbooks-list tr.success > td { background-color: #3a6a2a; }
+
+body.moss .alert-warning {
+    background-color: #3a3a1a;
+    border-color: #4a4a2a;
+    color: #e0d8a0;
+}
+body.moss .alert-success {
+    background-color: #1a3a1a;
+    border-color: #2a4a2a;
+    color: #a0e0a0;
+}
+body.moss .alert-info {
+    background-color: #1a2a3a;
+    border-color: #2a3a4a;
+    color: #a0c8e0;
+}
+body.moss .alert-danger {
+    background-color: #3a1a1a;
+    border-color: #4a2a2a;
+    color: #e0a0a0;
+}
+
+body.moss #toast-container > .toast {
+    background-color: #1e281e;
+    color: #d0e0c8;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+}
+
+body.moss .dropdown-menu {
+    background-color: #1e281e;
+    border-color: #2a382a;
+}
+body.moss .dropdown-menu > li > a { color: #d0e0c8; }
+body.moss .dropdown-menu > li > a:hover {
+    background-color: #2a382a;
+    color: #e8f0e0;
+}
+
+body.moss .pagination > li > a,
+body.moss .pagination > li > span {
+    background-color: #1e281e;
+    border-color: #2a382a;
+    color: #d0e0c8;
+}
+body.moss .pagination > li > a:hover {
+    background-color: #2a382a;
+    border-color: #344838;
+    color: #e8f0e0;
+}
+
+body.moss .label-default { background-color: #4a5a4a; }
+body.moss .label-success { background-color: #3d7a3d; }
+body.moss .label-warning { background-color: #8a7a3b; }
+body.moss .label-danger { background-color: #a94442; }
+body.moss .label-info { background-color: #31708f; }
+
+body.moss hr { border-color: #2a382a; }
+body.moss blockquote {
+    border-color: #2a382a;
+    color: #a0b8a0;
+}
+
+body.moss #voice-indicator {
+    background: #1e281e;
+    border-color: #2a382a;
+    color: #a0b8a0;
+}
+
+body.moss .voice-help-content h5 { color: #d0e0c8; }
+body.moss .voice-help-note {
+    background: #2a382a;
+    border-left-color: #5a9a5a;
+}
+body.moss .voice-help-link { color: #78c078; }
+body.moss .voice-help-link:hover,
+body.moss .voice-help-link:focus { color: #a0e0a0; }
+
+body.moss .page-card {
+    background: #1e281e;
+    border-color: #2a382a;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+body.moss .app-footer {
+    background: #0a0f0a;
+    border-top-color: #141a14;
+    color: #809880;
+}
+body.moss .app-footer a { color: #a0b8a0; }
+body.moss .app-footer a:hover { color: #d0e0c8; }
+
+body.moss .action.random {
+    background: #2a382a;
+    border-bottom-color: #5a9a5a;
+}
+body.moss .action.random:hover { background: #344838; }
+body.moss .action.random.picked {
+    color: #d0e0c8;
+    background: transparent;
+    border-bottom: none;
+}
+
+/* ============================================================
+   Theme Popup
+   ============================================================ */
+.footer-theme-toggle {
+    float: right;
+    cursor: pointer;
+    margin-left: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+.footer-theme-toggle:hover {
+    background: rgba(128,128,128,0.15);
+}
+.footer-theme-toggle > * {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+.footer-theme-toggle > *:last-child {
+    margin-right: 0;
+}
+
+.theme-current-swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(128,128,128,0.4);
+}
+.theme-current-swatch.light { background: #fff; }
+.theme-current-swatch.dark { background: #2a2a2a; }
+.theme-current-swatch.paper { background: #f4f1e8; }
+.theme-current-swatch.ember { background: #e09040; }
+.theme-current-swatch.moss { background: #5a9a5a; }
+
+.theme-current-name {
+    font-size: 0.9em;
+}
+
+.theme-arrow {
+    font-size: 0.7em;
+    opacity: 0.6;
+}
+
+.theme-popup {
+    position: fixed;
+    bottom: 48px;
+    right: 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    padding: 6px 0;
+    min-width: 140px;
+    z-index: 1060;
+}
+
+.theme-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #333;
+    transition: background 0.1s;
+}
+.theme-option:hover {
+    background: #f5f5f5;
+}
+
+.theme-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+    flex-shrink: 0;
+}
+.theme-swatch.light { background: #fff; }
+.theme-swatch.dark { background: #2a2a2a; }
+.theme-swatch.paper { background: #f4f1e8; }
+.theme-swatch.ember { background: #e09040; }
+.theme-swatch.moss { background: #5a9a5a; }
+
+/* Dark mode popup */
+body.dark .theme-popup {
+    background: #2a2a2a;
+    border-color: #444;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+body.dark .theme-option {
+    color: #ccc;
+}
+body.dark .theme-option:hover {
+    background: #333;
+}
+
+/* Paper mode popup */
+body.paper .theme-popup {
+    background: #f4f1e8;
+    border-color: #c4b9a8;
+    box-shadow: 0 2px 12px rgba(61,43,31,0.2);
+}
+body.paper .theme-option {
+    color: #3d2b1f;
+}
+body.paper .theme-option:hover {
+    background: #eae5d8;
+}
+
+/* Ember mode popup */
+body.ember .theme-popup {
+    background: #2a1e18;
+    border-color: #3d2e24;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+body.ember .theme-option {
+    color: #e8d8c8;
+}
+body.ember .theme-option:hover {
+    background: #3d2e24;
+}
+
+/* Moss mode popup */
+body.moss .theme-popup {
+    background: #1e281e;
+    border-color: #2a382a;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+body.moss .theme-option {
+    color: #d0e0c8;
+}
+body.moss .theme-option:hover {
+    background: #2a382a;
+}
+
 /* ── Font Family Overrides ── */
 body.font-sans,
 body.font-sans * {
