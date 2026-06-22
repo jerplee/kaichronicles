@@ -31,20 +31,37 @@ This repository does not contain game books data. Data must be downloaded from t
 
 ## Setup
 
-Download dependencies
+Download dependencies:
 ```bash
 npm install
 ```
 
-Download the Project Aon game data:
+This will require Node.js (any recent version).
+
+### Quick start (download books from the UI)
+
+Start the dev server:
+```bash
+npm run serve
+```
+
+Open your browser on http://localhost:3000, then click **Download Books** from the main menu. This opens a page where you can download individual books or the entire collection directly from [Project Aon](https://www.projectaon.org/en/xhtml/lw/). Books that are already present are shown with a **Redownload** option in case you need to replace corrupted files.
+
+> **Tip:** The download buttons work only while `npm run serve` is running, since the dev server handles the fetch requests. If the API is unavailable, the page will still show which books are already downloaded.
+
+### Alternative: download from the command line
+
+If you prefer, you can download all book data before starting the server:
 ```bash
 npm run downloaddata
 ```
 
-This will require Node.js (any recent version).
+Or download a specific book:
+```bash
+npm run downloaddata -- 1
+```
 
-### Setup web site
-
+Then start the server:
 ```bash
 npm run serve
 ```

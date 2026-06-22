@@ -473,7 +473,8 @@ body.dark .mechanics-combatUI.combat-finished .fighter-name::after {
 .large-button:active {
     background: #e0e0e0;
 }
-.large-button img {
+.large-button img,
+.large-button .action-icon {
     max-width: 32px;
     max-height: 32px;
     margin-right: 12px;
@@ -3430,5 +3431,207 @@ body.font-serif .glyphicon {
     color: #ccc;
     letter-spacing: 2px;
     text-transform: uppercase;
+}
+
+/* ── Download Books Page ── */
+.download-books-header {
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+.download-books-header h2 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+.download-books-subtitle {
+    text-align: center;
+    color: #888;
+    margin-bottom: 16px;
+}
+.download-books-subtitle a {
+    color: #337ab7;
+    text-decoration: underline;
+}
+.download-books-back {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.download-books-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.download-series-header {
+    width: 100%;
+    margin: 16px 0 8px;
+    padding-bottom: 4px;
+    border-bottom: 2px solid #ddd;
+    font-size: 1.2em;
+    color: #555;
+}
+
+.book-card {
+    flex: 1 1 200px;
+    max-width: 260px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: box-shadow 0.15s;
+}
+.book-card:hover {
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+.book-cover-wrap {
+    width: 100px;
+    height: 140px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 3px;
+    background: #f5f5f5;
+}
+.book-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.book-cover-placeholder {
+    font-size: 48px;
+    color: #bbb;
+}
+
+.book-info {
+    text-align: center;
+    margin-bottom: 10px;
+    width: 100%;
+}
+.book-number {
+    font-size: 0.85em;
+    color: #888;
+    margin-bottom: 2px;
+}
+.book-title {
+    font-weight: bold;
+    font-size: 0.95em;
+    color: #333;
+    margin-bottom: 6px;
+    line-height: 1.2;
+}
+.book-title a {
+    color: inherit;
+    text-decoration: none;
+}
+.book-title a:hover {
+    color: #337ab7;
+    text-decoration: underline;
+}
+.book-status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.book-missing .book-status-badge {
+    background: #f2dede;
+    color: #a94442;
+}
+.book-downloaded .book-status-badge {
+    background: #dff0d8;
+    color: #3c763d;
+}
+
+.book-actions {
+    margin-top: auto;
+}
+.book-download-btn .glyphicon {
+    margin-right: 4px;
+}
+
+/* Spin animation for loading indicators */
+.glyphicon-spin {
+    animation: spin 1s infinite linear;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Dark mode */
+body.dark .download-series-header {
+    border-bottom-color: #444;
+    color: #ccc;
+}
+body.dark .book-card {
+    background: #2a2a2a;
+    border-color: #444;
+}
+body.dark .book-cover-wrap {
+    background: #333;
+}
+body.dark .book-cover-placeholder {
+    color: #555;
+}
+body.dark .book-title {
+    color: #ddd;
+}
+body.dark .book-title a:hover {
+    color: #7db9e8;
+}
+body.dark .book-missing .book-status-badge {
+    background: #4a2222;
+    color: #e0a0a0;
+}
+body.dark .book-downloaded .book-status-badge {
+    background: #2a4a2a;
+    color: #a0d0a0;
+}
+body.dark .download-books-subtitle a {
+    color: #7db9e8;
+}
+
+/* Paper theme */
+body.paper .book-card {
+    background: #f4f1e8;
+    border-color: #c4b9a8;
+}
+body.paper .book-cover-wrap {
+    background: #eae5d8;
+}
+
+/* Ember theme */
+body.ember .book-card {
+    background: #2a1e18;
+    border-color: #3d2e24;
+}
+body.ember .book-cover-wrap {
+    background: #3d2e24;
+}
+body.ember .book-title {
+    color: #e8d8c8;
+}
+
+/* Moss theme */
+body.moss .book-card {
+    background: #1e281e;
+    border-color: #2a382a;
+}
+body.moss .book-cover-wrap {
+    background: #2a382a;
+}
+body.moss .book-title {
+    color: #d0e0c8;
 }
 

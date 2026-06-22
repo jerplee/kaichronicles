@@ -17,6 +17,7 @@ export * from "./common";
 export * from "./pwa";
 
 export * from "./controller/mainMenuController";
+export * from "./controller/downloadBooksController";
 export * from "./controller/privacyController";
 export * from "./controller/testsController";
 export * from "./controller/gameController";
@@ -77,6 +78,7 @@ export * from "./views/viewsUtils/objectsTableItem";
 export * from "./views/mapView";
 export * from "./views/loadGameView";
 export * from "./views/mainMenuView";
+export * from "./views/downloadBooksView";
 
 export * from "./model/projectAon";
 export * from "./model/disciplines";
