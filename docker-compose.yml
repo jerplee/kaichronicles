@@ -1,0 +1,6 @@
+services:
+  kai:
+    build: .
+    ports:
+      - "8094:8094"
+    container_name: kaichronicles

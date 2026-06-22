@@ -1,0 +1,14 @@
+node_modules
+dist
+.git
+.github
+ctrf
+*.log
+tests_log.txt
+test-results.json
+.env
+.DS_Store
+.vscode
+.idea
+coverage
+.planning

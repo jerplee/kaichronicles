@@ -1,14 +1,33 @@
 # Docker
 
-Running Kai Chronicles inside a Docker cointainer configures and runs a local website for playing the game. If you intend to develop the game and are not familiar with Docker, then this method is not recommended.
- * Download and install [Docker](https://docs.docker.com/install/) and make sure it's is in your PATH environment variable
- * Using a terminal (Linux or iOS) or PowerShell (Windows 10) navigate to the project's directory
- * Type `docker build -t kai:1.18 .` (including the `.`)
+Running Kai Chronicles inside a Docker container configures and runs a local website for playing the game. If you intend to develop the game and are not familiar with Docker, then this method is not recommended.
+
+## Quick Start (Docker Compose)
+
+The easiest way to run the game:
+
+```bash
+docker compose up
+```
+
+Then open http://localhost:8094.
+
+To stop: `Ctrl+C` or `docker compose down`.
+
+## Manual Build & Run
+
+ * Download and install [Docker](https://docs.docker.com/install/) and make sure it is in your PATH environment variable
+ * Using a terminal (Linux, macOS) or PowerShell (Windows) navigate to the project's directory
+ * Build the image:
+     ```bash
+     docker build -t kai:1.2 .
+     ```
      * The build command only needs to be run once.
-     * It takes awhile.
- * Type `docker run -p 8080:8080 kai:1.18` 
-     * If you want to access the site via a different port, change the *first* 8080 e.g. `docker run -p 5000:8080 kai:1.18`
-     * If you want to run the website independently of your terminal window (i.e. as a daemon), add a `-d` flag e.g. `docker run -d -p 8080:8080 kai:1.18`
-     * If you try this command and you get some kind of 'conflicting port' error, then try a different port per instructions above.
- * Open http://localhost:8080
-     * The server's ready message has incorrect URLs. Use the URL above, swapping in the correct port if you changed it.
+     * It takes a while.
+ * Run the container:
+     ```bash
+     docker run -p 8094:8094 kai:1.2
+     ```
+     * To run in the background, add `-d`: `docker run -d -p 8094:8094 kai:1.2`
+     * If port 8094 is already in use, change the *first* number to map a different host port, e.g. `docker run -p 5000:8094 kai:1.2`
+ * Open http://localhost:8094

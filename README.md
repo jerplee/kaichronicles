@@ -72,11 +72,17 @@ Optional method for running a local website only to play the game
 
 > **Note:** The Docker setup has not been tested after recent UI and build-system updates. It may still work, but no guarantees are provided.
 
- * Download and install [Docker](https://docs.docker.com/install/) and make sure it's is in your PATH environment variable
- * Using a terminal (Linux or iOS) or PowerShell (Windows 10) navigate to the project's directory
+**Easy way (Docker Compose):**
+```bash
+docker compose up
+```
+
+**Manual way:**
+ * Download and install [Docker](https://docs.docker.com/install/) and make sure it is in your PATH environment variable
+ * Using a terminal (Linux, macOS) or PowerShell (Windows) navigate to the project's directory
  * Type `docker build -t kai:1.2 .`
- * Type `docker run -p 8080:8080 kai:1.2`
- * Open http://localhost:8080
+ * Type `docker run -p 8094:8094 kai:1.2`
+ * Open http://localhost:8094
 
 More information about this method [here](./doc/README-docker.md)
 
