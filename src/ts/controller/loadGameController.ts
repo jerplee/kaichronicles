@@ -35,7 +35,18 @@ export class loadGameController {
             }
             return saveGameDb.getAllSlots();
         }).then((slots) => {
-            loadGameView.renderSlots(slots);
+            let currentKaiName = state.actionChart?.kaiName;
+            if (!currentKaiName && state.activeSlotKey) {
+                // Fallback: look up the active slot to get player name (handles page refresh)
+                const activeSlot = slots.find((s) => s.slotKey === state.activeSlotKey && !s.isAutoSave);
+                if (activeSlot) {
+                    currentKaiName = activeSlot.kaiName;
+                }
+            }
+            if (currentKaiName) {
+                slots = slots.filter((s) => s.kaiName === currentKaiName);
+            }
+            loadGameView.renderSlots(slots, currentKaiName);
         }).catch((e) => {
             mechanicsEngine.debugWarning("Failed to load save slots: " + e);
         });

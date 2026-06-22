@@ -31,13 +31,42 @@ export class EquipmentSectionMechanics {
             return;
         }
 
-        // Get the the number of picked objects
-        const pickedObjects = EquipmentSectionMechanics.getPickedObjects( originalObjects );
+        // Count total picked items across all object types (not just distinct types)
+        const totalPicked = EquipmentSectionMechanics.getTotalPickedCount( originalObjects );
 
-        if ( pickedObjects.length >= nPickableObjects && !pickedObjects.includes(pickedObjectId) ) {
+        if ( totalPicked >= nPickableObjects ) {
             // D'oh!
             throw translations.text( "maximumPick" , [nPickableObjects] );
         }
+    }
+
+    /**
+     * Get the total number of picked objects on the current section.
+     * @param originalObjects Original objects on the section. Key is object id, value is count.
+     * @returns Total number of original objects that are no longer in the section state
+     */
+    private static getTotalPickedCount(originalObjects: { [objectId: string ]: number } ): number {
+        const sectionStateObjects = state.sectionStates.getSectionState().objects;
+        const currentObjects: { [objectId: string]: number } = {};
+        for (const object of sectionStateObjects) {
+            const objectId = object.id;
+            if (!currentObjects[objectId]) {
+                currentObjects[objectId] = 1;
+            } else {
+                currentObjects[objectId] += 1;
+            }
+        }
+
+        let total = 0;
+        for (const objectId in originalObjects) {
+            if (!Object.prototype.hasOwnProperty.call(originalObjects, objectId)) {
+                continue;
+            }
+            const nOriginal = originalObjects[objectId];
+            const nCurrent = currentObjects[objectId] || 0;
+            total += Math.max(0, nOriginal - nCurrent);
+        }
+        return total;
     }
 
     /**

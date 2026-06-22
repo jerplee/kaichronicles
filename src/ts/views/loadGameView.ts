@@ -27,8 +27,17 @@ export const loadGameView = {
     /**
      * Render save slots as a compact list in the load game view.
      * Only shows auto-saves for the currently active slot.
+     * @param slots Save slots to display
+     * @param playerName If provided, updates the header to "Load Game: [PlayerName]"
      */
-    renderSlots(slots: SaveSlotRecord[]) {
+    renderSlots(slots: SaveSlotRecord[], playerName?: string) {
+        const $heading = $("#loadGame-heading");
+        if (playerName && $heading.length) {
+            $heading.text("Load Game: " + playerName);
+        } else if ($heading.length) {
+            $heading.text("Load Game");
+        }
+
         const $grid = $("#loadGame-slotsGrid");
         $grid.empty();
 

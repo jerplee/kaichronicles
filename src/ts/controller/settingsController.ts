@@ -107,6 +107,7 @@ export const settingsController = {
 
     /**
      * Refresh the save slots grid from IndexedDB.
+     * Filters by current player's kaiName when a game is active.
      */
     refreshSlots() {
         if ($("#menu-saveSlotsGrid").length) {
@@ -119,6 +120,16 @@ export const settingsController = {
             return;
         }
         saveGameDb.getAllSlots().then((slots) => {
+            let currentKaiName = state.actionChart?.kaiName;
+            if (!currentKaiName && state.activeSlotKey) {
+                const activeSlot = slots.find((s) => s.slotKey === state.activeSlotKey && !s.isAutoSave);
+                if (activeSlot) {
+                    currentKaiName = activeSlot.kaiName;
+                }
+            }
+            if (currentKaiName) {
+                slots = slots.filter((s) => s.kaiName === currentKaiName);
+            }
             saveSlotsView.renderSlots(slots);
         }).catch((e) => {
             mechanicsEngine.debugWarning("Failed to load save slots: " + e);
