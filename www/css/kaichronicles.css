@@ -1109,24 +1109,17 @@ a.equipment-op {
     pointer-events: none;
 }
 
-/* --- Book copyright footer (fixed bottom, full-width) --- */
-#game-copyrights-wrapper {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+/* ── Sidebar book title ── */
+.sidebar-book-title {
+    padding: 10px 15px 0;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #555;
     text-align: center;
-    font-size: 0.85em;
-    font-style: italic;
-    color: #777;
-    padding: 12px 15px;
-    border-top: 1px solid #ddd;
-    background: #f8f8f8;
+    line-height: 1.3;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    z-index: 10;
-    pointer-events: none;
 }
 
 /* --- Dark Mode for all new styles --- */
@@ -1192,10 +1185,8 @@ body.dark .available-zoom {
 body.dark .available-zoom:hover {
     color: #333;
 }
-body.dark #game-copyrights-wrapper {
-    background: #2a2a2a;
-    border-top-color: #444;
-    color: #999;
+body.dark .sidebar-book-title {
+    color: #ccc;
 }
 body.dark .menu-card {
     background: #2a2a2a;
@@ -1675,29 +1666,15 @@ body.sidebar-visible #content {
     }
 }
 
-/* ── Book title banner (moved from navbar) ── */
-.book-title-banner {
-    font-size: 1.4em;
-    font-weight: bold;
-    text-align: center;
-    margin: 15px 0 5px;
-    color: #555;
-    letter-spacing: 0.5px;
-}
-
-body.dark .book-title-banner {
-    color: #ccc;
-}
-
-body.paper .book-title-banner {
+body.paper .sidebar-book-title {
     color: #5a4a3a;
 }
 
-body.ember .book-title-banner {
+body.ember .sidebar-book-title {
     color: #b09070;
 }
 
-body.moss .book-title-banner {
+body.moss .sidebar-book-title {
     color: #90b080;
 }
 
@@ -2035,12 +2012,6 @@ body.paper .available-zoom:hover {
     color: #3d2b1f;
 }
 
-/* Paper: copyright wrapper */
-body.paper #game-copyrights-wrapper {
-    background: #f4f1e8;
-    border-top-color: #c4b9a8;
-    color: #8a7a6a;
-}
 
 /* Paper: menu cards */
 body.paper .menu-card {
@@ -2564,11 +2535,6 @@ body.ember .available-card .available-desc { color: #b0a090; }
 body.ember .available-zoom { color: #8a7a6a; }
 body.ember .available-zoom:hover { color: #e8d8c8; }
 
-body.ember #game-copyrights-wrapper {
-    background: #2a1e18;
-    border-top-color: #3d2e24;
-    color: #8a7a6a;
-}
 
 body.ember .menu-card {
     background: #2a1e18;
@@ -2936,11 +2902,6 @@ body.moss .available-card .available-desc { color: #a0b8a0; }
 body.moss .available-zoom { color: #809880; }
 body.moss .available-zoom:hover { color: #d0e0c8; }
 
-body.moss #game-copyrights-wrapper {
-    background: #1e281e;
-    border-top-color: #2a382a;
-    color: #809880;
-}
 
 body.moss .menu-card {
     background: #1e281e;

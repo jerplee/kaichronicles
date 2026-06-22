@@ -146,6 +146,10 @@ export class ExpressionEvaluator {
             return state.actionChart.getMaxEndurance();
         },
 
+        "[CURRENTCOMBATSKILL]"() {
+            return state.actionChart.getCurrentCombatSkill();
+        },
+
         "[ORIGINALCOMBATSKILL]"() {
             return state.actionChart.combatSkill;
         },

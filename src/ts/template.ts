@@ -15,7 +15,7 @@ export const template = {
      */
     setNavTitle(title: string, url: string, showTitleOnSmallDevs: boolean ) {
         document.title = title;
-        const $bookTitle = $("#game-book-title");
+        const $bookTitle = $("#sidebar-book-title");
         if ($bookTitle.length > 0) {
             $bookTitle.text(title);
         }
@@ -291,7 +291,7 @@ export const template = {
 
         const cs = state.actionChart.getCurrentCombatSkill();
         const currentEp = state.actionChart.currentEndurance;
-        const maxEp = state.actionChart.endurance;
+        const maxEp = state.actionChart.getMaxEndurance();
 
         // Combat bar (assume max ~30 for percentage)
         const csPercent = Math.min(100, Math.max(0, (cs / 30) * 100));
@@ -592,7 +592,6 @@ export const template = {
      *  Needed for testing with selenium (the fixed footer blocks clicks on bottom elements)
      */
     hideCopyrightsForTests() {
-        $("#game-copyrights-wrapper").hide();
         $("#sidebar-copyright").hide();
         // Prevent body.sidebar-visible CSS from re-showing the footer
         if ($("#test-hide-footer").length === 0) {

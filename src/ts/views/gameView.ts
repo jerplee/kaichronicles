@@ -72,11 +72,6 @@ export const gameView = {
             gameController.onNavigatePrevNext(+1);
         });
 
-        // Show book title banner and copyright
-        $("#game-book-title").text(state.book.getBookTitle());
-        const copyrightHtml = state.book.getCopyrightHtml().replace(/<br\s*\/?>/gi, "  -  ");
-        $("#game-copyrights").html(DOMPurify.sanitize(copyrightHtml));
-
         // Update voice indicator visibility (feature-gated)
         if (VOICE_FEATURE_ENABLED) {
             voiceManager.updateSidebarIcon();

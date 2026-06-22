@@ -198,9 +198,15 @@ export class Combat {
      * @return The current combat skill
      */
     public getCurrentCombatSkill(): number {
-        let cs = state.actionChart.combatSkill;
-        for (const bonus of this.getCSBonuses().filter((b) => !b.enemy)) {
-            cs += bonus.increment;
+        let cs = state.actionChart.getCurrentCombatSkill(this);
+        if (this.combatModifier) {
+            cs += this.combatModifier;
+        }
+        if (!this.mentalOnly && this.objectsUsageModifier) {
+            cs += this.objectsUsageModifier;
+        }
+        if (this.mindforceCS < 0 && !state.actionChart.hasMindShield()) {
+            cs += this.mindforceCS;
         }
         return cs;
     }
@@ -211,8 +217,11 @@ export class Combat {
      */
     public getCurrentEnemyCombatSkill(): number {
         let cs = this.combatSkill;
-        for (const bonus of this.getCSBonuses().filter((b) => b.enemy)) {
+        for (const bonus of state.actionChart.getCurrentCombatSkillBonuses(this).filter((b) => b.enemy)) {
             cs += bonus.increment;
+        }
+        if (this.enemyCombatModifier) {
+            cs += this.enemyCombatModifier;
         }
         return cs;
     }

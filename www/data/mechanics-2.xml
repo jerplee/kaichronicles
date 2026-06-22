@@ -513,7 +513,7 @@
             </afterElude>
         </section>
 
-        <section id="sect91">
+        <section id="sect91" pickMaximum="2">
             <object objectId="quarterstaff" />
             <object objectId="blanket" />
             <object objectId="meal" index="0" />

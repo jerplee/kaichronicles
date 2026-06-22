@@ -59,6 +59,7 @@ describe("Combat player name XSS prevention", () => {
             hasMgnDiscipline: () => false,
             hasGndDiscipline: () => false,
             hasNewOrderDiscipline: () => false,
+            getCurrentCombatSkill: () => 15,
             getCurrentCombatSkillBonuses: () => [],
         };
 
