@@ -20,16 +20,16 @@ To stop: `Ctrl+C` or `docker compose down`.
  * Using a terminal (Linux, macOS) or PowerShell (Windows) navigate to the project's directory
  * Build the image:
      ```bash
-     docker build -t kai:1.2 .
+     docker build -t kai:1.22 .
      ```
      * The build command only needs to be run once.
      * It takes a while.
  * Run the container:
      ```bash
-     docker run -p 8094:8094 kai:1.2
+     docker run -p 8094:8094 kai:1.22
      ```
-     * To run in the background, add `-d`: `docker run -d -p 8094:8094 kai:1.2`
-     * If port 8094 is already in use, change the *first* number to map a different host port, e.g. `docker run -p 5000:8094 kai:1.2`
+     * To run in the background, add `-d`: `docker run -d -p 8094:8094 kai:1.22`
+     * If port 8094 is already in use, change the *first* number to map a different host port, e.g. `docker run -p 5000:8094 kai:1.22`
  * Open http://localhost:8094
 
 ## Updating to a Newer Version
@@ -43,6 +43,6 @@ docker compose up --build
 **Manual Docker:**
 ```bash
 docker stop kaichronicles
-docker build -t kai:1.2 .
-docker run -p 8094:8094 kai:1.2
+docker build -t kai:1.22 .
+docker run -p 8094:8094 kai:1.22
 ```
