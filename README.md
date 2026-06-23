@@ -86,6 +86,19 @@ docker compose up
 
 More information about this method [here](./doc/README-docker.md)
 
+### Updating the Game
+
+If you cloned the repository with `git` and want to pull the latest changes:
+
+```bash
+git pull
+npm install
+npm run downloaddata
+npm run dist
+```
+
+Then start the server again with `npm run serve` or your Docker command.
+
 ### Save System
 
 The game uses **IndexedDB** for local save storage. Up to three fixed save slots are available on the main menu. Each slot can be:

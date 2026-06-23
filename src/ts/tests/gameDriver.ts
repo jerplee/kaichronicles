@@ -293,6 +293,34 @@ export class GameDriver {
         await this.cleanClickAndWait( await this.getElementByCss(CombatMechanics.PLAY_TURN_BTN_SELECTOR) );
     }
 
+    public async getCombatUIByIndex(index: number): Promise<WebElement> {
+        return await this.getElementByCss(`.mechanics-combatUI[data-combatIdx="${index}"]`);
+    }
+
+    public async clickPlayCombatTurnByIndex(index: number) {
+        const combatUI = await this.getCombatUIByIndex(index);
+        const btn = await combatUI.findElement(By.css(CombatMechanics.PLAY_TURN_BTN_SELECTOR));
+        await this.cleanClickAndWait(btn);
+    }
+
+    public async isCombatQueued(index: number): Promise<boolean> {
+        const combatUI = await this.getCombatUIByIndex(index);
+        if (!combatUI) {
+            return false;
+        }
+        const cls = await combatUI.getAttribute("class");
+        return cls.includes("combat-queued");
+    }
+
+    public async isCombatFinished(index: number): Promise<boolean> {
+        const combatUI = await this.getCombatUIByIndex(index);
+        if (!combatUI) {
+            return false;
+        }
+        const cls = await combatUI.getAttribute("class");
+        return cls.includes("combat-finished");
+    }
+
     public async getCombatRatio(): Promise<number> {
         return parseInt( await this.getTextByCss(CombatMechanics.COMBAT_RATIO_SELECTOR) , 10);
     }

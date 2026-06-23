@@ -313,16 +313,10 @@ export class State {
 
         // Save active slot immediately (not debounced)
         if (saveGameDb.isAvailable() && this.activeSlotKey) {
-            console.log("[DEBUG] persistState saving to activeSlotKey:", this.activeSlotKey);
             const slotRecord = this.buildSlotSaveRecord();
-            saveGameDb.saveToSlot(this.activeSlotKey, slotRecord).then((id) => {
-                console.log("[DEBUG] Slot saved successfully, id:", id);
-            }).catch((e) => {
+            saveGameDb.saveToSlot(this.activeSlotKey, slotRecord).catch((e) => {
                 mechanicsEngine.debugWarning("IndexedDB slot save failed: " + e);
-                console.log("[DEBUG] Slot save failed:", e);
             });
-        } else {
-            console.log("[DEBUG] persistState skipping slot save. available:", saveGameDb.isAvailable(), "activeSlotKey:", this.activeSlotKey);
         }
 
         // Also schedule auto-save (debounced)

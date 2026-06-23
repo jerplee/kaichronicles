@@ -366,6 +366,20 @@ body.dark .mechanics-combatUI.combat-finished .fighter-name::after {
     display: none !important;
 }
 
+/* Queued combat (waiting for previous combat to finish) */
+.mechanics-combatUI.combat-queued {
+    opacity: 0.55;
+    border: 2px dashed #999;
+}
+.mechanics-combatUI.combat-queued::before {
+    content: "Queued — finish the current combat first";
+    display: block;
+    text-align: center;
+    font-style: italic;
+    color: #777;
+    margin-bottom: 8px;
+}
+
 /* Combat buttons */
 .mechanics-playTurn {
     margin-top: 10px;

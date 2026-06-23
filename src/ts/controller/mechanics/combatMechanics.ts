@@ -52,6 +52,16 @@ export class CombatMechanics {
 
         $template.attr("id", null);
 
+        // Determine the first active (unfinished) combat index
+        let firstActiveIdx = -1;
+        for (let i = 0; i < sectionState.combats.length; i++) {
+            const c = sectionState.combats[i];
+            if (!c.isFinished() && !sectionState.combatEluded && !c.disabled) {
+                firstActiveIdx = i;
+                break;
+            }
+        }
+
         // Populate combats
         $.each(sectionState.combats, (index: number, combat: Combat) => {
             const $combatUI = $template.clone();
@@ -102,6 +112,11 @@ export class CombatMechanics {
                 $combatUI.find(".mechanics-playerName").text( state.actionChart.kaiName );
             }
 
+            // Update originalPlayerEndurance for combats that haven't started yet
+            if (combat.turns.length === 0 && !combat.isFinished() && !combat.disabled) {
+                combat.originalPlayerEndurance = state.actionChart.currentEndurance;
+            }
+
             // Set enemy name on table and status panel
             $combatUI.find(".mechanics-enemyName").html( DOMPurify.sanitize(combat.enemy) );
             // Set combat ratio:
@@ -132,11 +147,18 @@ export class CombatMechanics {
                 $combatUI.find(CombatMechanics.AUDIT_BTN_SELECTOR).show();
                 // Mark as finished for styling
                 $combatUI.addClass("combat-finished");
+                $combatUI.removeClass("combat-queued");
+            } else if (index !== firstActiveIdx) {
+                // Queued combat - waiting for previous combat to finish
+                CombatMechanics.hideCombatButtons( $combatUI );
+                $combatUI.find(CombatMechanics.AUDIT_BTN_SELECTOR).hide();
+                $combatUI.addClass("combat-queued");
             } else {
-                // Check if the combat can be eluded
+                // First active combat
                 CombatMechanics.showHideEludeButton( combat , $combatUI );
                 // Hide audit button while combat is active
                 $combatUI.find(CombatMechanics.AUDIT_BTN_SELECTOR).hide();
+                $combatUI.removeClass("combat-queued");
             }
 
             // Setup XXX-Surge checkbox
@@ -300,6 +322,11 @@ export class CombatMechanics {
         const sectionState = state.sectionStates.getSectionState();
         const combat = sectionState.combats[ combatIndex ];
 
+        // Ensure originalPlayerEndurance reflects current endurance for the first turn
+        if (combat.turns.length === 0) {
+            combat.originalPlayerEndurance = state.actionChart.currentEndurance;
+        }
+
         combat.checkKaiBlast().then(() => combat.nextTurnAsync(elude))
         .then((turn) => {
 
@@ -337,6 +364,25 @@ export class CombatMechanics {
 
                 // Hide button to run more turns
                 CombatMechanics.hideCombatButtons( $combatUI );
+
+                // Enable the next active combat, if any
+                if (!elude) {
+                    for (let i = combatIndex + 1; i < sectionState.combats.length; i++) {
+                        const nextCombat = sectionState.combats[i];
+                        if (!nextCombat.isFinished() && !sectionState.combatEluded && !nextCombat.disabled) {
+                            const $nextUI = $(`.mechanics-combatUI[data-combatIdx="${i}"]`).first();
+                            if ($nextUI.length > 0) {
+                                CombatMechanics.showCombatButtons($nextUI);
+                                $nextUI.removeClass("combat-queued");
+                                // Update fighter status panel with current endurance
+                                CombatMechanics.updateFighterStatusPanel($nextUI, nextCombat, true);
+                                // Update combat ratio in case modifiers changed
+                                CombatMechanics.updateCombatRatio($nextUI, nextCombat);
+                            }
+                            break;
+                        }
+                    }
+                }
 
                 // Show audit button for completed combats
                 $combatUI.find(CombatMechanics.AUDIT_BTN_SELECTOR).show();

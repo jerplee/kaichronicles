@@ -92,6 +92,7 @@ export const mainMenuView = {
             "</div>" +
             '<div class="save-slot-actions">' +
             '<button class="btn btn-xs btn-primary slot-continue">Continue</button>' +
+            '<button class="btn btn-xs btn-success slot-new">New</button>' +
             '<button class="btn btn-xs btn-default slot-upload">Upload</button>' +
             '<button class="btn btn-xs btn-default slot-rename">Rename</button>' +
             '<button class="btn btn-xs btn-danger slot-delete">Delete</button>' +
@@ -112,6 +113,7 @@ export const mainMenuView = {
             "</div>" +
             '<div class="save-slot-actions">' +
             '<button class="btn btn-sm btn-success slot-newGame">New Game</button>' +
+            '<button class="btn btn-sm btn-default slot-import">Import Save</button>' +
             "</div>" +
             "</div>";
     },
@@ -120,7 +122,15 @@ export const mainMenuView = {
      * Bind events for filled slot cards.
      */
     bindFilledEvents() {
-        $("#menu-saveSlotsGrid").off("click").on("click", ".slot-continue", function(e) {
+        $("#menu-saveSlotsGrid").off("click").on("click", ".slot-new", function(e) {
+            e.preventDefault();
+            const slotNum = $(this).closest(".save-slot-card").data("slot-key").replace("slot-", "");
+            $("#menu-newGameSlot").val(slotNum);
+            $("#menu-newGameName").val("");
+            $("#menu-newGameModal").modal("show");
+        });
+
+        $("#menu-saveSlotsGrid").on("click", ".slot-continue", function(e) {
             e.preventDefault();
             const id = $(this).closest(".save-slot-card").data("id");
             loadGameController.loadSlot(id);
@@ -166,6 +176,12 @@ export const mainMenuView = {
      * Bind events for empty slot cards.
      */
     bindEmptyEvents() {
+        $("#menu-saveSlotsGrid").on("click", ".slot-import", function(e) {
+            e.preventDefault();
+            const slotNum = $(this).closest(".save-slot-card").data("slot-num");
+            $("#menu-upload-slot" + slotNum).trigger("click");
+        });
+
         $("#menu-saveSlotsGrid").on("click", ".slot-newGame", function(e) {
             e.preventDefault();
             const slotNum = $(this).closest(".save-slot-card").data("slot-num");

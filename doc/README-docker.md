@@ -31,3 +31,18 @@ To stop: `Ctrl+C` or `docker compose down`.
      * To run in the background, add `-d`: `docker run -d -p 8094:8094 kai:1.2`
      * If port 8094 is already in use, change the *first* number to map a different host port, e.g. `docker run -p 5000:8094 kai:1.2`
  * Open http://localhost:8094
+
+## Updating to a Newer Version
+
+**Docker Compose:**
+```bash
+docker compose down
+docker compose up --build
+```
+
+**Manual Docker:**
+```bash
+docker stop kaichronicles
+docker build -t kai:1.2 .
+docker run -p 8094:8094 kai:1.2
+```

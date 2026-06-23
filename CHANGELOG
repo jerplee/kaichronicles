@@ -149,3 +149,9 @@
 1.18 (*Thanks to lonevvolf for the books*)
  - Book 26 to 27 available.
  - Add manual selection of Kai Weapon
+
+1.19
+ - Combats with multiple enemies on the same section now run sequentially: only one combat is active at a time, and player endurance carries over to the next enemy after each fight
+ - Settings page: added Load Game button for quick access to save slots and file import
+ - Main menu save cards: added New and Import Save options on each slot
+ - Fixed Docker setup to use port 8094 by default, added docker-compose support

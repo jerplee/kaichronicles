@@ -24,19 +24,15 @@ export const mainMenuController = {
      * Load the 3 fixed slots and render them.
      */
     refreshSlots() {
-        console.log("[DEBUG] refreshSlots called");
         if (saveGameDb.isAvailable()) {
             Promise.all(
-                SLOT_KEYS.map((key) => saveGameDb.getSlotByKey(key).catch((e) => { console.log("[DEBUG] " + key + " error:", e); return undefined; }))
+                SLOT_KEYS.map((key) => saveGameDb.getSlotByKey(key).catch(() => undefined))
             ).then((slots) => {
-                console.log("[DEBUG] refreshSlots loaded:", slots.map((s) => s ? s.name : "empty"));
                 mainMenuView.renderSlots(slots);
-            }).catch((e) => {
-                console.log("[DEBUG] refreshSlots error:", e);
+            }).catch(() => {
                 mainMenuView.renderSlots([undefined, undefined, undefined]);
             });
         } else {
-            console.log("[DEBUG] IndexedDB not available");
             mainMenuView.renderSlots([undefined, undefined, undefined]);
         }
     },
@@ -59,7 +55,6 @@ export const mainMenuController = {
 
             // Set the target slot for auto-save
             state.activeSlotKey = "slot-" + slotNum;
-            console.log("[DEBUG] Starting new game in slot:", state.activeSlotKey);
 
             // Start new game with the chosen name and book
             state.reset(true);

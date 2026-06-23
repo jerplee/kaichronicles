@@ -114,6 +114,12 @@ export const settingsView = {
             routing.redirect("newGame");
         });
 
+        // Load game
+        $("#settings-load").on("click", (e) => {
+            e.preventDefault();
+            routing.redirect("loadGame");
+        });
+
         // Game rules
         $("#settings-gamerules").on("click", () => {
             routing.redirect("gameRules");

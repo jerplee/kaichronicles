@@ -175,10 +175,7 @@ export const gameController = {
      * On leave controller
      */
     onLeave() {
-        console.log("[DEBUG] gameController.onLeave called");
-
         if (!state || !state.actionChart) {
-            console.log("[DEBUG] onLeave early return: no state/actionChart");
             return;
         }
 
@@ -188,7 +185,6 @@ export const gameController = {
             state.actionChart.yScrollPosition = window.scrollY;
         }
 
-        console.log("[DEBUG] onLeave calling persistState. activeSlotKey:", state.activeSlotKey);
         state.persistState();
     }
 
