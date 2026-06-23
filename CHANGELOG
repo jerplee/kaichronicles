@@ -150,7 +150,7 @@
  - Book 26 to 27 available.
  - Add manual selection of Kai Weapon
 
-1.19
+1.22
  - Combats with multiple enemies on the same section now run sequentially: only one combat is active at a time, and player endurance carries over to the next enemy after each fight
  - Settings page: added Load Game button for quick access to save slots and file import
  - Main menu save cards: added New and Import Save options on each slot
