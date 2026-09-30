@@ -4,6 +4,10 @@
 
 This fork builds on the work of [cracrayol](https://github.com/cracrayol/kaichronicles), who continued the [original Kai Chronicles](https://github.com/tonib/kaichronicles) by tonib after development ended in 2021.
 
+### Updates Notes - Sept 2026
+
+It appears the gamebook data has been removed from Project AON's website. If you want access to the data, it appears you'll have to request access directly from the moderators. 
+
 ### Update Notes — June 2026
 
 I played "Masters of Darkness" as a kid but could never afford the rest of the series. Stumbling on Project Aon was a gift to my childhood self — I'm grateful to Joe Dever, the original artists, and the community that kept Lone Wolf alive.
